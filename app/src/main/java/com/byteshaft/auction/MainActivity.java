@@ -12,32 +12,58 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import com.byteshaft.auction.fragments.buyer.Buyer;
 import com.byteshaft.auction.fragments.seller.Seller;
+import com.byteshaft.auction.utils.Helpers;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+
+    private boolean isUserRoleAvailble = false;
+    private Button buyerButton;
+    private Button sellerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
-        tx.replace(R.id.container, new Seller());
-        tx.commit();
-
+        if (!Helpers.getUserRole().equals("")) {
+            if (Helpers.getUserRole().equals("Buyer")) {
+                loadFragment(new Buyer());
+                isUserRoleAvailble = true;
+            } else if (Helpers.getUserRole().equals("Seller")) {
+                loadFragment(new Seller());
+                isUserRoleAvailble = true;
+            }
+        }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        buyerButton = (Button) findViewById(R.id.buyer_button);
+        sellerButton = (Button) findViewById(R.id.seller_button);
+        if (isUserRoleAvailble) {
+            buyerButton.setVisibility(View.INVISIBLE);
+            sellerButton.setVisibility(View.INVISIBLE);
+            buyerButton.setEnabled(false);
+            sellerButton.setEnabled(false);
+        }
+        buyerButton.setOnClickListener(this);
+        sellerButton.setOnClickListener(this);
+    }
+
+    public void loadFragment(Fragment fragment) {
+        FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
+        tx.replace(R.id.container, fragment);
+        tx.commit();
     }
 
     @Override
@@ -71,14 +97,14 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public void selectDrawerItem(MenuItem menuItem, DrawerLayout drawerLayout) {
+    public void selectDrawerItem(MenuItem menuItem) {
         Fragment fragment = null;
         Class fragmentClass;
         switch (menuItem.getItemId()) {
-            case R.id.nav_map:
+            case R.id.buyer:
                 fragmentClass = Buyer.class;
                 break;
-            case R.id.nav_my_profile:
+            case R.id.seller:
                 fragmentClass = Seller.class;
                 break;
             default:
@@ -102,8 +128,30 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        selectDrawerItem(item,drawer);
+        selectDrawerItem(item);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.buyer_button:
+                Helpers.saveUserRole(buyerButton.getText().toString());
+                buyerButton.setEnabled(false);
+                buyerButton.setVisibility(View.INVISIBLE);
+                sellerButton.setEnabled(false);
+                sellerButton.setVisibility(View.INVISIBLE);
+                loadFragment(new Buyer());
+                break;
+            case R.id.seller_button:
+                Helpers.saveUserRole(sellerButton.getText().toString());
+                sellerButton.setEnabled(false);
+                sellerButton.setVisibility(View.INVISIBLE);
+                buyerButton.setEnabled(false);
+                buyerButton.setVisibility(View.INVISIBLE);
+                loadFragment(new Seller());
+                break;
+        }
     }
 }
