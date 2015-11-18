@@ -1,5 +1,6 @@
 package com.byteshaft.auction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -17,6 +18,7 @@ import android.widget.Button;
 
 import com.byteshaft.auction.fragments.buyer.Buyer;
 import com.byteshaft.auction.fragments.seller.Seller;
+import com.byteshaft.auction.login.RegisterFragment;
 import com.byteshaft.auction.utils.Helpers;
 
 public class MainActivity extends AppCompatActivity
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        startActivity(new Intent(getApplicationContext(), RegisterFragment.class));
         if (!Helpers.getUserRole().equals("")) {
             if (Helpers.getUserRole().equals("Buyer")) {
                 loadFragment(new Buyer());
