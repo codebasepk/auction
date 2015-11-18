@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.flagsinputbox.VerifyPhoneFragment;
 
-public class RegisterFragment extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

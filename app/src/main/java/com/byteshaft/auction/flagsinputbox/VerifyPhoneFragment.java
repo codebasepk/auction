@@ -33,7 +33,7 @@ public class VerifyPhoneFragment extends BaseFlagFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.seller_layout, container, false);
+        View rootView = inflater.inflate(R.layout.register_fragment, container, false);
         initUI(rootView);
         return rootView;
     }

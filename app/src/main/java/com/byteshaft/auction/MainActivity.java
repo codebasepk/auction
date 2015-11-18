@@ -18,27 +18,30 @@ import android.widget.Button;
 
 import com.byteshaft.auction.fragments.buyer.Buyer;
 import com.byteshaft.auction.fragments.seller.Seller;
-import com.byteshaft.auction.login.RegisterFragment;
+import com.byteshaft.auction.login.LoginActivity;
+import com.byteshaft.auction.login.RegisterActivity;
 import com.byteshaft.auction.utils.Helpers;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
-    private boolean isUserRoleAvailble = false;
-    private Button buyerButton;
-    private Button sellerButton;
+    private boolean isLastFragmentAvailable = false;
+    private Button loginButton;
+    private Button registerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startActivity(new Intent(getApplicationContext(), RegisterFragment.class));
-        if (!Helpers.getUserRole().equals("")) {
-            if (Helpers.getUserRole().equals("Buyer")) {
-                loadFragment(new Buyer());
-                isUserRoleAvailble = true;
-            } else if (Helpers.getUserRole().equals("Seller")) {
-                loadFragment(new Seller());
-                isUserRoleAvailble = true;
+        System.out.println(getClass().getName());
+        if (Helpers.isUserLoggedIn()) {
+            if (!Helpers.getLastFragment().equals("")) {
+                if (Helpers.getLastFragment().equals("Buyer")) {
+                    loadFragment(new Buyer());
+                    isLastFragmentAvailable = true;
+                } else {
+                    loadFragment(new Seller());
+                    isLastFragmentAvailable = true;
+                }
             }
         }
         setContentView(R.layout.activity_main);
@@ -51,16 +54,16 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        buyerButton = (Button) findViewById(R.id.buyer_button);
-        sellerButton = (Button) findViewById(R.id.seller_button);
-        if (isUserRoleAvailble) {
-            buyerButton.setVisibility(View.INVISIBLE);
-            sellerButton.setVisibility(View.INVISIBLE);
-            buyerButton.setEnabled(false);
-            sellerButton.setEnabled(false);
+        loginButton = (Button) findViewById(R.id.login_button);
+        registerButton = (Button) findViewById(R.id.register_button);
+        if (isLastFragmentAvailable) {
+            loginButton.setVisibility(View.INVISIBLE);
+            registerButton.setVisibility(View.INVISIBLE);
+            loginButton.setEnabled(false);
+            registerButton.setEnabled(false);
         }
-        buyerButton.setOnClickListener(this);
-        sellerButton.setOnClickListener(this);
+        loginButton.setOnClickListener(this);
+        registerButton.setOnClickListener(this);
     }
 
     public void loadFragment(Fragment fragment) {
@@ -139,21 +142,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.buyer_button:
-                Helpers.saveUserRole(buyerButton.getText().toString());
-                buyerButton.setEnabled(false);
-                buyerButton.setVisibility(View.INVISIBLE);
-                sellerButton.setEnabled(false);
-                sellerButton.setVisibility(View.INVISIBLE);
-                loadFragment(new Buyer());
+            case R.id.login_button:
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+//
                 break;
-            case R.id.seller_button:
-                Helpers.saveUserRole(sellerButton.getText().toString());
-                sellerButton.setEnabled(false);
-                sellerButton.setVisibility(View.INVISIBLE);
-                buyerButton.setEnabled(false);
-                buyerButton.setVisibility(View.INVISIBLE);
-                loadFragment(new Seller());
+            case R.id.register_button:
+                startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+//
                 break;
         }
     }

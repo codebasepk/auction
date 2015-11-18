@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:paddingTop="14dp">
+
+        <TextView
+            android:text="Name:"
+            android:textStyle="bold"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/name_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="full name"
+                android:textColorHint="@color/gray"
+                android:maxLength="10"
+                android:inputType="textEmailAddress" />
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:text="Email:"
+            android:textStyle="bold"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/email_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="abc@xyz.com"
+                android:textColorHint="@color/colorAccent"
+                android:maxLength="10"
+                android:inputType="textEmailAddress" />
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:text="password:"
+            android:textStyle="bold"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/et_password_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password"
+                android:textColorHint="@color/colorAccent"
+                android:maxLength="10"
+                android:inputType="textPassword" />
+        </android.support.design.widget.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/l1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@+id/mobile_edit_text"
+            android:layout_marginTop="37dp">
+
+            <Spinner
+                style="@android:style/Widget.Spinner.DropDown"
+                android:id="@+id/spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="41dp"
+                android:background="@drawable/edit_box_drop_selector"
+                android:dropDownWidth="200dp"/>
+
+            <TextView
+                android:id="@+id/country_code_text_view"
+                android:textAppearance="@android:style/TextAppearance.Material.Title"
+                android:padding="3dp"
+                android:layout_marginTop="5dp"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="@color/gray"
+                android:layout_marginLeft="2dp">
+
+                <EditText
+                    android:id="@+id/phone"
+                    android:layout_height="wrap_content"
+                    android:hint="123 1234567"
+                    android:layout_width="wrap_content"
+                    android:ems="10"
+                    android:maxLength="10"
+                    android:inputType="phone" />
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/btn_send"
+            android:layout_width="fill_parent"
+            android:textColor="@color/gray"
+            android:hapticFeedbackEnabled="true"
+            android:background="@color/colorAccent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="20dp"
+            android:padding="12dp"
+            android:text="Register" />
+
+    </LinearLayout>
+</ScrollView>

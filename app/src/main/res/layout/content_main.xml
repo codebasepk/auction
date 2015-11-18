@@ -12,8 +12,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Buyer"
-        android:id="@+id/buyer_button"
+        android:text="Login"
+        android:id="@+id/login_button"
         android:layout_marginTop="106dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
@@ -21,8 +21,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Seller"
-        android:id="@+id/seller_button"
+        android:text="Register"
+        android:id="@+id/register_button"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 </RelativeLayout>
