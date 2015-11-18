@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (!Helpers.isUserLoggedIn()) {
+            drawer.closeDrawer(GravityCompat.START);
             Toast.makeText(getApplicationContext(), "please login or register first",
                     Toast.LENGTH_SHORT).show();
             return false;
