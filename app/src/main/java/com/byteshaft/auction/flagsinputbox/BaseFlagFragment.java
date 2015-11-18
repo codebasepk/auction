@@ -97,7 +97,7 @@ public abstract class BaseFlagFragment extends Fragment {
     protected PhoneNumberUtil mPhoneNumberUtil = PhoneNumberUtil.getInstance();
     protected Spinner mSpinner;
     protected TextView mTextView;
-    private String[] registrationData
+    private String[] registrationData;
     protected String mLastEnteredPhone;
     protected EditText mPhoneEdit;
     protected CountryAdapter mAdapter;
