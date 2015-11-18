@@ -20,7 +20,6 @@ import com.byteshaft.auction.fragments.buyer.Buyer;
 import com.byteshaft.auction.fragments.seller.Seller;
 import com.byteshaft.auction.login.LoginActivity;
 import com.byteshaft.auction.login.RegisterActivity;
-import com.byteshaft.auction.utils.Helpers;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -33,17 +32,18 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         System.out.println(getClass().getName());
-        if (Helpers.isUserLoggedIn()) {
-            if (!Helpers.getLastFragment().equals("")) {
-                if (Helpers.getLastFragment().equals("Buyer")) {
-                    loadFragment(new Buyer());
-                    isLastFragmentAvailable = true;
-                } else {
-                    loadFragment(new Seller());
-                    isLastFragmentAvailable = true;
-                }
-            }
-        }
+        loadFragment(new Buyer());
+//        if (Helpers.isUserLoggedIn()) {
+//            if (!Helpers.getLastFragment().equals("")) {
+//                if (Helpers.getLastFragment().equals("Buyer")) {
+//                    loadFragment(new Buyer());
+//                    isLastFragmentAvailable = true;
+//                } else {
+//                    loadFragment(new Seller());
+//                    isLastFragmentAvailable = true;
+//                }
+//            }
+//        }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

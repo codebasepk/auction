@@ -12,6 +12,14 @@
         android:paddingRight="24dp"
         android:paddingTop="14dp">
 
+        <ImageView
+            android:layout_gravity="center"
+            android:src="@mipmap/ic_gavel"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
