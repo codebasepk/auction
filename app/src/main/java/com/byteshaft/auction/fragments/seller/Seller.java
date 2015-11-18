@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.byteshaft.auction.R;
+import com.byteshaft.auction.utils.Helpers;
 
 
 public class Seller extends Fragment {
@@ -15,8 +15,8 @@ public class Seller extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mBaseView = inflater.inflate(R.layout.seller_fragment, container, false);
-
+//        mBaseView = inflater.inflate(R.layout.seller_fragment, container, false);
+        Helpers.saveLastFragmentOpend(getClass().getName());
         return mBaseView;
     }
 }

@@ -116,14 +116,14 @@
                 android:textColorHint="@color/gray"
                 android:layout_marginLeft="2dp">
 
-            <EditText
-                android:id="@+id/phone"
-                android:layout_height="wrap_content"
-                android:hint="123 1234567"
-                android:layout_width="wrap_content"
-                android:ems="10"
-                android:maxLength="10"
-                android:inputType="phone" />
+                <EditText
+                    android:id="@+id/phone"
+                    android:layout_height="wrap_content"
+                    android:hint="123 1234567"
+                    android:layout_width="wrap_content"
+                    android:ems="10"
+                    android:maxLength="10"
+                    android:inputType="phone" />
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
 
