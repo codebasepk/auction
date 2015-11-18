@@ -8,6 +8,7 @@ import com.byteshaft.auction.flagsinputbox.VerifyPhoneFragment;
 
 public class RegisterActivity extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,6 +19,5 @@ public class RegisterActivity extends AppCompatActivity {
                     .add(R.id.container, new VerifyPhoneFragment())
                     .commit();
         }
-
     }
 }

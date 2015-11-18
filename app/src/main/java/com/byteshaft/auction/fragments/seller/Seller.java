@@ -16,7 +16,7 @@ public class Seller extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 //        mBaseView = inflater.inflate(R.layout.seller_fragment, container, false);
-        Helpers.saveLastFragmentOpend(getClass().getName());
+        Helpers.saveLastFragmentOpend(getClass().getSimpleName());
         return mBaseView;
     }
 }

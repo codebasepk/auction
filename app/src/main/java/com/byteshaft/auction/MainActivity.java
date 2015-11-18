@@ -32,10 +32,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        System.out.println(getClass().getName());
+        System.out.println(getClass().getSimpleName());
         if (Helpers.isUserLoggedIn()) {
             if (!Helpers.getLastFragment().equals("")) {
-                if (Helpers.getLastFragment().equals("Buyer")) {
+                if (Helpers.getLastFragment().contains("Buyer")) {
                     loadFragment(new Buyer());
                     isLastFragmentAvailable = true;
                 } else {
