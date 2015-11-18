@@ -56,12 +56,12 @@
                 android:layout_height="wrap_content"
                 android:hint="abc@xyz.com"
                 android:textColorHint="@color/colorAccent"
-                android:maxLength="10"
+                android:maxLength="30"
                 android:inputType="textEmailAddress" />
         </android.support.design.widget.TextInputLayout>
 
         <TextView
-            android:text="password:"
+            android:text="Password:"
             android:textStyle="bold"
             android:textAppearance="@android:style/TextAppearance.Material.Title"
             android:textSize="20sp"
@@ -75,7 +75,7 @@
             android:layout_marginTop="8dp">
 
             <EditText
-                android:id="@+id/et_password_login"
+                android:id="@+id/password_login"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Password"
@@ -85,7 +85,7 @@
         </android.support.design.widget.TextInputLayout>
 
         <LinearLayout
-            android:id="@+id/l1"
+            android:id="@+id/layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"

@@ -25,11 +25,14 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.byteshaft.auction.R;
+import com.byteshaft.auction.utils.AppGlobals;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
@@ -94,10 +97,16 @@ public abstract class BaseFlagFragment extends Fragment {
     protected PhoneNumberUtil mPhoneNumberUtil = PhoneNumberUtil.getInstance();
     protected Spinner mSpinner;
     protected TextView mTextView;
-
+    private String[] registrationData;
     protected String mLastEnteredPhone;
     protected EditText mPhoneEdit;
     protected CountryAdapter mAdapter;
+    private EditText mNameEditText;
+    private EditText mEmailEditText;
+    private EditText mPasswordEditText;
+    private TextView mCountryCode;
+    private EditText mPhoneNumeber;
+    private Button mRegisterButton;
 
     protected TextView mBtnLink;
 
@@ -175,12 +184,15 @@ public abstract class BaseFlagFragment extends Fragment {
         mSpinner = (Spinner) rootView.findViewById(R.id.spinner);
         mSpinner.setOnItemSelectedListener(mOnItemSelectedListener);
         mTextView = (TextView) rootView.findViewById(R.id.country_code_text_view);
-
         mAdapter = new CountryAdapter(getActivity());
-
         mSpinner.setAdapter(mAdapter);
-
         mPhoneEdit = (EditText) rootView.findViewById(R.id.phone);
+        mNameEditText = (EditText) rootView.findViewById(R.id.name_edit_text);
+        mEmailEditText = (EditText) rootView.findViewById(R.id.email_edit_text);
+        mPasswordEditText = (EditText) rootView.findViewById(R.id.password_login);
+        mCountryCode = (TextView) rootView.findViewById(R.id.country_code_text_view);
+        mPhoneNumeber = (EditText) rootView.findViewById(R.id.phone);
+        mRegisterButton = (Button) rootView.findViewById(R.id.btn_send);
 //        mPhoneEdit.addTextChangedListener(new CustomPhoneNumberFormattingTextWatcher(mOnPhoneChangedListener));
 //        InputFilter filter = new InputFilter() {
 //            public CharSequence filter(CharSequence source, int start, int end,
@@ -294,26 +306,77 @@ public abstract class BaseFlagFragment extends Fragment {
         }
     }
 
-    protected abstract void send();
+    public final static boolean isValidEmail(CharSequence target) {
+        if (target == null) {
+            return false;
+        } else {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        }
+    }
 
-    protected String validate() {
-        String region = null;
-        String phone = null;
-        if (mLastEnteredPhone != null) {
-            try {
-                Phonenumber.PhoneNumber p = mPhoneNumberUtil.parse(mLastEnteredPhone, null);
-                StringBuilder sb = new StringBuilder(16);
-                sb.append('+').append(p.getCountryCode()).append(p.getNationalNumber());
-                phone = sb.toString();
-                region = mPhoneNumberUtil.getRegionCodeForNumber(p);
-            } catch (NumberParseException ignore) {
+    public final boolean containsDigit(String s){
+        boolean containsDigit = false;
+
+        if(s != null && !s.isEmpty()){
+            for(char c : s.toCharArray()){
+                if(containsDigit = Character.isDigit(c)){
+                    break;
+                }
             }
         }
-        if (region != null) {
-            return phone;
-        } else {
-            return null;
+
+        return containsDigit;
+    }
+
+    public String[] getRegistrationData() {
+        return registrationData;
+
+
+    }
+
+    protected abstract void send();
+
+    protected void validate() {
+        registrationData = new String[3];
+        System.out.println(mNameEditText.getText().toString());
+        if (mNameEditText.getText().toString().trim().isEmpty()) {
+            Toast.makeText(AppGlobals.getContext(), "please enter your name", Toast.LENGTH_SHORT).show();
+            return;
         }
+        boolean validEmail = isValidEmail(mEmailEditText.getText().toString());
+        if (!validEmail) {
+            Toast.makeText(AppGlobals.getContext(), "please enter a valid email", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        System.out.println(containsDigit(mPasswordEditText.getText().toString()));
+        if (!containsDigit(mPasswordEditText.getText().toString())) {
+            Toast.makeText(AppGlobals.getContext(), "password must contain 0-9", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (mPasswordEditText.getText().toString().length() < 6) {
+            Toast.makeText(AppGlobals.getContext(), "password must contain 6 character", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+
+//        String region = null;
+//        String phone = null;
+//        if (mLastEnteredPhone != null) {
+//            try {
+//                Phonenumber.PhoneNumber p = mPhoneNumberUtil.parse(mLastEnteredPhone, null);
+//                StringBuilder sb = new StringBuilder(16);
+//                sb.append('+').append(p.getCountryCode()).append(p.getNationalNumber());
+//                phone = sb.toString();
+//                region = mPhoneNumberUtil.getRegionCodeForNumber(p);
+//            } catch (NumberParseException ignore) {
+//            }
+//        }
+//        if (region != null) {
+//            return phone;
+//        } else {
+//            return null;
+//        }
     }
 
     protected void hideKeyboard(View v) {

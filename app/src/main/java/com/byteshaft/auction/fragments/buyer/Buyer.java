@@ -26,6 +26,8 @@ public class Buyer extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Helpers.saveLastFragmentOpend(getActivity().getClass().getSimpleName());
+
         mBaseView = inflater.inflate(R.layout.buyer_faragment, container, false);
         Helpers.saveLastFragmentOpend(getClass().getName());
         category = (GridView) mBaseView.findViewById(R.id.category_list);
