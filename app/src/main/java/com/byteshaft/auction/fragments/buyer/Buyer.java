@@ -79,7 +79,7 @@ public class Buyer extends Fragment {
             }
             String title = categoryList.get(position);
             holder.title.setText(title);
-            holder.character.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
+            holder.character.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
             return convertView;
         }
     }
