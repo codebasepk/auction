@@ -32,9 +32,9 @@ public class Buyer extends Fragment {
         Helpers.saveLastFragmentOpend(getClass().getName());
         category = (GridView) mBaseView.findViewById(R.id.category_list);
         ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("1 tatti");
-        arrayList.add("2 tatti");
-        arrayList.add("3 tatti");
+        arrayList.add("item");
+        arrayList.add("item second");
+        arrayList.add("item third");
         arrayAdapter = new CategoryArrayAdapter(getContext(), R.layout.category_layout,arrayList);
         category.setAdapter(arrayAdapter);
         category.setOnItemClickListener(new AdapterView.OnItemClickListener() {

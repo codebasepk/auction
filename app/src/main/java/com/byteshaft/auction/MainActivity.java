@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.byteshaft.auction.fragments.buyer.Buyer;
 import com.byteshaft.auction.fragments.seller.Seller;
@@ -111,6 +112,11 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (!Helpers.isUserLoggedIn()) {
+            Toast.makeText(getApplicationContext(), "please login or register first",
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
         selectDrawerItem(item);
         drawer.closeDrawer(GravityCompat.START);
         loginButton.setVisibility(View.INVISIBLE);
