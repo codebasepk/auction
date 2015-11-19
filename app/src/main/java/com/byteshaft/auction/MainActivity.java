@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         loadFragment(new CategoriesFragment());
-        System.out.println(getClass().getSimpleName());
         if (Helpers.isUserLoggedIn()) {
             isLastFragmentAvailable = true;
             if (!Helpers.getLastFragment().equals("")) {
@@ -92,6 +91,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.seller:
                 fragmentClass = Seller.class;
+                break;
+            case R.id.categories:
+                fragmentClass = CategoriesFragment.class;
                 break;
             default:
                 fragmentClass = Buyer.class;
