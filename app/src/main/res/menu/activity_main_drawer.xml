@@ -11,7 +11,14 @@
                 <item android:id="@+id/seller"
                     android:title="Seller"
                     android:icon="@drawable/sell_nav_icon"/>
-
+            </menu>
+        </item>
+        <item android:title="My Account">
+            <menu>
+                <item android:id="@+id/categories"
+                    android:title="My categories"
+                    android:icon="@drawable/nav_category_icon">
+                </item>
             </menu>
         </item>
 
