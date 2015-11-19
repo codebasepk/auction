@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -63,6 +65,7 @@ public class CategoriesFragment extends Fragment {
     static class ViewHolder {
         public TextView title;
         public ImageView character;
+        public CheckBox mCheckBox;
     }
 
     class CategoryArrayAdapter extends ArrayAdapter<String> {
@@ -77,7 +80,7 @@ public class CategoriesFragment extends Fragment {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             ViewHolder holder;
             if (convertView == null) {
                 LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -85,14 +88,24 @@ public class CategoriesFragment extends Fragment {
                 holder = new ViewHolder();
                 holder.title = (TextView) convertView.findViewById(R.id.file_path);
                 holder.character = (ImageView) convertView.findViewById(R.id.thumb_nail);
+                holder.mCheckBox = (CheckBox) convertView.findViewById(R.id.checkBox);
                 convertView.setTag(holder);
+                String title = categoryList.get(position);
+                holder.title.setText(title);
+                holder.character.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
+                holder.mCheckBox.setChecked(Helpers.getCategoryStatue(categoryList.get(position)));
+                holder.mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        Helpers.saveCategoryStatus(categoryList.get(position), isChecked);
+                    }
+                });
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-            String title = categoryList.get(position);
-            holder.title.setText(title);
-            holder.character.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
+
             return convertView;
         }
     }
+
 }
