@@ -16,7 +16,6 @@
         android:id="@+id/relativeLayout">
 
         <ImageView
-            android:background="@drawable/nav_category_icon"
             android:id="@+id/thumb_nail"
             android:layout_width="35dp"
             android:layout_height="wrap_content"
@@ -25,7 +24,7 @@
             android:layout_alignParentStart="true" />
 
         <TextView
-            android:id="@+id/FilePath"
+            android:id="@+id/file_path"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -39,8 +38,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/checkBox"
             android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/FilePath"
-            android:layout_toEndOf="@+id/FilePath" />
+            android:layout_toRightOf="@+id/file_path"
+            android:layout_toEndOf="@+id/file_path" />
 
 
     </RelativeLayout>

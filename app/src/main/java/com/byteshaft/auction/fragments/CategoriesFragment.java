@@ -83,7 +83,7 @@ public class CategoriesFragment extends Fragment {
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 convertView = inflater.inflate(mResources , parent, false);
                 holder = new ViewHolder();
-                holder.title = (TextView) convertView.findViewById(R.id.FilePath);
+                holder.title = (TextView) convertView.findViewById(R.id.file_path);
                 holder.character = (ImageView) convertView.findViewById(R.id.thumb_nail);
                 convertView.setTag(holder);
             } else {
