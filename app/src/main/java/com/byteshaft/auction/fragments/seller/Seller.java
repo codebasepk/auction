@@ -24,7 +24,7 @@ public class Seller extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        mBaseView = inflater.inflate(R.layout.seller_fragment, container, false);
+        mBaseView = inflater.inflate(R.layout.seller_fragment, container, false);
         Helpers.saveLastFragmentOpend(getClass().getSimpleName());
 
         itemTitle = (EditText) mBaseView.findViewById(R.id.item_title);
