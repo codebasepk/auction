@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.byteshaft.auction.fragments.CategoriesFragment;
 import com.byteshaft.auction.fragments.buyer.Buyer;
 import com.byteshaft.auction.fragments.seller.Seller;
 import com.byteshaft.auction.login.LoginActivity;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        loadFragment(new CategoriesFragment());
         System.out.println(getClass().getSimpleName());
         if (Helpers.isUserLoggedIn()) {
             isLastFragmentAvailable = true;

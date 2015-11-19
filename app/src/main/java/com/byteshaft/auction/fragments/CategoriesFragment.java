@@ -1,8 +1,9 @@
 package com.byteshaft.auction.fragments;
 
-import android.app.Fragment;
+
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,6 @@ import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 
 import java.util.ArrayList;
-
 
 public class CategoriesFragment extends Fragment {
 
@@ -83,8 +83,8 @@ public class CategoriesFragment extends Fragment {
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 convertView = inflater.inflate(mResources , parent, false);
                 holder = new ViewHolder();
-                holder.title = (TextView) convertView.findViewById(R.id.FilePath);
-                holder.character = (ImageView) convertView.findViewById(R.id.Thumbnail);
+                holder.title = (TextView) convertView.findViewById(R.id.file_path);
+                holder.character = (ImageView) convertView.findViewById(R.id.thumb_nail);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
