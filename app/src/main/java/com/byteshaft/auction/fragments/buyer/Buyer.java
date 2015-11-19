@@ -81,7 +81,7 @@ public class Buyer extends Fragment {
                 convertView = inflater.inflate(mResources , parent, false);
                 holder = new ViewHolder();
                 holder.title = (TextView) convertView.findViewById(R.id.FilePath);
-                holder.character = (ImageView) convertView.findViewById(R.id.Thumbnail);
+                holder.character = (ImageView) convertView.findViewById(R.id.thumb_nail);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();

@@ -1,33 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="80dp"
-    android:orientation="horizontal"
     android:weightSum="100"
     android:layout_margin="2dp"
     android:padding="5dp">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_weight="70"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:id="@+id/relativeLayout">
+
+        <ImageView
+            android:background="@drawable/nav_category_icon"
+            android:id="@+id/thumb_nail"
+            android:layout_width="35dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
         <TextView
             android:id="@+id/FilePath"
             android:layout_width="200dp"
-            android:layout_marginTop="10dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:textStyle="bold"
-            android:textSize="18sp"/>
-    </LinearLayout>
+            android:textSize="18sp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
 
-    <ImageView
-        android:id="@+id/Thumbnail"
-        android:layout_width="35dp"
-        android:layout_height="wrap_content"/>
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkBox"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/FilePath"
+            android:layout_toEndOf="@+id/FilePath" />
 
-</LinearLayout>
+
+    </RelativeLayout>
+
+
+
+
+</RelativeLayout>
