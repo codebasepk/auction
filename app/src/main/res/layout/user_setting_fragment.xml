@@ -20,7 +20,7 @@
             android:layout_marginTop="8dp">
 
             <EditText
-                android:id="@+id/name_edit_text"
+                android:id="@+id/user_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="user name"
@@ -35,7 +35,7 @@
             android:layout_marginTop="8dp">
 
             <EditText
-                android:id="@+id/email_edit_text"
+                android:id="@+id/user_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Email address"
@@ -50,16 +50,31 @@
             android:layout_marginTop="8dp">
 
             <EditText
-                android:id="@+id/password_login"
+                android:id="@+id/current_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Password"
+                android:hint="Current Password"
+                android:textColorHint="@color/colorDefault"
+                android:inputType="textPassword" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/new_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="New password"
                 android:textColorHint="@color/colorDefault"
                 android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_send"
+            android:id="@+id/btn_done"
             android:layout_width="fill_parent"
             android:textColor="@color/gray"
             android:hapticFeedbackEnabled="true"
@@ -68,7 +83,7 @@
             android:layout_marginBottom="16dp"
             android:layout_marginTop="20dp"
             android:padding="12dp"
-            android:text="Register" />
+            android:text="Done" />
 
     </LinearLayout>
 </ScrollView>

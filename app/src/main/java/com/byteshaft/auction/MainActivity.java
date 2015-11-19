@@ -14,9 +14,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.CategoriesFragment;
+import com.byteshaft.auction.fragments.UserSettingFragment;
 import com.byteshaft.auction.fragments.buyer.Buyer;
 import com.byteshaft.auction.fragments.seller.Seller;
 import com.byteshaft.auction.login.LoginActivity;
@@ -29,11 +30,13 @@ public class MainActivity extends AppCompatActivity
     private boolean isLastFragmentAvailable = false;
     private Button loginButton;
     private Button registerButton;
+    private TextView navUserNameText;
+    private TextView navUserEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loadFragment(new CategoriesFragment());
+//        loadFragment(new CategoriesFragment());
         if (Helpers.isUserLoggedIn()) {
             isLastFragmentAvailable = true;
             if (!Helpers.getLastFragment().equals("")) {
@@ -86,14 +89,17 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
         Class fragmentClass;
         switch (menuItem.getItemId()) {
-            case R.id.buyer:
+            case R.id.nav_buyer:
                 fragmentClass = Buyer.class;
                 break;
-            case R.id.seller:
+            case R.id.nav_seller:
                 fragmentClass = Seller.class;
                 break;
-            case R.id.categories:
+            case R.id.nav_categories:
                 fragmentClass = CategoriesFragment.class;
+                break;
+            case R.id.nav_user:
+                fragmentClass = UserSettingFragment.class;
                 break;
             default:
                 fragmentClass = Buyer.class;
@@ -116,12 +122,12 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (!Helpers.isUserLoggedIn()) {
-            drawer.closeDrawer(GravityCompat.START);
-            Toast.makeText(getApplicationContext(), "please login or register first",
-                    Toast.LENGTH_SHORT).show();
-            return false;
-        }
+//        if (!Helpers.isUserLoggedIn()) {
+//            drawer.closeDrawer(GravityCompat.START);
+//            Toast.makeText(getApplicationContext(), "please login or register first",
+//                    Toast.LENGTH_SHORT).show();
+//            return false;
+//        }
         selectDrawerItem(item);
         drawer.closeDrawer(GravityCompat.START);
         loginButton.setVisibility(View.INVISIBLE);
