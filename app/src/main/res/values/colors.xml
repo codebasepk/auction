@@ -4,5 +4,7 @@
     <color name="colorPrimaryDark">#663096</color>
     <color name="colorDefault">#663096</color>
     <color name="gray">#d3d3d3</color>
+    <color name="orange">#FF9900</color>
+    <color name="green">#009900</color>
 
 </resources>

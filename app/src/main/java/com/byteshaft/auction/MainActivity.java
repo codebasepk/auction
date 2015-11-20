@@ -14,7 +14,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.CategoriesFragment;
 import com.byteshaft.auction.fragments.UserSettingFragment;
@@ -27,16 +26,13 @@ import com.byteshaft.auction.utils.Helpers;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
-    private boolean isLastFragmentAvailable = false;
-    private Button loginButton;
-    private Button registerButton;
-    private TextView navUserNameText;
-    private TextView navUserEmail;
+    public static boolean isLastFragmentAvailable = false;
+    public static Button loginButton;
+    public static Button registerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        loadFragment(new CategoriesFragment());
         if (Helpers.isUserLoggedIn()) {
             isLastFragmentAvailable = true;
             if (!Helpers.getLastFragment().equals("")) {
@@ -67,6 +63,17 @@ public class MainActivity extends AppCompatActivity
         }
         loginButton.setOnClickListener(this);
         registerButton.setOnClickListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isLastFragmentAvailable) {
+            loginButton.setVisibility(View.INVISIBLE);
+            registerButton.setVisibility(View.INVISIBLE);
+            loginButton.setEnabled(false);
+            registerButton.setEnabled(false);
+        }
     }
 
     public void loadFragment(Fragment fragment) {
@@ -120,14 +127,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        if (!Helpers.isUserLoggedIn()) {
-//            drawer.closeDrawer(GravityCompat.START);
-//            Toast.makeText(getApplicationContext(), "please login or register first",
-//                    Toast.LENGTH_SHORT).show();
-//            return false;
-//        }
+//         if (!Helpers.isUserLoggedIn()) {
+//         drawer.closeDrawer(GravityCompat.START);
+//         Toast.makeText(getApplicationContext(), "please login or register first",
+//                 Toast.LENGTH_SHORT).show();
+//         return false;
+//         }
+        int id = item.getItemId();
         selectDrawerItem(item);
         drawer.closeDrawer(GravityCompat.START);
         loginButton.setVisibility(View.INVISIBLE);

@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
@@ -30,7 +31,6 @@ public class Seller extends Fragment implements View.OnClickListener{
     private Button submintButton;
     private Button addImageButton;
     private Spinner categorySpinner;
-
     private static final int SELECT_PHOTO = 100;
     private View mBaseView;
 
@@ -57,6 +57,15 @@ public class Seller extends Fragment implements View.OnClickListener{
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (MainActivity.isLastFragmentAvailable) {
+            MainActivity.loginButton.setVisibility(View.INVISIBLE);
+            MainActivity.registerButton.setVisibility(View.INVISIBLE);
+            MainActivity.loginButton.setEnabled(false);
+            MainActivity.registerButton.setEnabled(false);
+        }
+    }
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_submit:

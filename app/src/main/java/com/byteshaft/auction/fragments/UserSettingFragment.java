@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
 
 public class UserSettingFragment extends Fragment implements View.OnClickListener {
@@ -29,6 +30,17 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
         mButtonDone = (Button) mBaseView.findViewById(R.id.btn_done);
         mButtonDone.setOnClickListener(this);
         return mBaseView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (MainActivity.isLastFragmentAvailable) {
+            MainActivity.loginButton.setVisibility(View.INVISIBLE);
+            MainActivity.registerButton.setVisibility(View.INVISIBLE);
+            MainActivity.loginButton.setEnabled(false);
+            MainActivity.registerButton.setEnabled(false);
+        }
     }
 
     @Override

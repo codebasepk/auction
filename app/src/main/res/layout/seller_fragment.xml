@@ -58,6 +58,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:textColor="@color/gray"
+        android:padding="5dp"
         android:background="@color/colorDefault"
         android:text="Add Images"
         android:layout_below="@+id/description"/>
@@ -67,6 +69,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorDefault"
+        android:textColor="@color/gray"
         android:text="Submit"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
