@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.Helpers;
 
@@ -32,5 +33,16 @@ public class Seller extends Fragment {
         submintButton = (Button) mBaseView.findViewById(R.id.btn_submit);
 
         return mBaseView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (MainActivity.isLastFragmentAvailable) {
+            MainActivity.loginButton.setVisibility(View.INVISIBLE);
+            MainActivity.registerButton.setVisibility(View.INVISIBLE);
+            MainActivity.loginButton.setEnabled(false);
+            MainActivity.registerButton.setEnabled(false);
+        }
     }
 }

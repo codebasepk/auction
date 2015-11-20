@@ -4,14 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <GridView
-        android:columnWidth="100dp"
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/category_list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
-    </GridView>
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
 
 </RelativeLayout>
