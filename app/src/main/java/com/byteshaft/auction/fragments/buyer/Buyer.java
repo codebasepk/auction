@@ -1,5 +1,6 @@
 package com.byteshaft.auction.fragments.buyer;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -7,7 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -15,6 +18,7 @@ import android.widget.TextView;
 
 import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
+import com.byteshaft.auction.utils.AppGlobals;
 
 import java.util.ArrayList;
 
@@ -67,7 +71,7 @@ public class Buyer extends Fragment {
         }
     }
 
-    private void refreshContent(){
+    private void refreshContent() {
         new Handler().post(new Runnable() {
             @Override
             public void run() {
@@ -80,22 +84,46 @@ public class Buyer extends Fragment {
     }
 
     @Override
-    public void onActivityCreated( Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         mAdapter = new CustomAdapter(arrayList);
         mRecyclerView.setAdapter(mAdapter);
-        super.onViewCreated(view, savedInstanceState);
+        mRecyclerView.addOnItemTouchListener(new CustomAdapter(AppGlobals.getContext(), new CustomAdapter.OnItemClickListener() {
+            @Override
+            public void onItem(View view, int position) {
+                System.out.println(position);
 
+            }
+        }));
     }
 
-    class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
+            RecyclerView.OnItemTouchListener {
 
         private ArrayList<String> item;
-        CustomView viewHolder;
+        private CustomView viewHolder;
+        private OnItemClickListener mListener;
+        private GestureDetector mGestureDetector;
+        private ViewGroup viewGroup;
+
+        public interface OnItemClickListener {
+            public void onItem(View view, int position);
+        }
+
+        public CustomAdapter(Context context, OnItemClickListener listener) {
+            mListener = listener;
+            mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    return true;
+                }
+            });
+        }
 
         public CustomAdapter(ArrayList<String> categories) {
             this.item = categories;
@@ -106,22 +134,23 @@ public class Buyer extends Fragment {
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_category_item, parent, false);
             viewHolder = new CustomView(view);
+            viewGroup = parent;
             return viewHolder;
         }
+
 
         private Drawable getImageForCategory(String item) {
             switch (item) {
                 case "Mobile":
-                    return getResources().getDrawable(R.drawable.mobile);
-                 case "Electronics":
-                    return getResources().getDrawable(R.drawable.electronics);
+                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.mobile);
+                case "Electronics":
+                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.electronics);
                 case "Vehicle":
-                    return getResources().getDrawable(R.drawable.vehicle);
+                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.vehicle);
                 case "Real State":
-                    return getResources().getDrawable(R.drawable.real_state);
+                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.real_state);
                 default:
-                    return getResources().getDrawable(R.drawable.not_found);
-
+                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.not_found);
             }
         }
 
@@ -135,19 +164,38 @@ public class Buyer extends Fragment {
         public int getItemCount() {
             return item.size();
         }
-    }
 
-    public static class CustomView extends RecyclerView.ViewHolder{
-        public TextView textView;
-        public ImageView imageView;
-        public CustomView(View itemView) {
-            super(itemView);
-            textView =  (TextView) itemView.findViewById(R.id.category_title);
-            imageView = (ImageView) itemView.findViewById(R.id.category_image);
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+            View childView = rv.findChildViewUnder(e.getX(), e.getY());
+            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
+                System.out.println("ok");
+                mListener.onItem(childView, rv.getChildPosition(childView));
+                return true;
+            }
+            return false;
+        }
 
+        @Override
+        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
 
         }
 
 
+        public class CustomView extends RecyclerView.ViewHolder {
+            public TextView textView;
+            public ImageView imageView;
+
+            public CustomView(View itemView) {
+                super(itemView);
+                textView = (TextView) itemView.findViewById(R.id.category_title);
+                imageView = (ImageView) itemView.findViewById(R.id.category_image);
+            }
+        }
     }
 }
