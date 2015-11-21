@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
-        menuItem.setChecked(true);
+        menuItem.setCheckable(true);
         setTitle(menuItem.getTitle());
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();

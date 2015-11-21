@@ -40,7 +40,7 @@ public class Seller extends Fragment implements View.OnClickListener{
         Helpers.saveLastFragmentOpend(getClass().getSimpleName());
 
         String[] list =
-                {"Books","Life Style" ,"Education","Electronics", "Entertainment", "Games"};
+                {"Mobiles","Electronics" ,"Vehicle","Real State",};
 
         itemTitle = (EditText) mBaseView.findViewById(R.id.item_title);
         itemDescription = (EditText) mBaseView.findViewById(R.id.item_description);
