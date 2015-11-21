@@ -8,6 +8,7 @@ public class AppGlobals extends Application{
     private static Context sContext;
     public static final String user_login_key = "user_login";
     public static final String lastFragment = "last_fragment";
+    public static final String selectedCategory = "selected_category";
 
     @Override
     public void onCreate() {
