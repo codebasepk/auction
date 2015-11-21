@@ -1,6 +1,7 @@
 package com.byteshaft.auction.fragments.buyer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
+import com.byteshaft.auction.SelectedCategoryList;
 import com.byteshaft.auction.utils.AppGlobals;
 
 import java.util.ArrayList;
@@ -96,8 +98,10 @@ public class Buyer extends Fragment {
         mRecyclerView.addOnItemTouchListener(new CustomAdapter(arrayList , AppGlobals.getContext(), new CustomAdapter.OnItemClickListener() {
             @Override
             public void onItem(String item) {
-
-
+                Intent intent = new Intent(getActivity().getApplicationContext(),
+                        SelectedCategoryList.class);
+                intent.putExtra(AppGlobals.selectedCategory, item);
+                startActivity(intent);
             }
         }));
     }
