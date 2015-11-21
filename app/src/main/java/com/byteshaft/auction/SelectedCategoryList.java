@@ -1,5 +1,7 @@
 package com.byteshaft.auction;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -7,8 +9,10 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,7 +25,6 @@ import java.util.ArrayList;
 
 public class SelectedCategoryList extends AppCompatActivity {
 
-    private View mBaseView;
     private RecyclerView mRecyclerView;
     private CustomAdapter mAdapter;
     private ArrayList<String> arrayList;
@@ -63,13 +66,28 @@ public class SelectedCategoryList extends AppCompatActivity {
         return false;
     }
 
-    class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
+            RecyclerView.OnItemTouchListener {
 
-        private ArrayList<String> item;
+        private ArrayList<String> items;
         private CustomView viewHolder;
 
+        private OnItemClickListener mListener;
+        private GestureDetector mGestureDetector;
+
+        public CustomAdapter(ArrayList<String> categories, Context context, OnItemClickListener listener) {
+            this.items = categories;
+            mListener = listener;
+            mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    return true;
+                }
+            });
+        }
+
         public CustomAdapter(ArrayList<String> categories) {
-            this.item = categories;
+            this.items = categories;
         }
 
 
@@ -83,27 +101,52 @@ public class SelectedCategoryList extends AppCompatActivity {
         private Drawable getImageForCategory(String item) {
             switch (item) {
                 case "Htc":
-                    return getResources().getDrawable(R.drawable.mobile);
+                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.mobile);
                 case "Moto":
-                    return getResources().getDrawable(R.drawable.electronics);
+                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.electronics);
                 case "Samsung":
-                    return getResources().getDrawable(R.drawable.vehicle);
+                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.vehicle);
                 case "LG":
-                    return getResources().getDrawable(R.drawable.real_state);
+                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.real_state);
                 default:
-                    return getResources().getDrawable(R.drawable.not_found);
+                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.not_found);
             }
         }
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            viewHolder.textView.setText(item.get(position));
-            viewHolder.imageView.setImageDrawable(getImageForCategory(item.get(position)));
+            viewHolder.textView.setText(items.get(position));
+            viewHolder.imageView.setImageDrawable(getImageForCategory(items.get(position)));
         }
 
         @Override
         public int getItemCount() {
-            return item.size();
+            return items.size();
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+            View childView = rv.findChildViewUnder(e.getX(), e.getY());
+            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
+                System.out.println(items == null);
+                mListener.onItem(items.get(rv.getChildPosition(childView)));
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+        }
+
+        public interface OnItemClickListener {
+            void onItem(String item);
         }
     }
 
@@ -141,6 +184,15 @@ public class SelectedCategoryList extends AppCompatActivity {
             mAdapter = new CustomAdapter(arrayList);
             mRecyclerView.setAdapter(mAdapter);
             mSwipeRefreshLayout.setRefreshing(false);
+            mRecyclerView.addOnItemTouchListener(new CustomAdapter(arrayList, getApplicationContext(),
+                    new CustomAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItem(String item) {
+                            Intent intent = new Intent(getApplicationContext(), ItemDetail.class);
+                            intent.putExtra(AppGlobals.detial, item);
+                            startActivity(intent);
+                        }
+                    }));
         }
     }
 }

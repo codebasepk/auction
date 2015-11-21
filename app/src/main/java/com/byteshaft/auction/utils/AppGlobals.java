@@ -9,6 +9,7 @@ public class AppGlobals extends Application{
     public static final String user_login_key = "user_login";
     public static final String lastFragment = "last_fragment";
     public static final String selectedCategory = "selected_category";
+    public static final String detial = "detail";
 
     @Override
     public void onCreate() {
