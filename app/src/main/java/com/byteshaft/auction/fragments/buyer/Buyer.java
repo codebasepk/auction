@@ -93,10 +93,10 @@ public class Buyer extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mAdapter = new CustomAdapter(arrayList);
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addOnItemTouchListener(new CustomAdapter(AppGlobals.getContext(), new CustomAdapter.OnItemClickListener() {
+        mRecyclerView.addOnItemTouchListener(new CustomAdapter(arrayList , AppGlobals.getContext(), new CustomAdapter.OnItemClickListener() {
             @Override
-            public void onItem(View view, int position) {
-                System.out.println(position);
+            public void onItem(View view, String item) {
+                System.out.println(item);
 
             }
         }));
@@ -105,17 +105,17 @@ public class Buyer extends Fragment {
     static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
             RecyclerView.OnItemTouchListener {
 
-        private ArrayList<String> item;
+        private ArrayList<String> items;
         private CustomView viewHolder;
         private OnItemClickListener mListener;
         private GestureDetector mGestureDetector;
-        private ViewGroup viewGroup;
 
         public interface OnItemClickListener {
-            public void onItem(View view, int position);
+            void onItem(View view, String item);
         }
 
-        public CustomAdapter(Context context, OnItemClickListener listener) {
+        public CustomAdapter(ArrayList<String> categories, Context context, OnItemClickListener listener) {
+            this.items = categories;
             mListener = listener;
             mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                 @Override
@@ -126,7 +126,7 @@ public class Buyer extends Fragment {
         }
 
         public CustomAdapter(ArrayList<String> categories) {
-            this.item = categories;
+            this.items = categories;
         }
 
 
@@ -134,7 +134,6 @@ public class Buyer extends Fragment {
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_category_item, parent, false);
             viewHolder = new CustomView(view);
-            viewGroup = parent;
             return viewHolder;
         }
 
@@ -156,21 +155,21 @@ public class Buyer extends Fragment {
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            viewHolder.textView.setText(item.get(position));
-            viewHolder.imageView.setImageDrawable(getImageForCategory(item.get(position)));
+            viewHolder.textView.setText(items.get(position));
+            viewHolder.imageView.setImageDrawable(getImageForCategory(items.get(position)));
         }
 
         @Override
         public int getItemCount() {
-            return item.size();
+            return items.size();
         }
 
         @Override
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
             View childView = rv.findChildViewUnder(e.getX(), e.getY());
             if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-                System.out.println("ok");
-                mListener.onItem(childView, rv.getChildPosition(childView));
+                System.out.println(items == null);
+                mListener.onItem(childView, items.get(rv.getChildPosition(childView)));
                 return true;
             }
             return false;
