@@ -36,11 +36,11 @@
                     android:layout_below="@id/specific_category_image"
                     android:layout_gravity="center"
                     android:layout_margin="10dp"
-
-                    android:text="pp00" />
+                    android:text="Rs: 1000" />
 
                 <TextView
                     android:id="@+id/specific_category_title"
+                    android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -48,9 +48,16 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="10dp" />
 
+                <TextView
+                    android:id="@+id/specific_category_description"
+                    android:textStyle="italic"
+                    android:text="ldkkkfklfkfklkkflfkfkklf"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_above="@+id/specific_category_price"
+                    android:layout_centerHorizontal="true" />
             </RelativeLayout>
-
         </android.support.v7.widget.CardView>
     </ScrollView>
-
 </RelativeLayout>
