@@ -95,8 +95,8 @@ public class Buyer extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addOnItemTouchListener(new CustomAdapter(arrayList , AppGlobals.getContext(), new CustomAdapter.OnItemClickListener() {
             @Override
-            public void onItem(View view, String item) {
-                System.out.println(item);
+            public void onItem(String item) {
+
 
             }
         }));
@@ -111,7 +111,7 @@ public class Buyer extends Fragment {
         private GestureDetector mGestureDetector;
 
         public interface OnItemClickListener {
-            void onItem(View view, String item);
+            void onItem(String item);
         }
 
         public CustomAdapter(ArrayList<String> categories, Context context, OnItemClickListener listener) {
@@ -168,8 +168,7 @@ public class Buyer extends Fragment {
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
             View childView = rv.findChildViewUnder(e.getX(), e.getY());
             if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-                System.out.println(items == null);
-                mListener.onItem(childView, items.get(rv.getChildPosition(childView)));
+                mListener.onItem(items.get(rv.getChildPosition(childView)));
                 return true;
             }
             return false;
