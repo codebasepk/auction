@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isLastFragmentAvailable = true;
         if (Helpers.isUserLoggedIn()) {
             isLastFragmentAvailable = true;
             if (!Helpers.getLastFragment().equals("")) {
