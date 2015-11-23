@@ -28,7 +28,6 @@ public class SelectedCategoryList extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private CustomAdapter mAdapter;
     private ArrayList<String> arrayList;
-    private static final String TAG = "RecyclerViewFragment";
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override

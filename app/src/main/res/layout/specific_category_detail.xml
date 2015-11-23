@@ -51,7 +51,7 @@
                 <TextView
                     android:id="@+id/specific_category_description"
                     android:textStyle="italic"
-                    android:text="ldkkkfklfkfklkkflfkfkklf"
+                    android:text="test"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
