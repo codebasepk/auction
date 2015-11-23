@@ -1,6 +1,7 @@
 package com.byteshaft.auction;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -9,6 +10,8 @@ import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.byteshaft.auction.fragments.ChatActivity;
 import com.byteshaft.auction.utils.AppGlobals;
 
 import java.io.IOException;
@@ -59,8 +63,18 @@ public class ItemDetail extends AppCompatActivity {
             case android.R.id.home:
                 onBackPressed();
                 return true;
+            case R.id.chat_button:
+                Intent intent = new Intent(this, ChatActivity.class);
+                startActivity(intent);
         }
         return false;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.chat_for_user, menu);
+        return true;
     }
 
     class CustomAdapter extends ArrayAdapter<Bitmap> {
@@ -113,7 +127,7 @@ public class ItemDetail extends AppCompatActivity {
             super.onPostExecute(s);
             bitmapArrayList.add(getBitmapFromMemCache(getTitle().toString()));
             adapter = new CustomAdapter(getApplicationContext(),
-                    R.layout.layout_for_horizontal_list_view , bitmapArrayList);
+                    R.layout.layout_for_horizontal_list_view, bitmapArrayList);
             grid.setAdapter(adapter);
         }
 
@@ -150,4 +164,5 @@ public class ItemDetail extends AppCompatActivity {
             return mMemoryCache.get(key);
         }
     }
+
 }
