@@ -76,9 +76,8 @@
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_done"
             android:layout_width="fill_parent"
-            android:textColor="@color/gray"
+            android:textColor="@color/colorPrimaryDark"
             android:hapticFeedbackEnabled="true"
-            android:background="@color/colorDefault"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:layout_marginTop="20dp"
