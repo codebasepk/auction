@@ -1,32 +1,30 @@
-package com.byteshaft.auction.fragments.buyer;
+package com.byteshaft.auction;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.byteshaft.auction.MainActivity;
-import com.byteshaft.auction.R;
-import com.byteshaft.auction.SelectedCategoryList;
 import com.byteshaft.auction.utils.AppGlobals;
 
 import java.util.ArrayList;
 
-public class Buyer extends Fragment {
+public class SelectedCategoryList extends AppCompatActivity {
 
-    private View mBaseView;
     private RecyclerView mRecyclerView;
     private CustomAdapter mAdapter;
     private ArrayList<String> arrayList;
@@ -34,76 +32,38 @@ public class Buyer extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mBaseView = inflater.inflate(R.layout.buyer_category_fragment, container, false);
-        mBaseView.setTag(TAG);
-        // BEGIN_INCLUDE(initializeRecyclerView)
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView = (RecyclerView) mBaseView.findViewById(R.id.recycler);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) mBaseView.findViewById(R.id.swipe_refresh);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        String selectedItem = getIntent().getStringExtra(AppGlobals.selectedCategory);
+        setContentView(R.layout.specific_category);
+        setTitle(selectedItem);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Toast.makeText(getApplicationContext(), selectedItem, Toast.LENGTH_SHORT).show();
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        mRecyclerView = (RecyclerView) findViewById(R.id.specific_recycler);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.specific_category_refresh);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.orange, R.color.green,
                 R.color.colorPrimary, R.color.gray);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshContent();
-            }
-        });
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
-        System.out.println(mRecyclerView == null);
-        arrayList = new ArrayList<>();
-        arrayList.add("Mobile");
-        arrayList.add("Electronics");
-        arrayList.add("Vehicle");
-        arrayList.add("Real State");
-        return mBaseView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        System.out.println(MainActivity.isLastFragmentAvailable);
-        if (MainActivity.isLastFragmentAvailable) {
-            MainActivity.loginButton.setVisibility(View.INVISIBLE);
-            MainActivity.registerButton.setVisibility(View.INVISIBLE);
-            MainActivity.loginButton.setEnabled(false);
-            MainActivity.registerButton.setEnabled(false);
-        }
-    }
-
-    private void refreshContent() {
-        new Handler().post(new Runnable() {
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void run() {
-                arrayList.add("test");
-                mAdapter = new CustomAdapter(arrayList);
-                mRecyclerView.setAdapter(mAdapter);
-                mSwipeRefreshLayout.setRefreshing(false);
+            public void onRefresh() {
+                new GetSpecificDataTask().execute();
             }
         });
+        new GetSpecificDataTask().execute();
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mAdapter = new CustomAdapter(arrayList);
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addOnItemTouchListener(new CustomAdapter(arrayList , AppGlobals.getContext(), new CustomAdapter.OnItemClickListener() {
-            @Override
-            public void onItem(String item) {
-                Intent intent = new Intent(getActivity().getApplicationContext(),
-                        SelectedCategoryList.class);
-                intent.putExtra(AppGlobals.selectedCategory, item);
-                startActivity(intent);
-            }
-        }));
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return false;
     }
 
     static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
@@ -111,12 +71,9 @@ public class Buyer extends Fragment {
 
         private ArrayList<String> items;
         private CustomView viewHolder;
+
         private OnItemClickListener mListener;
         private GestureDetector mGestureDetector;
-
-        public interface OnItemClickListener {
-            void onItem(String item);
-        }
 
         public CustomAdapter(ArrayList<String> categories, Context context, OnItemClickListener listener) {
             this.items = categories;
@@ -136,21 +93,20 @@ public class Buyer extends Fragment {
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_category_item, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.specific_category_detail, parent, false);
             viewHolder = new CustomView(view);
             return viewHolder;
         }
 
-
         private Drawable getImageForCategory(String item) {
             switch (item) {
-                case "Mobile":
+                case "Htc":
                     return AppGlobals.getContext().getResources().getDrawable(R.drawable.mobile);
-                case "Electronics":
+                case "Moto":
                     return AppGlobals.getContext().getResources().getDrawable(R.drawable.electronics);
-                case "Vehicle":
+                case "Samsung":
                     return AppGlobals.getContext().getResources().getDrawable(R.drawable.vehicle);
-                case "Real State":
+                case "LG":
                     return AppGlobals.getContext().getResources().getDrawable(R.drawable.real_state);
                 default:
                     return AppGlobals.getContext().getResources().getDrawable(R.drawable.not_found);
@@ -172,6 +128,7 @@ public class Buyer extends Fragment {
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
             View childView = rv.findChildViewUnder(e.getX(), e.getY());
             if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
+                System.out.println(items == null);
                 mListener.onItem(items.get(rv.getChildPosition(childView)));
                 return true;
             }
@@ -188,16 +145,54 @@ public class Buyer extends Fragment {
 
         }
 
+        public interface OnItemClickListener {
+            void onItem(String item);
+        }
+    }
 
-        public class CustomView extends RecyclerView.ViewHolder {
-            public TextView textView;
-            public ImageView imageView;
+    public static class CustomView extends RecyclerView.ViewHolder{
+        public TextView textView;
+        public ImageView imageView;
+        public CustomView(View itemView) {
+            super(itemView);
+            textView =  (TextView) itemView.findViewById(R.id.specific_category_title);
+            imageView = (ImageView) itemView.findViewById(R.id.specific_category_image);
+        }
+    }
 
-            public CustomView(View itemView) {
-                super(itemView);
-                textView = (TextView) itemView.findViewById(R.id.category_title);
-                imageView = (ImageView) itemView.findViewById(R.id.category_image);
-            }
+    class GetSpecificDataTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mSwipeRefreshLayout.setRefreshing(true);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            arrayList = new ArrayList<>();
+            arrayList.add("Moto");
+            arrayList.add("Htc");
+            arrayList.add("Samsug");
+            arrayList.add("LG");
+            mAdapter = new CustomAdapter(arrayList);
+            mRecyclerView.setAdapter(mAdapter);
+            mSwipeRefreshLayout.setRefreshing(false);
+            mRecyclerView.addOnItemTouchListener(new CustomAdapter(arrayList, getApplicationContext(),
+                    new CustomAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItem(String item) {
+                            Intent intent = new Intent(getApplicationContext(), ItemDetail.class);
+                            intent.putExtra(AppGlobals.detial, item);
+                            startActivity(intent);
+                        }
+                    }));
         }
     }
 }

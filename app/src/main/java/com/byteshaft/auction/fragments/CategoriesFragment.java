@@ -2,11 +2,15 @@ package com.byteshaft.auction.fragments;
 
 
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -31,6 +35,7 @@ public class CategoriesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.categories_fragment, container, false);
         mBaseView.setTag(TAG);
+        setHasOptionsMenu(true);
         // BEGIN_INCLUDE(initializeRecyclerView)
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView = (RecyclerView) mBaseView.findViewById(R.id.category_list);
@@ -57,6 +62,21 @@ public class CategoriesFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        getActivity().getMenuInflater().inflate(R.menu.my_category_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_done:
+                new UpdateCategories().execute();
+                return true;
+        }
+        return false;
+    }
 
     @Override
     public void onActivityCreated( Bundle savedInstanceState) {
@@ -135,6 +155,15 @@ public class CategoriesFragment extends Fragment {
             imageView = (ImageView) itemView.findViewById(R.id.all_category_image);
             checkBox = (CheckBox) itemView.findViewById(R.id.all_categories_checkbox);
         }
+    }
+
+    class UpdateCategories extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            return null;
+        }
+
     }
 
 }

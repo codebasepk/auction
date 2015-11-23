@@ -21,6 +21,8 @@
         </activity>
         <activity android:name=".login.RegisterActivity"/>
         <activity android:name=".login.LoginActivity"/>
+        <activity android:name=".SelectedCategoryList"/>
+        <activity android:name=".ItemDetail"/>
     </application>
 
 </manifest>
