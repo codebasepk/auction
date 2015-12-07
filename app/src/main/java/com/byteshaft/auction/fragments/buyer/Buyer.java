@@ -65,12 +65,12 @@ public class Buyer extends Fragment {
     public void onResume() {
         super.onResume();
         System.out.println(MainActivity.isLastFragmentAvailable);
-        if (MainActivity.isLastFragmentAvailable) {
-            MainActivity.loginButton.setVisibility(View.INVISIBLE);
-            MainActivity.registerButton.setVisibility(View.INVISIBLE);
-            MainActivity.loginButton.setEnabled(false);
-            MainActivity.registerButton.setEnabled(false);
-        }
+//        if (MainActivity.isLastFragmentAvailable) {
+//            MainActivity.loginButton.setVisibility(View.INVISIBLE);
+//            MainActivity.registerButton.setVisibility(View.INVISIBLE);
+//            MainActivity.loginButton.setEnabled(false);
+//            MainActivity.registerButton.setEnabled(false);
+//        }
     }
 
     private void refreshContent() {

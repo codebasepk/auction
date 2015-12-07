@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
 
 public class UserSettingFragment extends Fragment implements View.OnClickListener {
@@ -35,12 +34,12 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
     @Override
     public void onResume() {
         super.onResume();
-        if (MainActivity.isLastFragmentAvailable) {
-            MainActivity.loginButton.setVisibility(View.INVISIBLE);
-            MainActivity.registerButton.setVisibility(View.INVISIBLE);
-            MainActivity.loginButton.setEnabled(false);
-            MainActivity.registerButton.setEnabled(false);
-        }
+//        if (MainActivity.isLastFragmentAvailable) {
+//            MainActivity.loginButton.setVisibility(View.INVISIBLE);
+//            MainActivity.registerButton.setVisibility(View.INVISIBLE);
+//            MainActivity.loginButton.setEnabled(false);
+//            MainActivity.registerButton.setEnabled(false);
+//        }
     }
 
     @Override
