@@ -13,23 +13,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:layout_width="fill_parent"
-        android:layout_height="60dp"
-        android:textColor="@color/colorPrimaryDark"
-        android:text="Login"
-        android:id="@+id/login_button"
-        android:layout_marginTop="106dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+    <!--<android.support.v7.widget.AppCompatButton-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:textColor="@color/colorPrimaryDark"-->
+        <!--android:text="Login"-->
+        <!--android:id="@+id/login_button"-->
+        <!--android:layout_marginTop="106dp"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_centerHorizontal="true" />-->
 
-    <android.support.v7.widget.AppCompatButton
-        android:layout_width="fill_parent"
-        android:layout_height="60dp"
-        android:textColor="@color/colorPrimaryDark"
-        android:text="Register"
-        android:id="@+id/register_button"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+    <!--<android.support.v7.widget.AppCompatButton-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:textColor="@color/colorPrimaryDark"-->
+        <!--android:text="Register"-->
+        <!--android:id="@+id/register_button"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_centerHorizontal="true" />-->
 
 </RelativeLayout>

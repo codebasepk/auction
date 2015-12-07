@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import com.byteshaft.auction.fragments.ChatActivity;
 import com.byteshaft.auction.utils.AppGlobals;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -109,49 +110,47 @@ public class ItemDetail extends AppCompatActivity {
         public ImageView imageView;
     }
 
-    class GetItemDetailsTask extends AsyncTask<String, String, String> {
+    class GetItemDetailsTask extends AsyncTask<String, String,ArrayList<Bitmap>> {
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            getBitmapFromURL("http://ibin.co/2NWjTZqWdF5M");
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            bitmapArrayList.add(getBitmapFromMemCache(getTitle().toString()));
-            adapter = new CustomAdapter(getApplicationContext(),
-                    R.layout.layout_for_horizontal_list_view, bitmapArrayList);
-            grid.setAdapter(adapter);
-        }
-
-        public void getBitmapFromURL(String src) {
-            Bitmap myBitmap = null;
+        protected ArrayList<Bitmap> doInBackground(String... params) {
+            ArrayList<Bitmap> myBitmap = null;
+            Bitmap bitmap = null;
             try {
-                URL url = new URL(src);
+                URL url = new URL(params[0]);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setDoInput(true);
                 connection.connect();
-                //Decryption
                 try {
                     InputStream input = connection.getInputStream();
-                    myBitmap = BitmapFactory.decodeStream(input);
-                    System.out.println("OK");
-
+                    bitmap = BitmapFactory.decodeStream(input);
+                    File file = new File(getCacheDir(),File.separator+ params[1]+File.separator
+                            +"images"+File.separator);
+                    if (!file.exists()) {
+                        file.mkdirs();
+                    }
                 } catch (Exception e) {
                     e.fillInStackTrace();
                     Log.v("ERROR", "Errorchence : " + e);
                 }
-                addBitmapToMemoryCache(getTitle().toString(), myBitmap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return myBitmap;
+        }
+
+        private int getBitmapNameLocally(int num) {
+             return num+1;
+        }
+
+
+        @Override
+        protected void onPostExecute(ArrayList<Bitmap> bitmap) {
+            super.onPostExecute(bitmap);
+            bitmapArrayList.add(getBitmapFromMemCache(getTitle().toString()));
+            adapter = new CustomAdapter(getApplicationContext(),
+                    R.layout.layout_for_horizontal_list_view, bitmapArrayList);
+            grid.setAdapter(adapter);
         }
 
         public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
@@ -159,10 +158,8 @@ public class ItemDetail extends AppCompatActivity {
                 mMemoryCache.put(key, bitmap);
             }
         }
-
         public Bitmap getBitmapFromMemCache(String key) {
             return mMemoryCache.get(key);
         }
     }
-
 }

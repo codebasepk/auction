@@ -44,9 +44,46 @@
                 android:layout_margin="10dp"/>
             <GridView
                 android:id="@+id/grid_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_below="@+id/btn_bid"
+                android:columnWidth="100dp"
+                android:layout_width="fill_parent"
+                android:layout_height="150dp">
             </GridView>
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:id="@+id/view"
+                android:layout_marginTop="5dp"
+                android:layout_below="@+id/grid_view"
+                android:background="#000000" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="About the seller"
+                android:layout_margin="5dp"
+                android:textSize="20sp"
+                android:textColor="@color/orange"
+                android:id="@+id/about_seller"
+                android:layout_below="@+id/view"
+                />
+
+            <TextView
+                android:id="@+id/seller_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="username: bilal"
+                android:layout_margin="5dp"
+                android:layout_below="@+id/about_seller"/>
+            <Button
+                android:id="@+id/contact_seller_button"
+                android:text="contact button"
+                android:layout_margin="5dp"
+                android:layout_below="@+id/seller_user_name"
+                android:textColor="@color/colorPrimary"
+                android:shadowColor="@color/orange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 </RelativeLayout>

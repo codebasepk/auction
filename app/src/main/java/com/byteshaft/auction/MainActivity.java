@@ -1,6 +1,5 @@
 package com.byteshaft.auction;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -12,23 +11,17 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 
 import com.byteshaft.auction.fragments.CategoriesFragment;
 import com.byteshaft.auction.fragments.UserSettingFragment;
 import com.byteshaft.auction.fragments.buyer.Buyer;
 import com.byteshaft.auction.fragments.seller.Seller;
-import com.byteshaft.auction.login.LoginActivity;
-import com.byteshaft.auction.login.RegisterActivity;
 import com.byteshaft.auction.utils.Helpers;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     public static boolean isLastFragmentAvailable = false;
-    public static Button loginButton;
-    public static Button registerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +37,9 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
+//        else {
+//            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+//        }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -54,27 +50,28 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        loginButton = (Button) findViewById(R.id.login_button);
-        registerButton = (Button) findViewById(R.id.register_button);
-        if (isLastFragmentAvailable) {
-            loginButton.setVisibility(View.INVISIBLE);
-            registerButton.setVisibility(View.INVISIBLE);
-            loginButton.setEnabled(false);
-            registerButton.setEnabled(false);
-        }
-        loginButton.setOnClickListener(this);
-        registerButton.setOnClickListener(this);
+//        loginButton = (Button) findViewById(R.id.login_button);
+//        registerButton = (Button) findViewById(R.id.register_button);
+//        if (isLastFragmentAvailable) {
+//            loginButton.setVisibility(View.INVISIBLE);
+//            registerButton.setVisibility(View.INVISIBLE);
+//            loginButton.setEnabled(false);
+//            registerButton.setEnabled(false);
+//        }
+//        loginButton.setOnClickListener(this);
+//        registerButton.setOnClickListener(this);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (isLastFragmentAvailable) {
-            loginButton.setVisibility(View.INVISIBLE);
-            registerButton.setVisibility(View.INVISIBLE);
-            loginButton.setEnabled(false);
-            registerButton.setEnabled(false);
-        }
+//        if (isLastFragmentAvailable) {
+//            loginButton.setVisibility(View.INVISIBLE);
+//            registerButton.setVisibility(View.INVISIBLE);
+//            loginButton.setEnabled(false);
+//            registerButton.setEnabled(false);
+//        }
     }
 
     public void loadFragment(Fragment fragment) {
@@ -138,23 +135,23 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         selectDrawerItem(item);
         drawer.closeDrawer(GravityCompat.START);
-        loginButton.setVisibility(View.INVISIBLE);
-        registerButton.setVisibility(View.INVISIBLE);
-        loginButton.setEnabled(false);
-        registerButton.setEnabled(false);
+//        loginButton.setVisibility(View.INVISIBLE);
+//        registerButton.setVisibility(View.INVISIBLE);
+//        loginButton.setEnabled(false);
+//        registerButton.setEnabled(false);
         return true;
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.login_button:
-                startActivity(new Intent(getApplicationContext(), LoginActivity.class));//
-                break;
-            case R.id.register_button:
-                startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
-//
-                break;
-        }
-    }
+//    @Override
+//    public void onClick(View v) {
+//        switch (v.getId()) {
+//            case R.id.login_button:
+//                startActivity(new Intent(getApplicationContext(), LoginActivity.class));//
+//                break;
+//            case R.id.register_button:
+//                startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+////
+//                break;
+//        }
+//    }
 }

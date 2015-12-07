@@ -18,7 +18,6 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
 
 import java.util.ArrayList;
@@ -54,12 +53,12 @@ public class CategoriesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (MainActivity.isLastFragmentAvailable) {
-            MainActivity.loginButton.setVisibility(View.INVISIBLE);
-            MainActivity.registerButton.setVisibility(View.INVISIBLE);
-            MainActivity.loginButton.setEnabled(false);
-            MainActivity.registerButton.setEnabled(false);
-        }
+//        if (MainActivity.isLastFragmentAvailable) {
+//            MainActivity.loginButton.setVisibility(View.INVISIBLE);
+//            MainActivity.registerButton.setVisibility(View.INVISIBLE);
+//            MainActivity.loginButton.setEnabled(false);
+//            MainActivity.registerButton.setEnabled(false);
+//        }
     }
 
     @Override
