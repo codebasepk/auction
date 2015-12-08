@@ -20,7 +20,7 @@
             android:layout_marginTop="8dp">
 
             <EditText
-                android:id="@+id/name_edit_text"
+                android:id="@+id/user_name_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="user name"
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Phone Number"
                 android:textColorHint="@color/colorDefault"
-                android:inputType="textPhonetic" />
+                android:inputType="phone" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -85,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Address"
                 android:textColorHint="@color/colorDefault"
-                android:inputType="textPassword" />
+                android:inputType="text" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -100,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:hint="City"
                 android:textColorHint="@color/colorDefault"
-                android:inputType="textPassword" />
+                android:inputType="text" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.AppCompatButton
