@@ -7,4 +7,10 @@
         android:orderInCategory="100"
         app:showAsAction="always" />
 
+    <item android:id="@+id/new_bid_notification"
+        android:title="Chat"
+        android:icon="@drawable/notification"
+        android:orderInCategory="100"
+        app:showAsAction="always" />
+
 </menu>

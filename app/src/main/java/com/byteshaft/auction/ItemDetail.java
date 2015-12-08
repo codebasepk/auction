@@ -7,7 +7,10 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.util.LruCache;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +40,8 @@ public class ItemDetail extends AppCompatActivity {
     private ArrayList<Bitmap> bitmapArrayList;
     private ArrayAdapter adapter;
     private GridView grid;
+    private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +59,20 @@ public class ItemDetail extends AppCompatActivity {
         String detail = getIntent().getStringExtra(AppGlobals.detial);
         setTitle(detail);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mRecyclerView = (RecyclerView) findViewById(R.id.bids_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout_for_item_detail);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.orange, R.color.green,
+                R.color.colorPrimary, R.color.gray);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         bitmapArrayList = new ArrayList<>();
 //        new GetItemDetailsTask().execute();
     }
