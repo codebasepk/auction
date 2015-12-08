@@ -39,5 +39,10 @@ public class Helpers {
         return sharedPreferences.getBoolean(key, false);
     }
 
+    public static void saveDataToSharedPreferences(String key, String value) {
+        SharedPreferences sharedPreferences = getPrefrenceManager();
+        sharedPreferences.edit().putString(key, value).apply();
+    }
+
 
 }

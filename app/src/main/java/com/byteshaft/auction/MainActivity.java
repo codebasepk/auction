@@ -18,12 +18,12 @@ import com.byteshaft.auction.fragments.UserSettingFragment;
 import com.byteshaft.auction.fragments.buyer.Buyer;
 import com.byteshaft.auction.fragments.seller.Seller;
 import com.byteshaft.auction.login.LoginActivity;
+import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static boolean isLastFragmentAvailable = false;
     private static MainActivity instance;
 
     public static MainActivity getInstance() {
@@ -33,10 +33,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        isLastFragmentAvailable = true;
         instance = this;
+        System.out.println(Helpers.getLastFragment());
         if (Helpers.isUserLoggedIn()) {
-            isLastFragmentAvailable = true;
             if (!Helpers.getLastFragment().equals("")) {
                 if (Helpers.getLastFragment().contains("Buyer")) {
                     loadFragment(new Buyer());
@@ -58,28 +57,16 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-//        loginButton = (Button) findViewById(R.id.login_button);
-//        registerButton = (Button) findViewById(R.id.register_button);
-//        if (isLastFragmentAvailable) {
-//            loginButton.setVisibility(View.INVISIBLE);
-//            registerButton.setVisibility(View.INVISIBLE);
-//            loginButton.setEnabled(false);
-//            registerButton.setEnabled(false);
-//        }
-//        loginButton.setOnClickListener(this);
-//        registerButton.setOnClickListener(this);
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        if (isLastFragmentAvailable) {
-//            loginButton.setVisibility(View.INVISIBLE);
-//            registerButton.setVisibility(View.INVISIBLE);
-//            loginButton.setEnabled(false);
-//            registerButton.setEnabled(false);
-//        }
+        if (AppGlobals.loginSuccessFull) {
+            loadFragment(new Buyer());
+            AppGlobals.loginSuccessFull = false;
+        }
     }
 
     public void loadFragment(Fragment fragment) {
@@ -142,32 +129,9 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//         if (!Helpers.isUserLoggedIn()) {
-//         drawer.closeDrawer(GravityCompat.START);
-//         Toast.makeText(getApplicationContext(), "please login or register first",
-//                 Toast.LENGTH_SHORT).show();
-//         return false;
-//         }
         int id = item.getItemId();
         selectDrawerItem(item);
         drawer.closeDrawer(GravityCompat.START);
-//        loginButton.setVisibility(View.INVISIBLE);
-//        registerButton.setVisibility(View.INVISIBLE);
-//        loginButton.setEnabled(false);
-//        registerButton.setEnabled(false);
         return true;
     }
-
-//    @Override
-//    public void onClick(View v) {
-//        switch (v.getId()) {
-//            case R.id.login_button:
-//                startActivity(new Intent(getApplicationContext(), LoginActivity.class));//
-//                break;
-//            case R.id.register_button:
-//                startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
-////
-//                break;
-//        }
-//    }
 }

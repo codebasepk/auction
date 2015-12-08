@@ -34,12 +34,6 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
     @Override
     public void onResume() {
         super.onResume();
-//        if (MainActivity.isLastFragmentAvailable) {
-//            MainActivity.loginButton.setVisibility(View.INVISIBLE);
-//            MainActivity.registerButton.setVisibility(View.INVISIBLE);
-//            MainActivity.loginButton.setEnabled(false);
-//            MainActivity.registerButton.setEnabled(false);
-//        }
     }
 
     @Override

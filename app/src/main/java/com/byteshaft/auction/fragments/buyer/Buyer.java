@@ -17,10 +17,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.SelectedCategoryList;
 import com.byteshaft.auction.utils.AppGlobals;
+import com.byteshaft.auction.utils.Helpers;
 
 import java.util.ArrayList;
 
@@ -37,6 +37,7 @@ public class Buyer extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.buyer_category_fragment, container, false);
         mBaseView.setTag(TAG);
+        Helpers.saveLastFragmentOpend(getClass().getSimpleName());
         // BEGIN_INCLUDE(initializeRecyclerView)
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView = (RecyclerView) mBaseView.findViewById(R.id.recycler);
@@ -64,13 +65,6 @@ public class Buyer extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        System.out.println(MainActivity.isLastFragmentAvailable);
-//        if (MainActivity.isLastFragmentAvailable) {
-//            MainActivity.loginButton.setVisibility(View.INVISIBLE);
-//            MainActivity.registerButton.setVisibility(View.INVISIBLE);
-//            MainActivity.loginButton.setEnabled(false);
-//            MainActivity.registerButton.setEnabled(false);
-//        }
     }
 
     private void refreshContent() {

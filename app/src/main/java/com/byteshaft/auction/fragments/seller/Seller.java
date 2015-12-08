@@ -58,12 +58,6 @@ public class Seller extends Fragment implements View.OnClickListener{
     @Override
     public void onResume() {
         super.onResume();
-//        if (MainActivity.isLastFragmentAvailable) {
-//            MainActivity.loginButton.setVisibility(View.INVISIBLE);
-//            MainActivity.registerButton.setVisibility(View.INVISIBLE);
-//            MainActivity.loginButton.setEnabled(false);
-//            MainActivity.registerButton.setEnabled(false);
-//        }
     }
     public void onClick(View v) {
         switch (v.getId()) {
