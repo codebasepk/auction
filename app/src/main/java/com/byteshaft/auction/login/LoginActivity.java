@@ -6,12 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
+import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button registerButton;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,5 +29,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
                 break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        MainActivity.getInstance().closeApplication();
     }
 }

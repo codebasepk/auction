@@ -1,5 +1,6 @@
 package com.byteshaft.auction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -16,17 +17,24 @@ import com.byteshaft.auction.fragments.CategoriesFragment;
 import com.byteshaft.auction.fragments.UserSettingFragment;
 import com.byteshaft.auction.fragments.buyer.Buyer;
 import com.byteshaft.auction.fragments.seller.Seller;
+import com.byteshaft.auction.login.LoginActivity;
 import com.byteshaft.auction.utils.Helpers;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static boolean isLastFragmentAvailable = false;
+    private static MainActivity instance;
+
+    public static MainActivity getInstance() {
+        return instance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isLastFragmentAvailable = true;
+        instance = this;
         if (Helpers.isUserLoggedIn()) {
             isLastFragmentAvailable = true;
             if (!Helpers.getLastFragment().equals("")) {
@@ -37,9 +45,9 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-//        else {
-//            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-//        }
+        else {
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -119,6 +127,14 @@ public class MainActivity extends AppCompatActivity
         setTitle(menuItem.getTitle());
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+    }
+
+    public void closeApplication() {
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
+        startActivity(startMain);
+        MainActivity.this.finish();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
