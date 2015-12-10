@@ -7,8 +7,8 @@ import com.parse.Parse;
 
 public class AppGlobals extends Application{
 
-    public static final String APPLICATION_ID = "9MwjJ95wMBfGQE1gtc07viXQpdWS3Wm7LUqK13V2";
-    public static final String CLIENT_KEY = "deOcsGXlodkAiuDkCXYlCQgi1SeluIImIiLWgHtM";
+    public static final String APPLICATION_ID = "ebT08jXzK3aUuzwKAM36XVAUltLWKBVQhrCaYXgA";
+    public static final String CLIENT_KEY = "Vlcn6jDAuoS2lxlDD2IWgxTJLIkZkWnS0iBJWPWs";
     private static Context sContext;
     public static final String user_login_key = "user_login";
     public static final String lastFragment = "last_fragment";
