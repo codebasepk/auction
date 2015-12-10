@@ -127,7 +127,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void selectImage() {
-        final CharSequence[] items = { "Take Photo", "Choose from Library", "Cancel" };
+        final CharSequence[] items = { "Take Photo", "Choose from Library", "Remove photo", "Cancel" };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
         builder.setTitle("Add Photo!");
@@ -147,6 +147,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             SELECT_FILE);
                 } else if (items[item].equals("Cancel")) {
                     dialog.dismiss();
+                } else if (items[item].equals("Remove photo")) {
+                    dpButton.setImageDrawable(null);
+                    System.out.println("worked");
                 }
             }
         });
