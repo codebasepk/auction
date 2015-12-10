@@ -38,7 +38,6 @@ public class Buyer extends Fragment {
         mBaseView = inflater.inflate(R.layout.buyer_category_fragment, container, false);
         mBaseView.setTag(TAG);
         Helpers.saveLastFragmentOpend(getClass().getSimpleName());
-        // BEGIN_INCLUDE(initializeRecyclerView)
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView = (RecyclerView) mBaseView.findViewById(R.id.recycler);
         mSwipeRefreshLayout = (SwipeRefreshLayout) mBaseView.findViewById(R.id.swipe_refresh);
@@ -53,7 +52,6 @@ public class Buyer extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
-        System.out.println(mRecyclerView == null);
         arrayList = new ArrayList<>();
         arrayList.add("Mobile");
         arrayList.add("Electronics");
@@ -89,7 +87,8 @@ public class Buyer extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mAdapter = new CustomAdapter(arrayList);
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addOnItemTouchListener(new CustomAdapter(arrayList , AppGlobals.getContext(), new CustomAdapter.OnItemClickListener() {
+        mRecyclerView.addOnItemTouchListener(new CustomAdapter(arrayList , AppGlobals.getContext()
+                , new CustomAdapter.OnItemClickListener() {
             @Override
             public void onItem(String item) {
                 Intent intent = new Intent(getActivity().getApplicationContext(),

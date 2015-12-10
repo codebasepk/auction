@@ -3,7 +3,6 @@ package com.byteshaft.auction;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.util.LruCache;
@@ -11,25 +10,22 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.ChatActivity;
 import com.byteshaft.auction.utils.AppGlobals;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class ItemDetail extends AppCompatActivity {
@@ -38,10 +34,11 @@ public class ItemDetail extends AppCompatActivity {
     final static int cacheSize = maxMemory / 8;
     private LruCache<String, Bitmap> mMemoryCache;
     private ArrayList<Bitmap> bitmapArrayList;
-    private ArrayAdapter adapter;
-    private GridView grid;
+    private GridView mGrid;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private BidsAdapter mBidsAdapter;
+    private ArrayList<String> arrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +52,7 @@ public class ItemDetail extends AppCompatActivity {
                 }
             };
         }
-        grid = (GridView) findViewById(R.id.grid_view);
+//        mGrid = (GridView) findViewById(R.id.grid_view);
         String detail = getIntent().getStringExtra(AppGlobals.detial);
         setTitle(detail);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -74,7 +71,31 @@ public class ItemDetail extends AppCompatActivity {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         bitmapArrayList = new ArrayList<>();
+        arrayList = new ArrayList<>();
+        arrayList.add("test one");
+        arrayList.add("test two");
+        arrayList.add("test three");
+        arrayList.add("test four");
+        arrayList.add("test five");
 //        new GetItemDetailsTask().execute();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mBidsAdapter = new BidsAdapter(arrayList, getApplicationContext());
+        mRecyclerView.setAdapter(mBidsAdapter);
+        System.out.println(mRecyclerView == null);
+        System.out.println(mBidsAdapter == null);
+        mRecyclerView.addOnItemTouchListener(new BidsAdapter(arrayList, getApplicationContext()
+                , new BidsAdapter.OnItemClickListener() {
+            @Override
+            public void onItem(String item) {
+                System.out.println(item);
+            }
+        }));
+        System.out.println("DONE");
+
     }
 
     @Override
@@ -120,65 +141,152 @@ public class ItemDetail extends AppCompatActivity {
             } else {
                 customView = (CustomView) convertView.getTag();
             }
-            customView.imageView.setImageBitmap(items.get(position));
+//            customView.imageView.setImageBitmap(items.get(position));
             return convertView;
         }
+
     }
 
     public class CustomView {
         public ImageView imageView;
     }
 
-    class GetItemDetailsTask extends AsyncTask<String, String,ArrayList<Bitmap>> {
+    class GetItemDetailsTask extends AsyncTask<String, String, ArrayList<Bitmap>> {
 
         @Override
         protected ArrayList<Bitmap> doInBackground(String... params) {
             ArrayList<Bitmap> myBitmap = null;
-            Bitmap bitmap = null;
-            try {
-                URL url = new URL(params[0]);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                try {
-                    InputStream input = connection.getInputStream();
-                    bitmap = BitmapFactory.decodeStream(input);
-                    File file = new File(getCacheDir(),File.separator+ params[1]+File.separator
-                            +"images"+File.separator);
-                    if (!file.exists()) {
-                        file.mkdirs();
-                    }
-                } catch (Exception e) {
-                    e.fillInStackTrace();
-                    Log.v("ERROR", "Errorchence : " + e);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            Bitmap bitmap = null;
+//            try {
+//                URL url = new URL(params[0]);
+//                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//                connection.setDoInput(true);
+//                connection.connect();
+//                try {
+//                    InputStream input = connection.getInputStream();
+//                    bitmap = BitmapFactory.decodeStream(input);
+//                    File file = new File(getCacheDir(), File.separator + params[1] + File.separator
+//                            + "images" + File.separator);
+//                    if (!file.exists()) {
+//                        file.mkdirs();
+//                    }
+//                } catch (Exception e) {
+//                    e.fillInStackTrace();
+//                    Log.v("ERROR", "Errorchence : " + e);
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
             return myBitmap;
         }
 
         private int getBitmapNameLocally(int num) {
-             return num+1;
+            return num + 1;
         }
 
 
         @Override
         protected void onPostExecute(ArrayList<Bitmap> bitmap) {
             super.onPostExecute(bitmap);
-            bitmapArrayList.add(getBitmapFromMemCache(getTitle().toString()));
-            adapter = new CustomAdapter(getApplicationContext(),
-                    R.layout.layout_for_horizontal_list_view, bitmapArrayList);
-            grid.setAdapter(adapter);
+//            bitmapArrayList.add(getBitmapFromMemCache(getTitle().toString()));
+//            adapter = new CustomAdapter(getApplicationContext(),
+//                    R.layout.layout_for_horizontal_list_view, bitmapArrayList);
+//            mGrid.setAdapter(adapter);
+
+        }
+    }
+
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+        return mMemoryCache.get(key);
+    }
+
+    static class BidsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
+            RecyclerView.OnItemTouchListener {
+
+        private OnItemClickListener mListener;
+        private GestureDetector mGestureDetector;
+        private BidView bidView;
+        private ArrayList<String> items;
+        private Context mContext;
+
+        public interface OnItemClickListener {
+            void onItem(String item);
         }
 
-        public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
-            if (getBitmapFromMemCache(key) == null) {
-                mMemoryCache.put(key, bitmap);
-            }
+        public BidsAdapter(ArrayList<String> data, Context context) {
+            this.items = data;
+            this.mContext = context;
         }
-        public Bitmap getBitmapFromMemCache(String key) {
-            return mMemoryCache.get(key);
+
+        public BidsAdapter(ArrayList<String> categories, Context context, OnItemClickListener listener) {
+            this.items = categories;
+            mListener = listener;
+            mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    return true;
+                }
+            });
+        }
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            System.out.println("beforeView");
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.bids_layout, parent, false);
+            System.out.println(view == null);
+            bidView = new BidView(view);
+            System.out.println("WORKING");
+            return bidView;
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            bidView.textView.setText(String.valueOf(position));
+            bidView.bidderTextView.setText(items.get(position));
+            System.out.println(position);
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+            View childView = rv.findChildViewUnder(e.getX(), e.getY());
+            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
+                mListener.onItem(items.get(rv.getChildPosition(childView)));
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return items.size();
+        }
+    }
+
+    static class BidView extends RecyclerView.ViewHolder {
+        public TextView textView;
+        public TextView bidderTextView;
+
+        public BidView(View itemView) {
+            super(itemView);
+            textView = (TextView) itemView.findViewById(R.id.bid_text_View);
+            bidderTextView = (TextView) itemView.findViewById(R.id.bidder_user_name);
         }
     }
 }
+
