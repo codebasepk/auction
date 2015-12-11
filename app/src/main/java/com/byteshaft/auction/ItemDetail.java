@@ -57,6 +57,7 @@ public class ItemDetail extends AppCompatActivity {
         setTitle(detail);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mRecyclerView = (RecyclerView) findViewById(R.id.bids_recycler_view);
+        System.out.println(mRecyclerView == null);
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout_for_item_detail);
@@ -77,6 +78,11 @@ public class ItemDetail extends AppCompatActivity {
         arrayList.add("test three");
         arrayList.add("test four");
         arrayList.add("test five");
+        arrayList.add("test six");
+        arrayList.add("test seven");
+        arrayList.add("test eight");
+        arrayList.add("test nine");
+        arrayList.add("test ten");
 //        new GetItemDetailsTask().execute();
     }
 
@@ -85,8 +91,6 @@ public class ItemDetail extends AppCompatActivity {
         super.onResume();
         mBidsAdapter = new BidsAdapter(arrayList);
         mRecyclerView.setAdapter(mBidsAdapter);
-        System.out.println(mRecyclerView == null);
-        System.out.println(mBidsAdapter == null);
         mRecyclerView.addOnItemTouchListener(new BidsAdapter(arrayList, getApplicationContext()
                 , new BidsAdapter.OnItemClickListener() {
             @Override
@@ -94,7 +98,6 @@ public class ItemDetail extends AppCompatActivity {
                 System.out.println(item);
             }
         }));
-        System.out.println("DONE");
 
     }
 
@@ -236,20 +239,16 @@ public class ItemDetail extends AppCompatActivity {
 
         @Override
         public BidView onCreateViewHolder(ViewGroup parent, int viewType) {
-            System.out.println("beforeView");
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.bids_layout, parent, false);
-            System.out.println(view == null);
             bidView = new BidView(view);
-            System.out.println("WORKING");
             return bidView;
         }
 
         @Override
         public void onBindViewHolder(BidView holder, int position) {
-            bidView.textView.setText(String.valueOf(position));
+            holder.setIsRecyclable(false);
+//            bidView.textView.setText(String.valueOf(position));
             bidView.bidderTextView.setText(items.get(position));
-            System.out.println(position);
-
         }
 
 
