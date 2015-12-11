@@ -83,7 +83,7 @@ public class ItemDetail extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mBidsAdapter = new BidsAdapter(arrayList, getApplicationContext());
+        mBidsAdapter = new BidsAdapter(arrayList);
         mRecyclerView.setAdapter(mBidsAdapter);
         System.out.println(mRecyclerView == null);
         System.out.println(mBidsAdapter == null);
@@ -206,22 +206,21 @@ public class ItemDetail extends AppCompatActivity {
         return mMemoryCache.get(key);
     }
 
-    static class BidsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
+    static class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView> implements
             RecyclerView.OnItemTouchListener {
 
         private OnItemClickListener mListener;
         private GestureDetector mGestureDetector;
         private BidView bidView;
         private ArrayList<String> items;
-        private Context mContext;
 
         public interface OnItemClickListener {
             void onItem(String item);
         }
 
-        public BidsAdapter(ArrayList<String> data, Context context) {
+        public BidsAdapter(ArrayList<String> data) {
+            super();
             this.items = data;
-            this.mContext = context;
         }
 
         public BidsAdapter(ArrayList<String> categories, Context context, OnItemClickListener listener) {
@@ -236,7 +235,7 @@ public class ItemDetail extends AppCompatActivity {
         }
 
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public BidView onCreateViewHolder(ViewGroup parent, int viewType) {
             System.out.println("beforeView");
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.bids_layout, parent, false);
             System.out.println(view == null);
@@ -246,11 +245,13 @@ public class ItemDetail extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        public void onBindViewHolder(BidView holder, int position) {
             bidView.textView.setText(String.valueOf(position));
             bidView.bidderTextView.setText(items.get(position));
             System.out.println(position);
+
         }
+
 
         @Override
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
@@ -276,17 +277,18 @@ public class ItemDetail extends AppCompatActivity {
         public int getItemCount() {
             return items.size();
         }
-    }
 
-    static class BidView extends RecyclerView.ViewHolder {
-        public TextView textView;
-        public TextView bidderTextView;
+        static class BidView extends RecyclerView.ViewHolder {
+            public TextView textView;
+            public TextView bidderTextView;
 
-        public BidView(View itemView) {
-            super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.bid_text_View);
-            bidderTextView = (TextView) itemView.findViewById(R.id.bidder_user_name);
+            public BidView(View itemView) {
+                super(itemView);
+                textView = (TextView) itemView.findViewById(R.id.bid_text_View);
+                bidderTextView = (TextView) itemView.findViewById(R.id.bidder_user_name);
+            }
         }
     }
+
 }
 

@@ -16,6 +16,7 @@ public class AppGlobals extends Application{
     public static final String detial = "detail";
     public static final String KEY_USERNAME = "username";
     public static final String KEY_PASSWORD = "password";
+    public static final String KEY_EMAIL = "email";
     public static boolean loginSuccessFull = false;
 
     @Override

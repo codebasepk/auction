@@ -12,6 +12,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.CategoriesFragment;
 import com.byteshaft.auction.fragments.UserSettingFragment;
@@ -57,7 +59,20 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        View header = navigationView.getHeaderView(0);
+        TextView userName = (TextView) header.findViewById(R.id.nav_user_name);
+        TextView userEmail = (TextView) header.findViewById(R.id.nav_user_email);
+        System.out.println(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME));
+        if (!Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME).equals("")) {
+            userName.setText(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME));
+        } else {
+            userName.setText("username");
+        }
+        if (!Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_EMAIL).equals("")) {
+            userEmail.setText(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_EMAIL));
+        } else {
+            userEmail.setText("abc@xyz.com");
+        }
     }
 
     @Override
