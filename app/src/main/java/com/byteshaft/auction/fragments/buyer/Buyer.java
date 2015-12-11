@@ -152,6 +152,7 @@ public class Buyer extends Fragment {
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            holder.setIsRecyclable(false);
             viewHolder.textView.setText(items.get(position));
             viewHolder.imageView.setImageDrawable(getImageForCategory(items.get(position)));
         }
