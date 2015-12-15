@@ -73,16 +73,16 @@ public class ItemDetail extends AppCompatActivity {
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         bitmapArrayList = new ArrayList<>();
         arrayList = new ArrayList<>();
-        arrayList.add("test one");
-        arrayList.add("test two");
-        arrayList.add("test three");
-        arrayList.add("test four");
-        arrayList.add("test five");
-        arrayList.add("test six");
-        arrayList.add("test seven");
-        arrayList.add("test eight");
-        arrayList.add("test nine");
-        arrayList.add("test ten");
+        arrayList.add("s9iper1");
+        arrayList.add("shg8rb");
+        arrayList.add("om26er");
+        arrayList.add("fi8er1");
+        arrayList.add("hussi");
+        arrayList.add("humza");
+        arrayList.add("talha");
+        arrayList.add("falak");
+        arrayList.add("jamal");
+        arrayList.add("that");
 //        new GetItemDetailsTask().execute();
     }
 
