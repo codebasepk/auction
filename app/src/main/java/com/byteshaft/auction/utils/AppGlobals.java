@@ -18,6 +18,12 @@ public class AppGlobals extends Application{
     public static final String KEY_PASSWORD = "password";
     public static final String KEY_EMAIL = "email";
     public static boolean loginSuccessFull = false;
+    public static final String LOGIN_URL = (
+            "LOGIN_URL"
+    );
+    public static final String REGISTER_URL = (
+            "LOGIN_URL"
+    );
 
     @Override
     public void onCreate() {
