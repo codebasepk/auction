@@ -3,8 +3,6 @@ package com.byteshaft.auction.utils;
 import android.app.Application;
 import android.content.Context;
 
-import com.parse.Parse;
-
 public class AppGlobals extends Application{
 
     public static final String APPLICATION_ID = "ebT08jXzK3aUuzwKAM36XVAUltLWKBVQhrCaYXgA";
@@ -17,22 +15,22 @@ public class AppGlobals extends Application{
     public static final String KEY_USERNAME = "username";
     public static final String KEY_PASSWORD = "password";
     public static final String KEY_EMAIL = "email";
+    public static final String KEY_CATEGORIES_SELECTED = "categories_selected";
+    public static final String KEY_PHONE_NUMBER = "phone_number";
+    public static final String KEY_ADDRESS = "address";
+    public static final String KEY_CITY = "city";
     public static boolean loginSuccessFull = false;
     public static final String LOGIN_URL = (
             "LOGIN_URL"
     );
     public static final String REGISTER_URL = (
-            "http://192.168.8.102:8080/users/"
+            "http://192.168.1.4:8000/users/"
     );
 
     @Override
     public void onCreate() {
         super.onCreate();
         sContext = getApplicationContext();
-//        ParseObject.registerSubclass(Message.class);
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this, APPLICATION_ID, CLIENT_KEY);
-
     }
 
     public static String getLogTag(Class aClass) {

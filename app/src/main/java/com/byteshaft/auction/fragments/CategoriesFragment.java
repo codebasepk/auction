@@ -17,8 +17,11 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.byteshaft.auction.R;
+import com.byteshaft.auction.utils.AppGlobals;
+import com.byteshaft.auction.utils.Helpers;
 
 import java.util.ArrayList;
 
@@ -35,7 +38,9 @@ public class CategoriesFragment extends Fragment {
         mBaseView = inflater.inflate(R.layout.categories_fragment, container, false);
         mBaseView.setTag(TAG);
         setHasOptionsMenu(true);
-        // BEGIN_INCLUDE(initializeRecyclerView)
+        if (!Helpers.getBooleanValueFromSharedPrefrence(AppGlobals.KEY_CATEGORIES_SELECTED)) {
+            Toast.makeText(getActivity(), "please select your categories", Toast.LENGTH_LONG).show();
+        }
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView = (RecyclerView) mBaseView.findViewById(R.id.category_list);
         mRecyclerView.setLayoutManager(linearLayoutManager);

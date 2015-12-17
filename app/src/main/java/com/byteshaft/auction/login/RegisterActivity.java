@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
@@ -33,7 +35,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -77,6 +78,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         .toString().trim().isEmpty() || mAddress.getText().toString().trim().isEmpty()
                         || mCity.getText().toString().trim().isEmpty()) {
                     Toast.makeText(AppGlobals.getContext(), "All fields are required", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (mUserNameEditText.getText().toString().contains(" ")) {
+                    Toast.makeText(getApplicationContext(), "username should not contain any spaces",
+                            Toast.LENGTH_SHORT).show();
                     return;
                 }
                 boolean validEmail = isValidEmail(mEmailEditText.getText().toString());
@@ -159,7 +165,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     dialog.dismiss();
                 } else if (items[item].equals("Remove photo")) {
                     dpButton.setImageDrawable(null);
-                    System.out.println("worked");
                 }
             }
         });
@@ -214,7 +219,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    class RegistrationTask extends AsyncTask<String, String, ArrayList<String>> {
+    class RegistrationTask extends AsyncTask<String, String, String[]> {
 
         @Override
         protected void onPreExecute() {
@@ -227,25 +232,34 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
 
         @Override
-        protected ArrayList<String> doInBackground(String... params) {
-            ArrayList<String> arrayList = new ArrayList<>();
+        protected String[] doInBackground(String... params) {
+            int resultCode = 0;
             try {
-                Helpers.getSessionId(params[0], params[1], params[2], params[3], params[4], params[5]);
+                resultCode  = Helpers.sendRegisterData(params[0], params[1], params[2], params[3], params[4], params[5]);
+                Log.i(AppGlobals.getLogTag(AppGlobals.getContext().getClass()), String.valueOf(resultCode)
+                );
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return arrayList;
+            return new String[]{String.valueOf(resultCode), params[0], params[1], params[2],
+                    params[3], params[4], params[5]};
         }
 
         @Override
-        protected void onPostExecute(final ArrayList<String> arrayList) {
-            super.onPostExecute(arrayList);
+        protected void onPostExecute(String[] result) {
+            super.onPostExecute(result);
             mProgressDialog.dismiss();
+            System.out.println(result.toString());
+            if (Integer.valueOf(result[0]).equals(201)) {
+                Helpers.userLogin(true);
+                Helpers.saveDataToSharedPreferences(AppGlobals.KEY_EMAIL, result[1]);
+                Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PASSWORD, result[2]);
+                Helpers.saveDataToSharedPreferences(AppGlobals.KEY_USERNAME, result[3]);
+                Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER, result[4]);
+                Helpers.saveDataToSharedPreferences(AppGlobals.KEY_CITY, result[5]);
+                Helpers.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, result[6]);
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            }
         }
     }
 }
