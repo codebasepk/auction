@@ -2,7 +2,6 @@ package com.byteshaft.auction.utils;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import org.json.JSONException;
 
@@ -52,13 +51,18 @@ public class Helpers {
         sharedPreferences.edit().putString(key, value).apply();
     }
 
+    public static Boolean getBooleanValueFromSharedPrefrence(String key) {
+        SharedPreferences sharedPreferences = getPrefrenceManager();
+        return sharedPreferences.getBoolean(key, false);
+    }
+
     public static String getStringDataFromSharedPreference(String key) {
         SharedPreferences sharedPreferences = getPrefrenceManager();
         return sharedPreferences.getString(key, "");
     }
 
-    public static void getSessionId(String email, String password, String userName,
-                                      String phoneNumber, String city, String address)
+    public static int sendRegisterData(String email, String password, String userName,
+                                        String phoneNumber, String city, String address)
             throws IOException, JSONException {
         URL url;
         HttpURLConnection urlConnection;
@@ -74,7 +78,7 @@ public class Helpers {
         OutputStream os = urlConnection.getOutputStream();
         os.write(bytes);
         os.close();
-        Log.i(AppGlobals.getLogTag(AppGlobals.getContext().getClass()), String.valueOf(urlConnection.getResponseCode()));
+        return urlConnection.getResponseCode();
     }
 
 }

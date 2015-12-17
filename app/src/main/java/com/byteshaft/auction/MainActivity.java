@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         instance = this;
+        System.out.println(Helpers.isUserLoggedIn());
         System.out.println(Helpers.getLastFragment());
         if (Helpers.isUserLoggedIn()) {
             if (!Helpers.getLastFragment().equals("")) {
@@ -44,6 +45,10 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     loadFragment(new Seller());
                 }
+            } else if (!Helpers.getBooleanValueFromSharedPrefrence(AppGlobals.KEY_CATEGORIES_SELECTED)) {
+                loadFragment(new CategoriesFragment());
+            } else {
+                loadFragment(new Buyer());
             }
         }
         else {
