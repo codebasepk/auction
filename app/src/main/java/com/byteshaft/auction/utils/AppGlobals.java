@@ -22,7 +22,7 @@ public class AppGlobals extends Application{
             "LOGIN_URL"
     );
     public static final String REGISTER_URL = (
-            "LOGIN_URL"
+            "http://192.168.8.102:8080/users/"
     );
 
     @Override
@@ -33,6 +33,10 @@ public class AppGlobals extends Application{
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, APPLICATION_ID, CLIENT_KEY);
 
+    }
+
+    public static String getLogTag(Class aClass) {
+        return aClass.getName();
     }
 
     public static Context getContext() {

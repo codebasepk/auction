@@ -52,6 +52,14 @@
                     android:text="Bid"
                     android:textColor="@color/colorPrimary" />
 
+                <RatingBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    style="?android:attr/ratingBarStyleSmall"
+                    android:isIndicator="true"
+                    android:id="@+id/ratingBar" />
+
                 <GridView
                     android:id="@+id/grid_view"
                     android:layout_width="fill_parent"
