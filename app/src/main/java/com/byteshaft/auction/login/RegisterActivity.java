@@ -24,12 +24,9 @@ import android.widget.Toast;
 
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
-import com.parse.FindCallback;
-import com.parse.LogInCallback;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
-import com.parse.SignUpCallback;
+import com.byteshaft.auction.utils.Helpers;
+
+import org.json.JSONException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -37,7 +34,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -96,8 +92,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(AppGlobals.getContext(), "password must contain 6 character", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                String[] data = {mUserNameEditText.getText().toString(),
-                        mPasswordEditText.getText().toString()};
+                String[] data = {mEmailEditText.getText().toString(),
+                        mPasswordEditText.getText().toString(), mUserNameEditText.getText().toString(),
+                        mPhoneNumber.getText().toString(), mCity.getText().toString(),
+                        mAddress.getText().toString()};
                 new RegistrationTask().execute(data);
                 break;
             case R.id.button_dp:
@@ -138,111 +136,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         return super.onOptionsItemSelected(item);
     }
 
-    class RegistrationTask extends AsyncTask<String, String, ArrayList<String>> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mProgressDialog = new ProgressDialog(RegisterActivity.this);
-            mProgressDialog.setMessage("Registering");
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.show();
-        }
-
-        @Override
-        protected ArrayList<String> doInBackground(String... params) {
-            boolean response = false;
-            ArrayList<String> arrayList = new ArrayList<>();
-            arrayList.add(params[0]);
-            arrayList.add(params[1]);
-            final ParseUser user = new ParseUser();
-            user.setPassword(arrayList.get(1));
-            user.put("username", arrayList.get(0));
-            ParseQuery<ParseUser> query = ParseUser.getQuery();
-            query.whereEqualTo("username", arrayList.get(0));
-            query.findInBackground(new FindCallback<ParseUser>() {
-                @Override
-                public void done(List<ParseUser> parseUsers, ParseException e) {
-                    if (e == null) {
-                        // Successful Query
-                        // User already exists ? then login
-                        if (parseUsers.size() > 0) {
-                            System.out.println("already present please login");
-//                            loginUser(arrayList.get(0), arrayList.get(1));
-                        } else {
-                            // No user found, so signup
-                            signupUser(user);
-                        }
-                    } else {
-                        // Shit happened!
-                        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
-                        builder.setMessage(e.getMessage())
-                                .setTitle("Oops!")
-                                .setPositiveButton(android.R.string.ok, null);
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
-                    }
-                }
-            });
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return arrayList;
-        }
-
-        @Override
-        protected void onPostExecute(final ArrayList<String> arrayList) {
-            super.onPostExecute(arrayList);
-            mProgressDialog.dismiss();
-        }
-
-        private void loginUser(String username, String password) {
-            ParseUser.logInInBackground(username, password, new LogInCallback() {
-                public void done(ParseUser user, ParseException e) {
-                    if (user != null) {
-                        // Hooray! The user is logged in.
-                        System.out.println("Login");
-
-                    } else {
-                        // Login failed!
-                        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
-                        builder.setMessage(e.getMessage())
-                                .setTitle("Oops!")
-                                .setPositiveButton(android.R.string.ok, null);
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
-                    }
-                }
-            });
-        }
-
-        private void signupUser(ParseUser user) {
-            user.signUpInBackground(new SignUpCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-                        // Signup successful!
-                        System.out.println("success");
-                    } else {
-                        // Fail!
-                        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
-                        builder.setMessage(e.getMessage())
-                                .setTitle("Oops!")
-                                .setPositiveButton(android.R.string.ok, null);
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
-                    }
-                }
-            });
-        }
-    }
-
     private void selectImage() {
-        
-        final CharSequence[] items = { "Take Photo", "Choose from Library", "Remove photo", "Cancel" };
+
+        final CharSequence[] items = {"Take Photo", "Choose from Library", "Remove photo", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -315,6 +211,41 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 bm = BitmapFactory.decodeFile(selectedImagePath, options);
                 dpButton.setImageBitmap(bm);
             }
+        }
+    }
+
+    class RegistrationTask extends AsyncTask<String, String, ArrayList<String>> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(RegisterActivity.this);
+            mProgressDialog.setMessage("Registering");
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+        }
+
+        @Override
+        protected ArrayList<String> doInBackground(String... params) {
+            ArrayList<String> arrayList = new ArrayList<>();
+            try {
+                Helpers.getSessionId(params[0], params[1], params[2], params[3], params[4], params[5]);
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return arrayList;
+        }
+
+        @Override
+        protected void onPostExecute(final ArrayList<String> arrayList) {
+            super.onPostExecute(arrayList);
+            mProgressDialog.dismiss();
         }
     }
 }
