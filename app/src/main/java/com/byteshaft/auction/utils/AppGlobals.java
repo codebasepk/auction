@@ -23,6 +23,7 @@ public class AppGlobals extends Application{
     public static final String LOGIN_URL = (
             "LOGIN_URL"
     );
+    public static final String USER_EXIST_URL = ("http://192.168.1.4:8000/user/username = ");
     public static final String REGISTER_URL = (
             "http://192.168.1.4:8000/users/"
     );

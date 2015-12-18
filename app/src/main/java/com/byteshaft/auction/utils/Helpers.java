@@ -4,8 +4,12 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -79,6 +83,33 @@ public class Helpers {
         os.write(bytes);
         os.close();
         return urlConnection.getResponseCode();
+    }
+
+    public static int checkIfUserExist(String userName) throws IOException, JSONException {
+        URL url;
+        HttpURLConnection urlConnection;
+        url = new URL (AppGlobals.USER_EXIST_URL + userName);
+        urlConnection =(HttpURLConnection) url.openConnection();
+//        urlConnection.setRequestProperty("Content-Type", "application/json");
+//        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+//        JSONObject jsonObject = readResponse(urlConnection);
+//        System.out.println(jsonObject);
+        return urlConnection.getResponseCode();
+    }
+
+    private static JSONObject readResponse(HttpURLConnection connection)
+            throws IOException, JSONException {
+
+        InputStream is = connection.getInputStream();
+        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+        String line;
+        StringBuilder response = new StringBuilder();
+        while((line = rd.readLine()) != null) {
+            response.append(line);
+            response.append('\r');
+        }
+        return new JSONObject(response.toString());
     }
 
 }
