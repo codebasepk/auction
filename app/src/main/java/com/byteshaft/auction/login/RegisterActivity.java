@@ -50,6 +50,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private EditText mAddress;
     private EditText mCity;
     public ProgressDialog mProgressDialog;
+    private boolean userAlreadyExists = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         dpButton = (ImageButton) findViewById(R.id.button_dp);
         dpButton.setOnClickListener(this);
         mRegisterButton.setOnClickListener(this);
+        mUserNameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    new CheckUserExistTask().execute(mUserNameEditText.getText().toString());
+                }
+            }
+        });
     }
 
     @Override
@@ -98,11 +107,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(AppGlobals.getContext(), "password must contain 6 character", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                String[] data = {mEmailEditText.getText().toString(),
-                        mPasswordEditText.getText().toString(), mUserNameEditText.getText().toString(),
-                        mPhoneNumber.getText().toString(), mCity.getText().toString(),
-                        mAddress.getText().toString()};
-                new RegistrationTask().execute(data);
+                if (!userAlreadyExists) {
+                    String[] data = {mEmailEditText.getText().toString(),
+                            mPasswordEditText.getText().toString(), mUserNameEditText.getText().toString(),
+                            mPhoneNumber.getText().toString(), mCity.getText().toString(),
+                            mAddress.getText().toString()};
+                    new RegistrationTask().execute(data);
+                }
                 break;
             case R.id.button_dp:
                 selectImage();
@@ -260,6 +271,26 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, result[6]);
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
+        }
+    }
+
+    class CheckUserExistTask extends AsyncTask<String, String, Integer> {
+
+        @Override
+        protected Integer doInBackground(String... params) {
+            int resultCode = 0;
+            try {
+                resultCode = Helpers.checkIfUserExist(params[0]);
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+            return resultCode;
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            System.out.println(integer);
         }
     }
 }
