@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
@@ -31,7 +29,6 @@ public class Buyer extends Fragment {
     private CustomAdapter mAdapter;
     private ArrayList<String> arrayList;
     private static final String TAG = "RecyclerViewFragment";
-    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,15 +37,6 @@ public class Buyer extends Fragment {
         Helpers.saveLastFragmentOpend(getClass().getSimpleName());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView = (RecyclerView) mBaseView.findViewById(R.id.recycler);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) mBaseView.findViewById(R.id.swipe_refresh);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.orange, R.color.green,
-                R.color.colorPrimary, R.color.gray);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshContent();
-            }
-        });
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
@@ -63,18 +51,6 @@ public class Buyer extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-    }
-
-    private void refreshContent() {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                arrayList.add("test");
-                mAdapter = new CustomAdapter(arrayList);
-                mRecyclerView.setAdapter(mAdapter);
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-        });
     }
 
     @Override

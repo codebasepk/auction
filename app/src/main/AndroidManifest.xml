@@ -23,8 +23,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".login.RegisterActivity"/>
-        <activity android:name=".login.LoginActivity"/>
+        <activity android:name=".register_login.RegisterActivity"/>
+        <activity android:name=".register_login.LoginActivity"/>
         <activity android:name=".SelectedCategoryList"/>
         <activity android:name=".ItemDetail"/>
         <activity android:name=".fragments.ChatActivity"/>
