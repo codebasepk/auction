@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 
 import com.byteshaft.auction.R;
@@ -23,13 +24,14 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 
-public class Seller extends Fragment implements View.OnClickListener{
+public class Seller extends Fragment implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
 
     private EditText itemTitle;
     private EditText itemDescription;
     private Button submintButton;
     private Button addImageButton;
     private Spinner categorySpinner;
+    private RadioGroup currenyGroup;
     private static final int SELECT_PHOTO = 100;
     private View mBaseView;
 
@@ -45,9 +47,11 @@ public class Seller extends Fragment implements View.OnClickListener{
         itemDescription = (EditText) mBaseView.findViewById(R.id.item_description);
         submintButton = (Button) mBaseView.findViewById(R.id.btn_submit);
         addImageButton = (Button) mBaseView.findViewById(R.id.btn_addimage);
+        currenyGroup = (RadioGroup) mBaseView.findViewById(R.id.currency_group);
         submintButton.setOnClickListener(this);
         addImageButton.setOnClickListener(this);
         categorySpinner = (Spinner) mBaseView.findViewById(R.id.spinner);
+        currenyGroup.setOnCheckedChangeListener(this);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_dropdown_item, list);
         categorySpinner.setAdapter(adapter);
@@ -120,4 +124,14 @@ public class Seller extends Fragment implements View.OnClickListener{
         return BitmapFactory.decodeStream(AppGlobals.getContext().getContentResolver().openInputStream(selectedImage), null, o2);
 
     }
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        if (checkedId == R.id.radio_doller) {
+            System.out.println("Doller");
+        } else if (checkedId == R.id.radio_riyal) {
+            System.out.println("Riyal");
+        }
+    }
+
 }
