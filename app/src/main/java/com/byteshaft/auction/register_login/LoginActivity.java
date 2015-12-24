@@ -1,4 +1,4 @@
-package com.byteshaft.auction.login;
+package com.byteshaft.auction.register_login;
 
 import android.app.ProgressDialog;
 import android.content.Intent;

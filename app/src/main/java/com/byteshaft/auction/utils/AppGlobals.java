@@ -20,18 +20,36 @@ public class AppGlobals extends Application{
     public static final String KEY_ADDRESS = "address";
     public static final String KEY_CITY = "city";
     public static boolean loginSuccessFull = false;
+    public static String cacheSaveLocationForProfilePic = "/"+ "profile_pic"+"/";
+    public static int responseCode;
+    public static int userExistResponce;
     public static final String LOGIN_URL = (
             "LOGIN_URL"
     );
-    public static final String USER_EXIST_URL = ("http://192.168.1.4:8000/user/username = ");
+    public static final String USER_EXIST_URL = ("http://testapp-byteshaft.herokuapp.com/user/");
     public static final String REGISTER_URL = (
-            "http://192.168.1.4:8000/users/"
+            "http://testapp-byteshaft.herokuapp.com/users/"
     );
 
     @Override
     public void onCreate() {
         super.onCreate();
         sContext = getApplicationContext();
+    }
+
+    public static void setUserExistResponse(int value) {
+        userExistResponce = value;
+    }
+
+    public static int getUserExistResponse() {
+        return userExistResponce;
+    }
+    public static void setResponseCode(int value) {
+        responseCode = value;
+    }
+
+    public static int getResponseCode() {
+        return responseCode;
     }
 
     public static String getLogTag(Class aClass) {
