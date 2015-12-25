@@ -24,7 +24,7 @@ public class AppGlobals extends Application{
     public static int responseCode;
     public static int userExistResponce;
     public static final String LOGIN_URL = (
-            "LOGIN_URL"
+            "http://testapp-byteshaft.herokuapp.com/users/"
     );
     public static final String USER_EXIST_URL = ("http://testapp-byteshaft.herokuapp.com/user/");
     public static final String REGISTER_URL = (
