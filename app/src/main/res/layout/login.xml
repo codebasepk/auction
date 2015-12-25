@@ -69,5 +69,16 @@
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:textSize="20sp"
+            android:text="forgot password"
+            android:textColor="@color/forget_password_background"
+            android:layout_margin="10dp"
+            android:id="@+id/forget_password"
+            android:layout_gravity="right" />
+
     </LinearLayout>
 </ScrollView>

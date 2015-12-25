@@ -134,7 +134,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(getApplicationContext(), "please enter a valid email", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (!containsDigit(mPasswordEditText.getText().toString())) {
+                if (!Helpers.containsDigit(mPasswordEditText.getText().toString())) {
                     Toast.makeText(getApplicationContext(), "password must contain 0-9", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -167,19 +167,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         } else {
             return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
         }
-    }
-
-    public final boolean containsDigit(String s) {
-        boolean containsDigit = false;
-
-        if (s != null && !s.isEmpty()) {
-            for (char c : s.toCharArray()) {
-                if (containsDigit = Character.isDigit(c)) {
-                    break;
-                }
-            }
-        }
-        return containsDigit;
     }
 
     @Override
@@ -266,7 +253,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         protected void onPreExecute() {
             super.onPreExecute();
             mProgressDialog = new ProgressDialog(RegisterActivity.this);
-            mProgressDialog.setMessage("Registering");
+            mProgressDialog.setMessage("Registering...");
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.setCancelable(false);
             mProgressDialog.show();

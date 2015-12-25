@@ -1,9 +1,13 @@
 package com.byteshaft.auction.utils;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -28,7 +32,7 @@ public class Helpers {
         sharedPreferences.edit().putBoolean(AppGlobals.user_login_key, value).apply();
     }
 
-    public static  boolean isUserLoggedIn() {
+    public static boolean isUserLoggedIn() {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getBoolean(AppGlobals.user_login_key, false);
     }
@@ -101,7 +105,7 @@ public class Helpers {
         BufferedReader rd = new BufferedReader(new InputStreamReader(is));
         String line;
         StringBuilder response = new StringBuilder();
-        while((line = rd.readLine()) != null) {
+        while ((line = rd.readLine()) != null) {
             response.append(line);
             response.append('\r');
         }
@@ -124,22 +128,20 @@ public class Helpers {
         return bm;
     }
 
-    public static String userExist(String username)
+    public static void userExist(String username)
             throws IOException, JSONException {
 
         String data = String.format("{\"username\" : \"%s\"}", username);
-        HttpURLConnection connection = openConnectionForUrl(AppGlobals.USER_EXIST_URL);
+        HttpURLConnection connection = openConnectionForUrl(AppGlobals.USER_EXIST_URL, "POST");
         sendRequestData(connection, data);
-        return " ";
     }
 
-    private static HttpURLConnection openConnectionForUrl(String path)
+    private static HttpURLConnection openConnectionForUrl(String path, String method)
             throws IOException {
-
         URL url = new URL(path);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("Content-Type", "application/json");
-        connection.setRequestMethod("POST");
+        connection.setRequestMethod(method);
         return connection;
     }
 
@@ -155,4 +157,72 @@ public class Helpers {
         Log.i("USER EXIST", String.valueOf(connection.getResponseCode()));
     }
 
+    public static final boolean containsDigit(String s) {
+        boolean containsDigit = false;
+
+        if (s != null && !s.isEmpty()) {
+            for (char c : s.toCharArray()) {
+                if (containsDigit = Character.isDigit(c)) {
+                    break;
+                }
+            }
+        }
+        return containsDigit;
+    }
+
+    public static String[] loginProcess(String userName, String password)
+            throws IOException {
+        String parsedString = "";
+        URL url = new URL(AppGlobals.LOGIN_URL+ userName + "/");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("Content-Type", "application/json");
+        String authString = userName + ":" + password;
+        System.out.println("auth string: " + authString);
+        String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
+        System.out.println("Base64 encoded auth string: " + authStringEncoded);
+        connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            InputStream is = connection.getInputStream();
+            parsedString = convertInputStreamToString(is);
+            return new String[]{String.valueOf(connection.getResponseCode()), parsedString};
+        }else {
+            return new String[]{String.valueOf(connection.getResponseCode()), parsedString};
+        }
+
+    }
+
+    public static String convertInputStreamToString(InputStream is) throws IOException {
+        if (is != null) {
+            StringBuilder sb = new StringBuilder();
+            String line;
+
+            try {
+                BufferedReader r1 = new BufferedReader(new InputStreamReader(
+                        is, "UTF-8"));
+                while ((line = r1.readLine()) != null) {
+                    sb.append(line).append("\n");
+                }
+            } finally {
+                is.close();
+            }
+            return sb.toString();
+        } else {
+            return "";
+        }
+    }
+
+    public static void alertDialog(final Activity activity, String title, String msg) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+        alertDialogBuilder.setTitle(title);
+        alertDialogBuilder
+                .setMessage(msg)
+                .setCancelable(false)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
 }
