@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.byteshaft.auction.MainActivity;
@@ -15,6 +16,11 @@ import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
@@ -24,6 +30,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText mEditTextPassword;
     private Button mLoginButton;
     private ProgressDialog mProgressDialog;
+    private TextView forgetPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +41,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mEditTextUserName = (EditText) findViewById(R.id.username_login);
         mEditTextPassword = (EditText) findViewById(R.id.password_login);
         mLoginButton = (Button) findViewById(R.id.btn_login);
+        forgetPassword = (TextView) findViewById(R.id.forget_password);
+        forgetPassword.setOnClickListener(this);
         mLoginButton.setOnClickListener(this);
         mRegisterButton.setOnClickListener(this);
     }
@@ -51,6 +60,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
+//                if (!Helpers.containsDigit(mEditTextPassword.getText().toString())) {
+//                    Toast.makeText(getApplicationContext(), "password must contain 0-9", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
                 if (!mEditTextUserName.getText().toString().trim().isEmpty()
                         || !mEditTextPassword.getText().toString().trim().isEmpty()) {
                     String userName = mEditTextUserName.getText().toString();
@@ -58,6 +71,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     String[] loginData = {userName, password};
                     new LoginTask().execute(loginData);
                 }
+                break;
+            case R.id.forget_password:
+
+                break;
         }
     }
 
@@ -68,40 +85,61 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         MainActivity.getInstance().closeApplication();
     }
 
-    class LoginTask extends AsyncTask<String, String, ArrayList<String>> {
+    class LoginTask extends AsyncTask<String, String, ArrayList<Integer>> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             mProgressDialog = new ProgressDialog(LoginActivity.this);
-            mProgressDialog.setMessage("Processing");
+            mProgressDialog.setMessage("Logging in...");
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.setCancelable(false);
             mProgressDialog.show();
         }
 
         @Override
-        protected ArrayList<String> doInBackground(String... params) {
-            ArrayList<String> arrayList = new ArrayList<>();
-            arrayList.add(params[0]);
-            arrayList.add(params[1]);
+        protected ArrayList<Integer> doInBackground(String... params) {
+            ArrayList<Integer> arrayList = new ArrayList<>();
+            String[] data;
             try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
+                data = Helpers.loginProcess(params[0], params[1]);
+                System.out.println(data[0]);
+                if (Integer.valueOf(data[0]).equals(HttpURLConnection.HTTP_OK)) {
+                    System.out.println(data[1]);
+                    JSONObject jsonobject = new JSONObject(data[1]);
+                    Helpers.saveDataToSharedPreferences(AppGlobals.KEY_USERNAME,
+                            String.valueOf(jsonobject.get("username")));
+                    Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PASSWORD, params[1]);
+                    Helpers.saveDataToSharedPreferences(AppGlobals.KEY_EMAIL,
+                            String.valueOf(jsonobject.get("email")));
+                    Helpers.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS,
+                            String.valueOf(jsonobject.get("address")));
+                    Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER,
+                            String.valueOf(jsonobject.get("phone_number")));
+                    Helpers.saveDataToSharedPreferences(AppGlobals.KEY_CITY,
+                            String.valueOf(jsonobject.get("city")));
+                    arrayList.add(HttpURLConnection.HTTP_OK);
+                } else {
+                    arrayList.add(HttpURLConnection.HTTP_FORBIDDEN);
+                }
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
             return arrayList;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<String> arrayList) {
+        protected void onPostExecute(ArrayList<Integer> arrayList) {
             super.onPostExecute(arrayList);
             mProgressDialog.dismiss();
-            Helpers.saveDataToSharedPreferences(AppGlobals.KEY_USERNAME, arrayList.get(0));
-            Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PASSWORD, arrayList.get(1));
-            Helpers.userLogin(true);
-            finish();
-            AppGlobals.loginSuccessFull = true;
+            if (arrayList.get(0).equals(HttpURLConnection.HTTP_OK)) {
+                Helpers.userLogin(true);
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            } else if (arrayList.get(0).equals(HttpURLConnection.HTTP_FORBIDDEN)) {
+                Helpers.alertDialog(LoginActivity.this, "Authentication Error",
+                        "Username or password is incorrect");
+            }
+            System.out.println(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME));
         }
     }
 }

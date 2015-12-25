@@ -60,7 +60,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     final static int cacheSize = maxMemory / 8;
     private LruCache<String, Bitmap> mMemoryCache;
     private Bitmap profilePic;
-
+    private boolean userExist = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +103,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mUserNameEditText.setCompoundDrawables(null, null, null, null);
+                userExist = false;
             }
 
             @Override
@@ -133,7 +134,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(getApplicationContext(), "please enter a valid email", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (!containsDigit(mPasswordEditText.getText().toString())) {
+                if (!Helpers.containsDigit(mPasswordEditText.getText().toString())) {
                     Toast.makeText(getApplicationContext(), "password must contain 0-9", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -145,7 +146,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //                    Toast.makeText(getApplicationContext(), "please select an image", Toast.LENGTH_SHORT).show();
 //                    return;
 //                }
-                if (!userAlreadyExists) {
+                if (!userAlreadyExists && userExist) {
                     String[] data = {mEmailEditText.getText().toString(),
                             mPasswordEditText.getText().toString(), mUserNameEditText.getText().toString(),
                             mPhoneNumber.getText().toString(), mCity.getText().toString(),
@@ -166,19 +167,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         } else {
             return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
         }
-    }
-
-    public final boolean containsDigit(String s) {
-        boolean containsDigit = false;
-
-        if (s != null && !s.isEmpty()) {
-            for (char c : s.toCharArray()) {
-                if (containsDigit = Character.isDigit(c)) {
-                    break;
-                }
-            }
-        }
-        return containsDigit;
     }
 
     @Override
@@ -265,7 +253,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         protected void onPreExecute() {
             super.onPreExecute();
             mProgressDialog = new ProgressDialog(RegisterActivity.this);
-            mProgressDialog.setMessage("Registering");
+            mProgressDialog.setMessage("Registering...");
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.setCancelable(false);
             mProgressDialog.show();
@@ -334,7 +322,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 Drawable x = getResources().getDrawable(R.drawable.tick);
                 x.setBounds(0, 0, 20, 20);
                 mUserNameEditText.setCompoundDrawables(null, null, x, null);
-                System.out.println("OK");
+                userExist = true;
             } else if (AppGlobals.getUserExistResponse() == 200) {
                 mUserNameEditText.setError("Username already exist");
             }
