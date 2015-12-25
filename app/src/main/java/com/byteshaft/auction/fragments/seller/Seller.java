@@ -13,12 +13,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Gallery;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
+import com.byteshaft.auction.utils.ImageAdapter;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -32,6 +34,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     private Button addImageButton;
     private Spinner categorySpinner;
     private RadioGroup currenyGroup;
+    private Gallery gallery;
     private static final int SELECT_PHOTO = 100;
     private View mBaseView;
 
@@ -50,6 +53,9 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
         currenyGroup = (RadioGroup) mBaseView.findViewById(R.id.currency_group);
         submintButton.setOnClickListener(this);
         addImageButton.setOnClickListener(this);
+        // gallery View for images
+        gallery = (Gallery) mBaseView.findViewById(R.id.gallery);
+        gallery.setAdapter(new ImageAdapter(AppGlobals.getContext()));
         categorySpinner = (Spinner) mBaseView.findViewById(R.id.spinner);
         currenyGroup.setOnCheckedChangeListener(this);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
@@ -93,36 +99,6 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                     System.out.println(yourSelectedImage);
                 }
         }
-    }
-
-    private Bitmap decodeUri(Uri selectedImage) throws FileNotFoundException {
-
-        // Decode image size
-        BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(AppGlobals.getContext().getContentResolver().openInputStream(selectedImage), null, o);
-
-        // The new size we want to scale to
-        final int REQUIRED_SIZE = 140;
-
-        // Find the correct scale value. It should be the power of 2.
-        int width_tmp = o.outWidth, height_tmp = o.outHeight;
-        int scale = 1;
-        while (true) {
-            if (width_tmp / 2 < REQUIRED_SIZE
-                    || height_tmp / 2 < REQUIRED_SIZE) {
-                break;
-            }
-            width_tmp /= 2;
-            height_tmp /= 2;
-            scale *= 2;
-        }
-
-        // Decode with inSampleSize
-        BitmapFactory.Options o2 = new BitmapFactory.Options();
-        o2.inSampleSize = scale;
-        return BitmapFactory.decodeStream(AppGlobals.getContext().getContentResolver().openInputStream(selectedImage), null, o2);
-
     }
 
     @Override
