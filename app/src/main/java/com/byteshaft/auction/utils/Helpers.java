@@ -2,24 +2,30 @@ package com.byteshaft.auction.utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.util.Base64;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Helpers {
 
@@ -62,7 +68,12 @@ public class Helpers {
         sharedPreferences.edit().putString(key, value).apply();
     }
 
-    public static Boolean getBooleanValueFromSharedPrefrence(String key) {
+    public static void saveBooleanToSharedPreference(String key, boolean value) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putBoolean(key, value).apply();
+    }
+
+    public static Boolean getBooleanValueFromSharedPreference(String key) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getBoolean(key, false);
     }
@@ -73,9 +84,9 @@ public class Helpers {
     }
 
     public static void sendRegisterData(String email, String password, String userName,
-                                        String phoneNumber, String city, String address)
+                                        String phoneNumber, String city, String address, String imageUri)
             throws IOException, JSONException {
-//        final File uploadFile = new File(imageUri);
+        final File uploadFile = new File(imageUri);
         MultiPartUtility http;
         try {
             http = new MultiPartUtility(new URL(AppGlobals.REGISTER_URL));
@@ -85,14 +96,14 @@ public class Helpers {
             http.addFormField("address", address);
             http.addFormField("city", city);
             http.addFormField("phone_number", phoneNumber);
-//            http.addFilePart("photo", uploadFile);
+            http.addFilePart("photo", uploadFile);
             final byte[] bytes = http.finish();
-//            try {
-//                OutputStream os = new FileOutputStream(imageUri);
-//                os.write(bytes);
-//            } catch (IOException e) {
-//
-//            }
+            try {
+                OutputStream os = new FileOutputStream(imageUri);
+                os.write(bytes);
+            } catch (IOException e) {
+
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -130,10 +141,9 @@ public class Helpers {
 
     public static void userExist(String username)
             throws IOException, JSONException {
-
-        String data = String.format("{\"username\" : \"%s\"}", username);
-        HttpURLConnection connection = openConnectionForUrl(AppGlobals.USER_EXIST_URL, "POST");
-        sendRequestData(connection, data);
+        HttpURLConnection connection =
+                openConnectionForUrl(AppGlobals.USER_EXIST_URL + username +"/"+ "exists", "GET");
+        AppGlobals.setUserExistResponse(connection.getResponseCode());
     }
 
     private static HttpURLConnection openConnectionForUrl(String path, String method)
@@ -143,18 +153,6 @@ public class Helpers {
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setRequestMethod(method);
         return connection;
-    }
-
-    private static void sendRequestData(HttpURLConnection connection, String body)
-            throws IOException {
-        System.out.println(body);
-
-        byte[] outputInBytes = body.getBytes("UTF-8");
-        OutputStream os = connection.getOutputStream();
-        os.write(outputInBytes);
-        os.close();
-        AppGlobals.setUserExistResponse(connection.getResponseCode());
-        Log.i("USER EXIST", String.valueOf(connection.getResponseCode()));
     }
 
     public static final boolean containsDigit(String s) {
@@ -224,5 +222,38 @@ public class Helpers {
                 });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+    }
+
+    public static void saveCategories(Set<String> stringSet) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putStringSet(AppGlobals.SELECTED_CATEGORIES, stringSet).apply();
+    }
+
+    public static Set<String> getCategories() {
+        Set<String> set = new HashSet<>();
+        set.add("nothing");
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getStringSet(AppGlobals.SELECTED_CATEGORIES, set);
+    }
+
+    public static boolean isNetworkAvailable(final Context context) {
+        ConnectivityManager cm = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
+    public static boolean isInternetWorking() {
+        boolean success = false;
+        try {
+            URL url = new URL("https://google.com");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(10000);
+            connection.connect();
+            success = connection.getResponseCode() == 200;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return success;
     }
 }

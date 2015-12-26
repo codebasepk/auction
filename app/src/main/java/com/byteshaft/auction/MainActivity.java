@@ -1,13 +1,11 @@
 package com.byteshaft.auction;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.util.LruCache;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.CategoriesFragment;
@@ -24,15 +23,13 @@ import com.byteshaft.auction.fragments.seller.Seller;
 import com.byteshaft.auction.register_login.LoginActivity;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
-import com.mikhaellopez.circularimageview.CircularImageView;
+
+import java.io.FileNotFoundException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static MainActivity instance;
-    final static int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-    final static int cacheSize = maxMemory / 8;
-    private LruCache<String, Bitmap> mMemoryCache;
 
     public static MainActivity getInstance() {
         return instance;
@@ -49,21 +46,15 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     loadFragment(new Seller());
                 }
-            } else if (!Helpers.getBooleanValueFromSharedPrefrence(AppGlobals.KEY_CATEGORIES_SELECTED)) {
-                loadFragment(new CategoriesFragment());
-            } else {
+            }
+//            else if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED)) {
+//                loadFragment(new CategoriesFragment());
+//            }
+            else {
                 loadFragment(new Buyer());
             }
         } else {
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-        }
-        if (mMemoryCache == null) {
-            mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
-                @Override
-                protected int sizeOf(String key, Bitmap bitmap) {
-                    return bitmap.getByteCount() / 1024;
-                }
-            };
         }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -88,15 +79,14 @@ public class MainActivity extends AppCompatActivity
         } else {
             userEmail.setText("abc@xyz.com");
         }
-        CircularImageView circularImageView = (CircularImageView) header.findViewById(R.id.imageView);
-        if (getBitmapFromMemCache(AppGlobals.cacheSaveLocationForProfilePic + "profilepic") != null) {
-            circularImageView.setImageBitmap(getBitmapFromMemCache(
-                    AppGlobals.cacheSaveLocationForProfilePic + "profilepic"));
+        ImageView circularImageView = (ImageView) header.findViewById(R.id.imageView);
+        try {
+            if (AppGlobals.getProfilePicBitMap() != null) {
+                circularImageView.setImageBitmap(AppGlobals.getProfilePicBitMap());
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-    }
-
-    public Bitmap getBitmapFromMemCache(String key) {
-        return mMemoryCache.get(key);
     }
 
     @Override
