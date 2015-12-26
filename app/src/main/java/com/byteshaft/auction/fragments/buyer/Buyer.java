@@ -69,7 +69,7 @@ public class Buyer extends Fragment {
             public void onItem(String item) {
                 Intent intent = new Intent(getActivity().getApplicationContext(),
                         SelectedCategoryList.class);
-                intent.putExtra(AppGlobals.selectedCategory, item);
+                intent.putExtra(AppGlobals.SELECTED_CATEGORIES, item);
                 startActivity(intent);
             }
         }));

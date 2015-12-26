@@ -33,7 +33,7 @@ public class SelectedCategoryList extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String selectedItem = getIntent().getStringExtra(AppGlobals.selectedCategory);
+        String selectedItem = getIntent().getStringExtra(AppGlobals.SELECTED_CATEGORIES);
         setContentView(R.layout.specific_category);
         setTitle(selectedItem);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -189,7 +189,7 @@ public class SelectedCategoryList extends AppCompatActivity {
                         @Override
                         public void onItem(String item) {
                             Intent intent = new Intent(getApplicationContext(), ItemDetail.class);
-                            intent.putExtra(AppGlobals.detial, item);
+                            intent.putExtra(AppGlobals.detail, item);
                             startActivity(intent);
                         }
                     }));

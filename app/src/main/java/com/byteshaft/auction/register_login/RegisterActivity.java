@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.CursorLoader;
-import android.support.v4.util.LruCache;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -56,11 +55,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private Uri selectedImageUri;
     private String imageUrl;
     private File destination;
-    final static int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-    final static int cacheSize = maxMemory / 8;
-    private LruCache<String, Bitmap> mMemoryCache;
     private Bitmap profilePic;
-    private boolean userExist = false;
+    private boolean userNotExist = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,14 +82,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 }
             }
         });
-        if (mMemoryCache == null) {
-            mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
-                @Override
-                protected int sizeOf(String key, Bitmap bitmap) {
-                    return bitmap.getByteCount() / 1024;
-                }
-            };
-        }
         mUserNameEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -103,7 +91,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mUserNameEditText.setCompoundDrawables(null, null, null, null);
-                userExist = false;
+                userNotExist = false;
             }
 
             @Override
@@ -142,15 +130,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(getApplicationContext(), "password must contain 6 character", Toast.LENGTH_SHORT).show();
                     return;
                 }
-//                if (imageUrl.isEmpty() || imageUrl == null) {
-//                    Toast.makeText(getApplicationContext(), "please select an image", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-                if (!userAlreadyExists && userExist) {
+                if (imageUrl.isEmpty() || imageUrl == null) {
+                    Toast.makeText(getApplicationContext(), "please select an image", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (!userAlreadyExists && userNotExist) {
                     String[] data = {mEmailEditText.getText().toString(),
                             mPasswordEditText.getText().toString(), mUserNameEditText.getText().toString(),
                             mPhoneNumber.getText().toString(), mCity.getText().toString(),
-                            mAddress.getText().toString()};
+                            mAddress.getText().toString(), imageUrl};
                     new RegistrationTask().execute(data);
                 }
                 break;
@@ -261,25 +249,16 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         @Override
         protected String[] doInBackground(String... params) {
-            try {
-                Helpers.sendRegisterData(params[0], params[1], params[2], params[3],
-                        params[4], params[5]);
-            } catch (IOException | JSONException e) {
-                e.printStackTrace();
+            if (Helpers.isNetworkAvailable(getApplicationContext()) && Helpers.isInternetWorking()) {
+                try {
+                    Helpers.sendRegisterData(params[0], params[1], params[2], params[3],
+                            params[4], params[5], params[6]);
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+                return new String[]{params[0], params[1], params[2], params[3], params[4], params[5]};
             }
-            return new String[]{params[0], params[1], params[2],params[3], params[4], params[5]};
-        }
-
-        public void addBitmapToMemoryCache(Bitmap bitmap, String folder) {
-            File file = new File(getCacheDir(), folder);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            mMemoryCache.put(folder, bitmap);
-        }
-
-        public Bitmap getBitmapFromMemCache(String key) {
-            return mMemoryCache.get(key);
+            return new String[] {String.valueOf(AppGlobals.NO_INTERNET)};
         }
 
         @Override
@@ -297,8 +276,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER, result[3]);
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_CITY, result[4]);
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, result[5]);
-//                addBitmapToMemoryCache(profilePic, AppGlobals.cacheSaveLocationForProfilePic + "profilepic");
+                AppGlobals.addBitmapToMemoryCache(profilePic);
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            } else if (Integer.valueOf(result[0]).equals(AppGlobals.NO_INTERNET)) {
+                Helpers.alertDialog(RegisterActivity.this, "No Internet", "Internet Not Available");
             }
         }
     }
@@ -307,24 +288,30 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         @Override
         protected Integer doInBackground(String... params) {
-            try {
-                Helpers.userExist(params[0]);
-            } catch (IOException | JSONException e) {
-                e.printStackTrace();
+            if (Helpers.isNetworkAvailable(getApplicationContext()) && Helpers.isInternetWorking()) {
+                try {
+                    Helpers.userExist(params[0]);
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+                return AppGlobals.getUserExistResponse();
             }
-            return AppGlobals.getUserExistResponse();
+            return AppGlobals.NO_INTERNET;
         }
 
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-            if (AppGlobals.getUserExistResponse() == 404) {
+            System.out.println(integer);
+            if (integer == 404) {
                 Drawable x = getResources().getDrawable(R.drawable.tick);
                 x.setBounds(0, 0, 20, 20);
                 mUserNameEditText.setCompoundDrawables(null, null, x, null);
-                userExist = true;
-            } else if (AppGlobals.getUserExistResponse() == 200) {
+                userNotExist = true;
+            } else if (integer == 200) {
                 mUserNameEditText.setError("Username already exist");
+            } else if (integer == AppGlobals.NO_INTERNET) {
+                Helpers.alertDialog(RegisterActivity.this, "No Internet", "Internet Not Available");
             }
         }
     }

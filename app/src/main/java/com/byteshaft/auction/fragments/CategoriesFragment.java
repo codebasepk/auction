@@ -24,6 +24,7 @@ import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public class CategoriesFragment extends Fragment {
 
@@ -32,13 +33,16 @@ public class CategoriesFragment extends Fragment {
     private CustomAdapter mAdapter;
     private ArrayList<String> arrayList;
     private static final String TAG = "RecyclerViewFragment";
+    private Set<String> selectedCategories;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.categories_fragment, container, false);
         mBaseView.setTag(TAG);
         setHasOptionsMenu(true);
-        if (!Helpers.getBooleanValueFromSharedPrefrence(AppGlobals.KEY_CATEGORIES_SELECTED)) {
+        if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED)) {
+            Helpers.alertDialog(getActivity(), "Category selection",
+                    "select categories to view products of your interest");
             Toast.makeText(getActivity(), "please select your categories", Toast.LENGTH_LONG).show();
         }
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -58,11 +62,6 @@ public class CategoriesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-//        if (MainActivity.isLastFragmentAvailable) {
-//            MainActivity.loginButton.setVisibility(View.INVISIBLE);
-//            MainActivity.registerButton.setVisibility(View.INVISIBLE);
-//            MainActivity.loginButton.setEnabled(false);
-//            MainActivity.registerButton.setEnabled(false);
 //        }
     }
 
@@ -76,7 +75,11 @@ public class CategoriesFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                new UpdateCategories().execute();
+                if (!selectedCategories.isEmpty()) {
+                    Helpers.saveCategoryStatus(AppGlobals.KEY_CATEGORIES_SELECTED, true);
+                    Helpers.saveCategories(selectedCategories);
+                    new UpdateCategories().execute();
+                }
                 return true;
         }
         return false;
@@ -131,14 +134,20 @@ public class CategoriesFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
+            selectedCategories = Helpers.getCategories();
+            holder.setIsRecyclable(false);
             viewHolder.textView.setText(item.get(position));
             viewHolder.imageView.setImageDrawable(getImageForCategory(item.get(position)));
-//            viewHolder.checkBox.setChecked();
             viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                    if (isChecked) {
+                        System.out.println(item.get(position));
+                        selectedCategories.add(item.get(position));
+                    } else {
+                        selectedCategories.remove(item.get(position));
+                    }
                 }
             });
         }
