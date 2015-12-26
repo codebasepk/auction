@@ -12,16 +12,10 @@
     android:orientation="vertical"
     android:gravity="bottom">
 
-    <com.mikhaellopez.circularimageview.CircularImageView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        app:border_color="#EEEEEE"
-        app:border_width="4dp"
-        app:shadow="true"
-        app:shadow_radius="10"
-        android:paddingTop="20dp"
+    <ImageView
         android:id="@+id/imageView"
-        app:shadow_color="#8BC34A"/>
+        android:layout_width="80dp"
+        android:layout_height="80dp" />
 
     <TextView
         android:id="@+id/nav_user_name"

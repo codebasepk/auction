@@ -3,10 +3,13 @@ package com.byteshaft.auction.register_login;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,7 +26,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
@@ -63,10 +68,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
-//                if (!Helpers.containsDigit(mEditTextPassword.getText().toString())) {
-//                    Toast.makeText(getApplicationContext(), "password must contain 0-9", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
+                if (!Helpers.containsDigit(mEditTextPassword.getText().toString())) {
+                    Toast.makeText(getApplicationContext(), "password must contain 0-9", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (!mEditTextUserName.getText().toString().trim().isEmpty()
                         || !mEditTextPassword.getText().toString().trim().isEmpty()) {
                     String userName = mEditTextUserName.getText().toString();
@@ -133,31 +138,38 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         @Override
         protected ArrayList<Integer> doInBackground(String... params) {
             ArrayList<Integer> arrayList = new ArrayList<>();
-            String[] data;
-            try {
-                data = Helpers.loginProcess(params[0], params[1]);
-                System.out.println(data[0]);
-                if (Integer.valueOf(data[0]).equals(HttpURLConnection.HTTP_OK)) {
-                    System.out.println(data[1]);
-                    JSONObject jsonobject = new JSONObject(data[1]);
-                    Helpers.saveDataToSharedPreferences(AppGlobals.KEY_USERNAME,
-                            String.valueOf(jsonobject.get("username")));
-                    Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PASSWORD, params[1]);
-                    Helpers.saveDataToSharedPreferences(AppGlobals.KEY_EMAIL,
-                            String.valueOf(jsonobject.get("email")));
-                    Helpers.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS,
-                            String.valueOf(jsonobject.get("address")));
-                    Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER,
-                            String.valueOf(jsonobject.get("phone_number")));
-                    Helpers.saveDataToSharedPreferences(AppGlobals.KEY_CITY,
-                            String.valueOf(jsonobject.get("city")));
-                    arrayList.add(HttpURLConnection.HTTP_OK);
-                } else {
-                    arrayList.add(HttpURLConnection.HTTP_FORBIDDEN);
+            if (Helpers.isNetworkAvailable(getApplicationContext()) && Helpers.isInternetWorking()) {
+                String[] data;
+                try {
+                    data = Helpers.loginProcess(params[0], params[1]);
+                    System.out.println(data[0]);
+                    if (Integer.valueOf(data[0]).equals(HttpURLConnection.HTTP_OK)) {
+                        System.out.println(data[1]);
+                        JSONObject jsonobject = new JSONObject(data[1]);
+                        Helpers.saveDataToSharedPreferences(AppGlobals.KEY_USERNAME,
+                                String.valueOf(jsonobject.get("username")));
+                        Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PASSWORD, params[1]);
+                        Helpers.saveDataToSharedPreferences(AppGlobals.KEY_EMAIL,
+                                String.valueOf(jsonobject.get("email")));
+                        Helpers.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS,
+                                String.valueOf(jsonobject.get("address")));
+                        Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER,
+                                String.valueOf(jsonobject.get("phone_number")));
+                        Helpers.saveDataToSharedPreferences(AppGlobals.KEY_CITY,
+                                String.valueOf(jsonobject.get("city")));
+                        Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PROFILE_PIC,
+                                String.valueOf(jsonobject.get("photo")));
+                        downloadProfilePic(String.valueOf(jsonobject.get("photo")));
+                        arrayList.add(HttpURLConnection.HTTP_OK);
+                    } else {
+                        arrayList.add(HttpURLConnection.HTTP_FORBIDDEN);
+                    }
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException | JSONException e) {
-                e.printStackTrace();
+                return arrayList;
             }
+            arrayList.add(AppGlobals.NO_INTERNET);
             return arrayList;
         }
 
@@ -171,8 +183,34 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else if (arrayList.get(0).equals(HttpURLConnection.HTTP_FORBIDDEN)) {
                 Helpers.alertDialog(LoginActivity.this, "Authentication Error",
                         "Username or password is incorrect");
+            } else if (arrayList.get(0).equals(AppGlobals.NO_INTERNET)) {
+                Helpers.alertDialog(LoginActivity.this, "No Internet", "Internet Not Available");
             }
             System.out.println(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME));
         }
     }
+
+        private void downloadProfilePic(String profilePicUrl) {
+            Bitmap myBitmap = null;
+            try {
+                URL url = new URL(profilePicUrl);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                try {
+                    InputStream input = connection.getInputStream();
+                    myBitmap = BitmapFactory.decodeStream(input);
+
+                } catch (Exception e) {
+                    e.fillInStackTrace();
+                    Log.v("ERROR", "Errorchence : " + e);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }if (myBitmap != null) {
+                AppGlobals.addBitmapToMemoryCache(myBitmap);
+                Helpers.saveBooleanToSharedPreference(AppGlobals.PROFILE_PIC_STATUS, true);
+            }
+        }
+
 }

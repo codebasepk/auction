@@ -53,7 +53,7 @@ public class ItemDetail extends AppCompatActivity {
             };
         }
 //        mGrid = (GridView) findViewById(R.id.grid_view);
-        String detail = getIntent().getStringExtra(AppGlobals.detial);
+        String detail = getIntent().getStringExtra(AppGlobals.detail);
         setTitle(detail);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mRecyclerView = (RecyclerView) findViewById(R.id.bids_recycler_view);
