@@ -22,6 +22,9 @@ import com.byteshaft.auction.utils.Helpers;
 
 import java.util.ArrayList;
 
+/**
+ * this class belongs to buyer.
+ */
 public class Buyer extends Fragment {
 
     private View mBaseView;
@@ -34,7 +37,7 @@ public class Buyer extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.buyer_category_fragment, container, false);
         mBaseView.setTag(TAG);
-        Helpers.saveLastFragmentOpend(getClass().getSimpleName());
+        Helpers.saveLastFragmentOpened(getClass().getSimpleName());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView = (RecyclerView) mBaseView.findViewById(R.id.recycler);
         mRecyclerView.setLayoutManager(linearLayoutManager);
@@ -87,10 +90,12 @@ public class Buyer extends Fragment {
             void onItem(String item);
         }
 
-        public CustomAdapter(ArrayList<String> categories, Context context, OnItemClickListener listener) {
+        public CustomAdapter(ArrayList<String> categories, Context context,
+                             OnItemClickListener listener) {
             this.items = categories;
             mListener = listener;
-            mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+            mGestureDetector = new GestureDetector(context,
+                    new GestureDetector.SimpleOnGestureListener() {
                 @Override
                 public boolean onSingleTapUp(MotionEvent e) {
                     return true;
@@ -105,12 +110,14 @@ public class Buyer extends Fragment {
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_category_item, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).
+                    inflate(R.layout.single_category_item, parent, false);
             viewHolder = new CustomView(view);
             return viewHolder;
         }
 
-
+        // this method is for getting the relevant drawable image for categories this will be
+        // removed when dynamic data will be in app
         private Drawable getImageForCategory(String item) {
             switch (item) {
                 case "Mobile":
@@ -159,6 +166,9 @@ public class Buyer extends Fragment {
         }
 
 
+        /* Member class that extends RecyclerView.ViewHolder allows us to access the elements inside
+           xml it takes view in constructor
+         */
         public class CustomView extends RecyclerView.ViewHolder {
             public TextView textView;
             public ImageView imageView;

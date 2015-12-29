@@ -10,6 +10,10 @@ import android.widget.EditText;
 
 import com.byteshaft.auction.R;
 
+
+/*
+class for user profile which will allow the user to update his/her information
+ */
 public class UserSettingFragment extends Fragment implements View.OnClickListener {
 
     private View mBaseView;

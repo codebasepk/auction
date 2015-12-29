@@ -26,7 +26,6 @@ public class AppGlobals extends Application{
     public static final String KEY_ADDRESS = "address";
     public static final String KEY_CITY = "city";
     public static boolean loginSuccessFull = false;
-    public static String cacheSaveLocationForProfilePic = "profile_pic";
     public static String KEY_PROFILE_PIC = "profile_pic";
     public static String PROFILE_PIC_STATUS = "profile_pic_status";
     public static int responseCode;
@@ -43,6 +42,7 @@ public class AppGlobals extends Application{
     public static final String CATEGORY_URL = "http://testapp-byteshaft.herokuapp.com/users/";
     private static String root;
     private static String profilePicName = "profile_pic.png";
+    public static final String POST_AD_URL = "http://testapp-byteshaft.herokuapp.com/api/users/";
 
     @Override
     public void onCreate() {
@@ -53,30 +53,37 @@ public class AppGlobals extends Application{
 
     }
 
+    // Globally set the value for userExistResponse it takes integer value as parameter
     public static void setUserExistResponse(int value) {
         userExistResponse = value;
     }
 
+    // Get the value of UserExist where needed it returns integer value
     public static int getUserExistResponse() {
         return userExistResponse;
     }
+    //Globally setResponse while posting data to server
     public static void setResponseCode(int value) {
         responseCode = value;
     }
 
+    // get posting request response
     public static int getResponseCode() {
         return responseCode;
     }
 
+    // Method to get LogTag globally it takes class as a parameter
     public static String getLogTag(Class aClass) {
         return aClass.getName();
     }
 
+    // Method to get context when need specially outside fragment or activity
     public static Context getContext() {
         return sContext;
     }
 
-    public static void addBitmapToMemoryCache(Bitmap bitmap) {
+    // Method to save bitmap to internal storage this method takes bitmap as parameter
+    public static void addBitmapToInternalMemory(Bitmap bitmap) {
         File myDir = new File(root);
         File file;
         myDir.mkdirs();
@@ -91,6 +98,7 @@ public class AppGlobals extends Application{
         }
     }
 
+    // get profile pic as bitmap when needed
     public static Bitmap getProfilePicBitMap() throws FileNotFoundException {
         File file = new File(root,profilePicName);
         if (file.exists()) {

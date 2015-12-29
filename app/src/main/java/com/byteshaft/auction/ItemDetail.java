@@ -28,6 +28,10 @@ import com.byteshaft.auction.utils.AppGlobals;
 
 import java.util.ArrayList;
 
+/**
+ * Class to show the details if a product which will include item images, bids, rating of the seller
+ * product description, price and option of chatting with the client
+ */
 public class ItemDetail extends AppCompatActivity {
 
     final static int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
@@ -121,6 +125,9 @@ public class ItemDetail extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Custom Member class for to show images in grid view
+     */
     class CustomAdapter extends ArrayAdapter<Bitmap> {
 
         private ArrayList<Bitmap> items;
@@ -159,27 +166,7 @@ public class ItemDetail extends AppCompatActivity {
         @Override
         protected ArrayList<Bitmap> doInBackground(String... params) {
             ArrayList<Bitmap> myBitmap = null;
-//            Bitmap bitmap = null;
-//            try {
-//                URL url = new URL(params[0]);
-//                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//                connection.setDoInput(true);
-//                connection.connect();
-//                try {
-//                    InputStream input = connection.getInputStream();
-//                    bitmap = BitmapFactory.decodeStream(input);
-//                    File file = new File(getCacheDir(), File.separator + params[1] + File.separator
-//                            + "images" + File.separator);
-//                    if (!file.exists()) {
-//                        file.mkdirs();
-//                    }
-//                } catch (Exception e) {
-//                    e.fillInStackTrace();
-//                    Log.v("ERROR", "Errorchence : " + e);
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+//
             return myBitmap;
         }
 
@@ -191,24 +178,13 @@ public class ItemDetail extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<Bitmap> bitmap) {
             super.onPostExecute(bitmap);
-//            bitmapArrayList.add(getBitmapFromMemCache(getTitle().toString()));
-//            adapter = new CustomAdapter(getApplicationContext(),
-//                    R.layout.layout_for_horizontal_list_view, bitmapArrayList);
-//            mGrid.setAdapter(adapter);
 
         }
     }
 
-    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
-        if (getBitmapFromMemCache(key) == null) {
-            mMemoryCache.put(key, bitmap);
-        }
-    }
-
-    public Bitmap getBitmapFromMemCache(String key) {
-        return mMemoryCache.get(key);
-    }
-
+    /**
+     * Custom class that extends RecyclerView adapter
+     */
     static class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView> implements
             RecyclerView.OnItemTouchListener {
 
@@ -254,11 +230,11 @@ public class ItemDetail extends AppCompatActivity {
 
         @Override
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-            View childView = rv.findChildViewUnder(e.getX(), e.getY());
-            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-                mListener.onItem(items.get(rv.getChildPosition(childView)));
-                return true;
-            }
+//            View childView = rv.findChildViewUnder(e.getX(), e.getY());
+//            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
+//                mListener.onItem(items.get(rv.getChildPosition(childView)));
+//                return true;
+//            }
             return false;
         }
 

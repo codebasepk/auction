@@ -13,7 +13,6 @@ import android.preference.PreferenceManager;
 import android.util.Base64;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,60 +28,73 @@ import java.util.Set;
 
 public class Helpers {
 
+    // get default sharedPreferences.
     private static SharedPreferences getPreferenceManager() {
         return PreferenceManager.getDefaultSharedPreferences(AppGlobals.getContext());
     }
 
+    // save boolean value for login status of user , takes boolean value as parameter
     public static void userLogin(boolean value) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         sharedPreferences.edit().putBoolean(AppGlobals.user_login_key, value).apply();
     }
 
+    // get user login status and manipulate app functions by its returned boolean value
     public static boolean isUserLoggedIn() {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getBoolean(AppGlobals.user_login_key, false);
     }
 
-    public static void saveLastFragmentOpend(String value) {
+    /**
+     * save the last opened fragment and open that fragment when app runs next time if person has
+     * is mostly intrested in buyer than buyer fragment will be opened else seller
+     * this only works for seller and buyer not other fragments
+     * It takes String value as parameter
+     *
+     */
+    public static void saveLastFragmentOpened(String value) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         sharedPreferences.edit().putString(AppGlobals.lastFragment, value).apply();
     }
 
+    // Get the last fragment that user opened return string value
     public static String getLastFragment() {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getString(AppGlobals.lastFragment, "");
     }
 
-    public static void saveCategoryStatus(String key, boolean value) {
-        SharedPreferences sharedPreferences = getPreferenceManager();
-        sharedPreferences.edit().putBoolean(key, value).apply();
-    }
-
-    public static boolean getCategoryStatue(String key) {
-        SharedPreferences sharedPreferences = getPreferenceManager();
-        return sharedPreferences.getBoolean(key, false);
-    }
-
+    /** Method to save String type data to sharedPreferences Requires String key
+     * and value as parameter*
+     */
     public static void saveDataToSharedPreferences(String key, String value) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         sharedPreferences.edit().putString(key, value).apply();
     }
 
+    /** Method to save boolean type data to sharedPreferences Requires String key
+     * and boolean value as parameter*
+     */
     public static void saveBooleanToSharedPreference(String key, boolean value) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         sharedPreferences.edit().putBoolean(key, value).apply();
     }
 
+    // Method to get boolean value from sharedPreference requires key as parameter
     public static Boolean getBooleanValueFromSharedPreference(String key) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getBoolean(key, false);
     }
 
+    // Method to get String value from sharedPreference requires key as parameter
     public static String getStringDataFromSharedPreference(String key) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getString(key, "");
     }
 
+    /**
+     * Void Method to send Data to server
+     * Requires email, password, username, city, address, profilePic as parameter
+     */
     public static void sendRegisterData(String email, String password, String userName,
                                         String phoneNumber, String city, String address, String imageUri)
             throws IOException, JSONException {
@@ -109,20 +121,7 @@ public class Helpers {
         }
     }
 
-    private static JSONObject readResponse(HttpURLConnection connection)
-            throws IOException, JSONException {
-
-        InputStream is = connection.getInputStream();
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-        String line;
-        StringBuilder response = new StringBuilder();
-        while ((line = rd.readLine()) != null) {
-            response.append(line);
-            response.append('\r');
-        }
-        return new JSONObject(response.toString());
-    }
-
+    // Method to get bitmap of a image it requires image path as parameter
     public static Bitmap getBitMapOfProfilePic(String selectedImagePath) {
         Bitmap bm;
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -139,6 +138,12 @@ public class Helpers {
         return bm;
     }
 
+    /**
+     * Method to check if user Exist or not
+     * @param username
+     * @throws IOException
+     * @throws JSONException
+     */
     public static void userExist(String username)
             throws IOException, JSONException {
         HttpURLConnection connection =
@@ -146,15 +151,27 @@ public class Helpers {
         AppGlobals.setUserExistResponse(connection.getResponseCode());
     }
 
-    private static HttpURLConnection openConnectionForUrl(String path, String method)
+    /**
+     * Methof to
+     * @param targetUrl
+     * @param method etc "POST", "GET"
+     * @return
+     * @throws IOException
+     */
+    private static HttpURLConnection openConnectionForUrl(String targetUrl, String method)
             throws IOException {
-        URL url = new URL(path);
+        URL url = new URL(targetUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setRequestMethod(method);
         return connection;
     }
 
+    /**
+     * Method to check if password contains digit or not
+     * @param s
+     * @return
+     */
     public static final boolean containsDigit(String s) {
         boolean containsDigit = false;
 
@@ -168,6 +185,13 @@ public class Helpers {
         return containsDigit;
     }
 
+    /**
+     * Method for the user Login
+     * @param userName
+     * @param password
+     * @return String[] which include user details
+     * @throws IOException
+     */
     public static String[] loginProcess(String userName, String password)
             throws IOException {
         String parsedString = "";
@@ -189,6 +213,12 @@ public class Helpers {
 
     }
 
+    /**
+     * convert the InputStream to String, Basically its a JsonObject than we can get user details
+     * @param is
+     * @return
+     * @throws IOException
+     */
     public static String convertInputStreamToString(InputStream is) throws IOException {
         if (is != null) {
             StringBuilder sb = new StringBuilder();
@@ -209,6 +239,12 @@ public class Helpers {
         }
     }
 
+    /**
+     * Just an Alert Dialog
+     * @param activity
+     * @param title
+     * @param msg
+     */
     public static void alertDialog(final Activity activity, String title, String msg) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
         alertDialogBuilder.setTitle(title);
@@ -224,11 +260,16 @@ public class Helpers {
         alertDialog.show();
     }
 
+    /**
+     * Saves the Set of categories selected by user
+     * @param stringSet
+     */
     public static void saveCategories(Set<String> stringSet) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         sharedPreferences.edit().putStringSet(AppGlobals.SELECTED_CATEGORIES, stringSet).apply();
     }
 
+    // Returns the set of categories selected by user
     public static Set<String> getCategories() {
         Set<String> set = new HashSet<>();
         set.add("nothing");
@@ -236,6 +277,7 @@ public class Helpers {
         return sharedPreferences.getStringSet(AppGlobals.SELECTED_CATEGORIES, set);
     }
 
+    // Check if network is available
     public static boolean isNetworkAvailable(final Context context) {
         ConnectivityManager cm = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -243,6 +285,7 @@ public class Helpers {
         return networkInfo != null && networkInfo.isConnected();
     }
 
+    // ping the google server to check if internet is really working or not
     public static boolean isInternetWorking() {
         boolean success = false;
         try {

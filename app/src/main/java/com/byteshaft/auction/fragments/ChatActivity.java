@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,29 +25,24 @@ public class ChatActivity extends Activity implements View.OnClickListener {
     private ImageButton buttonSend;
     private EditText editTextMessage;
     private String contactName;
-
     private String mContextUserTable;
     String[] messages = new String[] {"incoming" , "outgoing",  "outgoing"};
-
     public ChatArrayAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_activity);
-
         textViewContactName = (TextView) findViewById(R.id.tv_contact_name_chat);
         editTextMessage = (EditText) findViewById(R.id.et_chat);
         buttonSend = (ImageButton) findViewById(R.id.button_chat_send);
         buttonSend.setOnClickListener(this);
         ListView bubbleList = (ListView) findViewById(R.id.lv_chat);
-
         Intent intent = getIntent();
         contactName = intent.getStringExtra("CONTACT_NAME");
 //        MessagesDatabase database = new MessagesDatabase(this);
         mContextUserTable = intent.getStringExtra("user_table");
         textViewContactName.setText(contactName);
-
         try {
 //            messages = database.getMessagesForContact(mContextUserTable);
         } catch (SQLiteException e) {
@@ -66,6 +60,7 @@ public class ChatActivity extends Activity implements View.OnClickListener {
 
     }
 
+    // custom raw chat interface
     private class ChatArrayAdapter extends ArrayAdapter {
 
         public ChatArrayAdapter(Context context, int resource, String[] objects) {
@@ -90,6 +85,7 @@ public class ChatActivity extends Activity implements View.OnClickListener {
         }
     }
 
+    // custom Member class for viewHolder to access xml elements
     static class ViewHolder {
         public TextView title;
         public LinearLayout layout;
