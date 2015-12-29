@@ -37,6 +37,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/**
+ * Register Activity:
+ * This activity will allow user to register on server.
+ */
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText mUserNameEditText;
@@ -149,6 +153,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
+    // Method to check if email is valid or not.
     public final static boolean isValidEmail(CharSequence target) {
         if (target == null) {
             return false;
@@ -167,8 +172,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         return super.onOptionsItemSelected(item);
     }
 
-    private void selectImage() {
 
+    // Dialog with option to capture image or choose from gallery
+    private void selectImage() {
         final CharSequence[] items = {"Take Photo", "Choose from Library", "Remove photo", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
         builder.setTitle("Add Photo!");
@@ -235,6 +241,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    // Member class to send registration data to server and check
     class RegistrationTask extends AsyncTask<String, String, String[]> {
 
         @Override
@@ -276,7 +283,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER, result[3]);
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_CITY, result[4]);
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, result[5]);
-                AppGlobals.addBitmapToMemoryCache(profilePic);
+                if (profilePic == null) {
+                } else {
+                    AppGlobals.addBitmapToInternalMemory(profilePic);
+                }
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             } else if (Integer.valueOf(result[0]).equals(AppGlobals.NO_INTERNET)) {
                 Helpers.alertDialog(RegisterActivity.this, "No Internet", "Internet Not Available");
@@ -284,6 +294,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    // Member background task to check if user exist.
     class CheckUserExistTask extends AsyncTask<String, String, Integer> {
 
         @Override

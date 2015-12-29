@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // Method to load the fragment required Fragment as parameter
     public void loadFragment(Fragment fragment) {
         FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
         tx.replace(R.id.container, fragment);
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // replace the fragment according to navigation item selected
     public void selectDrawerItem(MenuItem menuItem) {
         Fragment fragment = null;
         Class fragmentClass;
@@ -145,6 +147,7 @@ public class MainActivity extends AppCompatActivity
         fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
     }
 
+    // Method to close the application when needed
     public void closeApplication() {
         Intent startMain = new Intent(Intent.ACTION_MAIN);
         startMain.addCategory(Intent.CATEGORY_HOME);

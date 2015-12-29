@@ -23,6 +23,9 @@ import com.byteshaft.auction.utils.AppGlobals;
 
 import java.util.ArrayList;
 
+/**
+ * Activity that represent the selected categories of user
+ */
 public class SelectedCategoryList extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
@@ -65,12 +68,12 @@ public class SelectedCategoryList extends AppCompatActivity {
         return false;
     }
 
+    // custom Member class to represent the categories selected by user and its images
     static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
             RecyclerView.OnItemTouchListener {
 
         private ArrayList<String> items;
         private CustomView viewHolder;
-
         private OnItemClickListener mListener;
         private GestureDetector mGestureDetector;
 
@@ -97,6 +100,7 @@ public class SelectedCategoryList extends AppCompatActivity {
             return viewHolder;
         }
 
+        // Get the drawable image according to category. will be dynamic the service is implemented
         private Drawable getImageForCategory(String item) {
             switch (item) {
                 case "Htc":
@@ -150,6 +154,7 @@ public class SelectedCategoryList extends AppCompatActivity {
         }
     }
 
+    // custom viewHolder to access xml elements requires a view in constructor
     public static class CustomView extends RecyclerView.ViewHolder{
         public TextView textView;
         public ImageView imageView;

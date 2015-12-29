@@ -31,6 +31,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
+/**
+ * Login Activity :
+ * This class simply include login process
+ */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button mRegisterButton;
@@ -87,6 +91,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    // password recovery dialog
     private void showCustomDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Password Recovery");
@@ -123,6 +128,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         MainActivity.getInstance().closeApplication();
     }
 
+    /**Member class
+     * Task to send username and password to server and if success it gets back to user data
+     * and save user data and profile pic if available
+     */
     class LoginTask extends AsyncTask<String, String, ArrayList<Integer>> {
 
         @Override
@@ -159,7 +168,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 String.valueOf(jsonobject.get("city")));
                         Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PROFILE_PIC,
                                 String.valueOf(jsonobject.get("photo")));
-                        downloadProfilePic(String.valueOf(jsonobject.get("photo")));
+                        if (String.valueOf(jsonobject.get("photo")).isEmpty() ||
+                                String.valueOf(jsonobject.get("photo")) == null) {
+                           // new code goes here.
+                        } else {
+                            downloadProfilePic(String.valueOf(jsonobject.get("photo")));
+                        }
                         arrayList.add(HttpURLConnection.HTTP_OK);
                     } else {
                         arrayList.add(HttpURLConnection.HTTP_FORBIDDEN);
@@ -190,27 +204,29 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-        private void downloadProfilePic(String profilePicUrl) {
-            Bitmap myBitmap = null;
+    // Method to download the profile pic which takes url as parameter
+    private void downloadProfilePic(String profilePicUrl) {
+        Bitmap myBitmap = null;
+        try {
+            URL url = new URL(profilePicUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
             try {
-                URL url = new URL(profilePicUrl);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                try {
-                    InputStream input = connection.getInputStream();
-                    myBitmap = BitmapFactory.decodeStream(input);
+                InputStream input = connection.getInputStream();
+                myBitmap = BitmapFactory.decodeStream(input);
 
-                } catch (Exception e) {
-                    e.fillInStackTrace();
-                    Log.v("ERROR", "Errorchence : " + e);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }if (myBitmap != null) {
-                AppGlobals.addBitmapToMemoryCache(myBitmap);
-                Helpers.saveBooleanToSharedPreference(AppGlobals.PROFILE_PIC_STATUS, true);
+            } catch (Exception e) {
+                e.fillInStackTrace();
+                Log.v("ERROR", "Errorchence : " + e);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        if (myBitmap != null) {
+            AppGlobals.addBitmapToInternalMemory(myBitmap);
+            Helpers.saveBooleanToSharedPreference(AppGlobals.PROFILE_PIC_STATUS, true);
+        }
+    }
 
 }

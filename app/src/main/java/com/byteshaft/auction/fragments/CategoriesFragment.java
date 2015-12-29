@@ -50,7 +50,6 @@ public class CategoriesFragment extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
-        System.out.println(mRecyclerView == null);
         arrayList = new ArrayList<>();
         arrayList.add("Mobile");
         arrayList.add("Electronics");
@@ -76,7 +75,7 @@ public class CategoriesFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.action_done:
                 if (!selectedCategories.isEmpty()) {
-                    Helpers.saveCategoryStatus(AppGlobals.KEY_CATEGORIES_SELECTED, true);
+//                    Helpers.saveCategoryStatus(AppGlobals.KEY_CATEGORIES_SELECTED, true);
                     Helpers.saveCategories(selectedCategories);
                     new UpdateCategories().execute();
                 }
@@ -100,6 +99,8 @@ public class CategoriesFragment extends Fragment {
 
     }
 
+
+    // custom RecyclerView class for inflating customView
     class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private ArrayList<String> item;
@@ -158,6 +159,7 @@ public class CategoriesFragment extends Fragment {
         }
     }
 
+    // custom class getting view item by giving view in constructor.
     public static class CustomView extends RecyclerView.ViewHolder{
         public TextView textView;
         public ImageView imageView;
@@ -170,6 +172,7 @@ public class CategoriesFragment extends Fragment {
         }
     }
 
+    // member class to update categories on server
     class UpdateCategories extends AsyncTask<String, String, String> {
 
         @Override

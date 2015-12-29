@@ -1,6 +1,5 @@
 package com.byteshaft.auction.utils;
 
-import android.content.Context;
 import android.content.res.TypedArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,27 +9,26 @@ import android.widget.ImageView;
 
 import com.byteshaft.auction.R;
 
+import java.util.ArrayList;
+
+/**
+ * class for the Gallery to show images captured or selected by user for posting a product
+ */
 public class ImageAdapter extends BaseAdapter{
-    int mGalleryItemBackground;
-    private Context mContext;
+    private int mGalleryItemBackground;
 
-    private Integer[] mImageIds = {
-            R.drawable.real_state,
-            R.drawable.vehicle,
-            R.drawable.mobile,
-            R.drawable.bubble_a,
-    };
+    private ArrayList<String> mImages;
 
-    public ImageAdapter(Context c) {
-        mContext = c;
-        TypedArray attr = mContext.obtainStyledAttributes(R.styleable.HelloGallery);
+    public ImageAdapter(ArrayList<String> images) {
+        TypedArray attr = AppGlobals.getContext().obtainStyledAttributes(R.styleable.HelloGallery);
         mGalleryItemBackground = attr.getResourceId(
                 R.styleable.HelloGallery_android_galleryItemBackground, 0);
         attr.recycle();
+        mImages = images;
     }
 
     public int getCount() {
-        return mImageIds.length;
+        return mImages.size();
     }
 
     public Object getItem(int position) {
@@ -42,13 +40,11 @@ public class ImageAdapter extends BaseAdapter{
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView = new ImageView(mContext);
-
-        imageView.setImageResource(mImageIds[position]);
+        ImageView imageView = new ImageView(AppGlobals.getContext());
+        imageView.setImageBitmap(Helpers.getBitMapOfProfilePic(mImages.get(position)));
         imageView.setLayoutParams(new Gallery.LayoutParams(250, 200));
         imageView.setScaleType(ImageView.ScaleType.FIT_XY);
         imageView.setBackgroundResource(mGalleryItemBackground);
-
         return imageView;
     }
 

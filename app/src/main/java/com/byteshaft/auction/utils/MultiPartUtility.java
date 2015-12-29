@@ -1,5 +1,7 @@
 package com.byteshaft.auction.utils;
 
+import android.util.Base64;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +20,6 @@ public class MultiPartUtility {
 
     private static final int CONNECT_TIMEOUT = 15000;
     private static final int READ_TIMEOUT = 10000;
-
     private final HttpURLConnection connection;
     private final OutputStream outputStream;
     private final PrintWriter writer;
@@ -46,7 +47,7 @@ public class MultiPartUtility {
                 true);
     }
 
-    public MultiPartUtility(final URL url, String method) throws IOException {
+    public MultiPartUtility(final URL url, String method, String userName, String password) throws IOException {
         start  = System.currentTimeMillis() % 1000;
         this.url = url;
         boundary = "---------------------------" + System.currentTimeMillis() % 1000;
@@ -54,12 +55,14 @@ public class MultiPartUtility {
         connection.setConnectTimeout(CONNECT_TIMEOUT);
         connection.setReadTimeout(READ_TIMEOUT);
         connection.setRequestMethod(method);
-        connection.setRequestProperty("Accept", "applicaiton/json");
-        connection.setRequestProperty("Content-Type", "applicaiton/json");
+        connection.setRequestProperty("Content-Type",
+                "multipart/form-data; boundary=" + boundary);
+        String authString = userName + ":" + password;
+        String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
         connection.setUseCaches(false);
         connection.setDoInput(true);
         connection.setDoOutput(true);
-
+        connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
         outputStream = connection.getOutputStream();
         writer = new PrintWriter(new OutputStreamWriter(outputStream, CHARSET),
                 true);
@@ -75,6 +78,8 @@ public class MultiPartUtility {
 
     public void addFilePart(final String fieldName, final File uploadFile)
             throws IOException {
+        System.out.println(fieldName);
+        System.out.println(uploadFile);
         final String fileName = uploadFile.getName();
         writer.append("--").append(boundary).append(CRLF)
                 .append("Content-Disposition: form-data; name=\"")
@@ -106,12 +111,10 @@ public class MultiPartUtility {
         writer.append(CRLF).append("--").append(boundary).append("--")
                 .append(CRLF);
         writer.close();
-
         final int status = connection.getResponseCode();
         System.out.println(status);
         if (status == 201) {
             AppGlobals.setResponseCode(status);
-            System.out.println("DONE");
         }
         System.out.println(connection.getResponseCode());
         InputStream is = connection.getInputStream();
@@ -124,11 +127,11 @@ public class MultiPartUtility {
         return bytes.toByteArray();
     }
 
-    public byte[] finishUserExist() throws IOException {
+    public byte[] finishFilesUpload() throws IOException {
         writer.append(CRLF).append("--").append(boundary).append("--")
-                .append(CRLF);
+                    .append(CRLF);
+        System.out.println(writer.toString());
         writer.close();
-
         final int status = connection.getResponseCode();
         System.out.println(status);
         System.out.println(connection.getErrorStream());
@@ -137,7 +140,6 @@ public class MultiPartUtility {
             AppGlobals.setUserExistResponse(status);
             System.out.println("DONE");
         }
-
         InputStream is = connection.getInputStream();
         final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         final byte[] buffer = new byte[4096];
