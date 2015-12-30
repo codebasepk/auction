@@ -31,14 +31,10 @@ public class AppGlobals extends Application{
     public static int responseCode;
     public static int userExistResponse;
     public static int NO_INTERNET = 2112;
-    public static final String LOGIN_URL = (
-            "http://testapp-byteshaft.herokuapp.com/api/users/"
-    );
+    public static final String LOGIN_URL = ("http://testapp-byteshaft.herokuapp.com/api/users/");
     public static final String USER_EXIST_URL = ("http://testapp-byteshaft.herokuapp.com/api/users/");
-    public static final String REGISTER_URL = (
-            "http://testapp-byteshaft.herokuapp.com/api/register"
-    );
-
+    public static final String REGISTER_URL = ("http://testapp-byteshaft.herokuapp.com/api/register");
+    public static int postProductResponse;
     public static final String CATEGORY_URL = "http://testapp-byteshaft.herokuapp.com/users/";
     private static String root;
     private static String profilePicName = "profile_pic.png";
@@ -106,5 +102,13 @@ public class AppGlobals extends Application{
         } else {
             return null;
         }
+    }
+
+    public static void setPostProductResponse(int value) {
+        postProductResponse = value;
+    }
+
+    public static int getPostProductResponse() {
+        return postProductResponse;
     }
 }

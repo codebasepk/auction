@@ -1,16 +1,17 @@
 package com.byteshaft.auction.fragments.seller;
 
+import android.app.ProgressDialog;
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,7 @@ import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.byteshaft.auction.utils.ImageAdapter;
 import com.byteshaft.auction.utils.MultiPartUtility;
+import com.byteshaft.auction.utils.RealPathToUri;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -54,14 +56,14 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     private File destination;
     private String imageUrl;
     private Bitmap imageForAd;
-    private Uri selectedImageUri;
+//    private Uri selectedImageUri;
     private ArrayList<String> imagesArray;
     private View mBaseView;
     private String currency = "";
     private String category = "";
     // static categories will be removed when api is connected
-    String[] list =
-            {"Mobiles","Electronics" ,"Vehicle","Real State"};
+    private String[] list = {"Mobiles", "Electronics", "Vehicle", "Real State"};
+    private ProgressDialog mProgressDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -104,6 +106,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
         super.onResume();
         gallery.setAdapter(new ImageAdapter(imagesArray));
     }
+
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_submit:
@@ -123,11 +126,11 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                 }
                 if (!itemTitle.getText().toString().trim().isEmpty() &&
                         !itemDescription.getText().toString().trim().isEmpty() &&
-                        !mItemAmount.getText().toString().isEmpty() &&  imagesArray.size() > 0 &&
+                        !mItemAmount.getText().toString().isEmpty() && imagesArray.size() > 0 &&
                         !currency.trim().isEmpty()) {
                     String[] dataToUpload = {itemTitle.getText().toString(),
                             itemDescription.getText().toString(), mItemAmount.getText().toString(),
-                    currency, category};
+                            currency, category};
                     new PostDataTask().execute(dataToUpload);
                 }
                 break;
@@ -161,6 +164,8 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                             Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
                     startActivityForResult(
                             Intent.createChooser(intent, "Select File"),
                             SELECT_FILE);
@@ -175,8 +180,9 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data.getExtras() != null || data.getData() != null) {
-            if (requestCode == REQUEST_CAMERA) {
+//        if (data != null || data.getExtras().get("data") != null) {
+        if (requestCode == REQUEST_CAMERA) {
+            if (data.getData() != null) {
                 System.out.println("Select file camera");
                 Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -201,70 +207,111 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                 imageForAd = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
                 if (!imagesArray.contains(destination.getAbsolutePath()) && imagesArray.size() <= 7) {
                     imagesArray.add(destination.getAbsolutePath());
+
                 }
-            } else if (requestCode == SELECT_FILE) {
-                selectedImageUri = data.getData();
-                String[] projection = {MediaStore.MediaColumns.DATA};
-                CursorLoader cursorLoader = new CursorLoader(AppGlobals.getContext(), selectedImageUri, projection, null, null,
-                        null);
-                Cursor cursor = cursorLoader.loadInBackground();
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                cursor.moveToFirst();
-                String selectedImagePath = cursor.getString(column_index);
-                imageForAd = Helpers.getBitMapOfProfilePic(selectedImagePath);
-                imageUrl = String.valueOf(selectedImagePath);
-                if (!imagesArray.contains(imageUrl) && imagesArray.size()<= 7) {
-                    imagesArray.add(imageUrl);
+            }
+        } else if (requestCode == SELECT_FILE) {
+            if (data != null) {
+                System.out.println(data.getStringExtra("data"));
+                if (Build.VERSION.SDK_INT < 19) {
+                    String[] imagesPath = data.getStringExtra("data").split("\\|");
+                    System.out.println(imagesPath);
+                } else if (Build.VERSION.SDK_INT < 19) {
+//                selectedImageUri = data.getData();
+//                System.out.println(selectedImageUri);
+                    ClipData clipData = data.getClipData();
+                    System.out.println(clipData == null);
+                    if (clipData != null) {
+                        System.out.println(clipData);
+                        for (int i = 0; i < clipData.getItemCount(); i++) {
+                            ClipData.Item item = clipData.getItemAt(i);
+                            System.out.println(item);
+                            Uri uri = item.getUri();
+                            System.out.println(uri);
+                            String path = RealPathToUri.getRealPathFromURI_API19(getActivity().
+                                    getApplicationContext(), uri);
+                            System.out.println(path);
+                            if (!imagesArray.contains(path) && imagesArray.size() <= 7) {
+                                imagesArray.add(path);
+                                System.out.println(path);
+                                imageForAd = Helpers.getBitMapOfProfilePic(path);
+                                imageUrl = String.valueOf(path);
+                            }
+                        }
+                    }
+                }
                 }
             }
         }
-    }
 
     /*
-    Member class allows us to send data.
+    Member class allow to send product data.
      */
-    class PostDataTask extends AsyncTask<String, String, String> {
+    class PostDataTask extends AsyncTask<String, String, Integer> {
 
         @Override
-        protected String doInBackground(String... params) {
-            MultiPartUtility http;
-            String username = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
-            String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
-            try {
-                http = new MultiPartUtility(new URL(AppGlobals.POST_AD_URL+username+"/"+"ads/post"),
-                        "POST", username, password);
-                http.addFormField("title", params[0]);
-                http.addFormField("description", params[1]);
-                http.addFormField("price", params[2]);
-                http.addFormField("price", params[3]);
-                http.addFormField("category", params[4]);
-//                int photo = 1;
-//                System.out.println(imagesArray);
-//                for (String item: imagesArray) {
-                    http.addFilePart(("photo1"), new File(imagesArray.get(0)));
-//                    photo++;
-//                }
-                final byte[] bytes = http.finishFilesUpload();
-//                for (String item: imagesArray) {
-                    try {
-                        OutputStream os = new FileOutputStream(imagesArray.get(0));
-                        os.write(bytes);
-                    } catch (IOException e) {
-
-                    }
-
-//                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(getActivity());
+            mProgressDialog.setMessage("Logging in...");
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
         }
 
         @Override
-        protected void onPostExecute(String s) {
+        protected Integer doInBackground(String... params) {
+            if (Helpers.isNetworkAvailable(getActivity().getApplicationContext())
+                    && Helpers.isInternetWorking()) {
+                MultiPartUtility http;
+                String username = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+                String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+                try {
+                    http = new MultiPartUtility(new URL(AppGlobals.POST_AD_URL + username + "/" + "ads/post"),
+                            "POST", username, password);
+                    http.addFormField("title", params[0]);
+                    http.addFormField("description", params[1]);
+                    http.addFormField("price", params[2]);
+//                http.addFormField("currency", params[3]);
+                    http.addFormField("category", params[4]);
+                    int photo = 1;
+                    System.out.println(imagesArray);
+                    for (String item : imagesArray) {
+                        http.addFilePart(("photo" + photo), new File(item));
+                        photo++;
+                    }
+                    final byte[] bytes = http.finishFilesUpload();
+                    for (String item : imagesArray) {
+                        try {
+                            OutputStream os = new FileOutputStream(item);
+                            os.write(bytes);
+                        } catch (IOException e) {
+
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return AppGlobals.getPostProductResponse();
+            } else {
+                return AppGlobals.NO_INTERNET;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer s) {
             super.onPostExecute(s);
-            System.out.println("DONE");
+            System.out.println(s);
+            imagesArray.clear();
+            mProgressDialog.dismiss();
+            if (s.equals(201)) {
+                Helpers.alertDialog(getActivity(), "Success!", "Your Product is posted");
+                itemTitle.setText("");
+                itemDescription.setText("");
+                mItemAmount.setText("");
+            } else if (s.equals(AppGlobals.NO_INTERNET)) {
+
+            }
         }
     }
 }

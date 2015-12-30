@@ -43,6 +43,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Button mLoginButton;
     private ProgressDialog mProgressDialog;
     private TextView forgetPassword;
+    private String profilePicUrl = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,7 +173,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 String.valueOf(jsonobject.get("photo")) == null) {
                            // new code goes here.
                         } else {
-                            downloadProfilePic(String.valueOf(jsonobject.get("photo")));
+                            profilePicUrl = String.valueOf(jsonobject.get("photo"));
                         }
                         arrayList.add(HttpURLConnection.HTTP_OK);
                     } else {
@@ -190,9 +191,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         @Override
         protected void onPostExecute(ArrayList<Integer> arrayList) {
             super.onPostExecute(arrayList);
+            if (!profilePicUrl.trim().isEmpty()) {
+                new DownloadProfilePic().execute(profilePicUrl);
+            }
             mProgressDialog.dismiss();
             if (arrayList.get(0).equals(HttpURLConnection.HTTP_OK)) {
                 Helpers.userLogin(true);
+                finish();
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             } else if (arrayList.get(0).equals(HttpURLConnection.HTTP_FORBIDDEN)) {
                 Helpers.alertDialog(LoginActivity.this, "Authentication Error",
@@ -200,32 +205,47 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else if (arrayList.get(0).equals(AppGlobals.NO_INTERNET)) {
                 Helpers.alertDialog(LoginActivity.this, "No Internet", "Internet Not Available");
             }
-            System.out.println(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME));
         }
     }
 
-    // Method to download the profile pic which takes url as parameter
-    private void downloadProfilePic(String profilePicUrl) {
-        Bitmap myBitmap = null;
-        try {
-            URL url = new URL(profilePicUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            try {
-                InputStream input = connection.getInputStream();
-                myBitmap = BitmapFactory.decodeStream(input);
+    // class to download image
+    class DownloadProfilePic extends AsyncTask<String, String, Boolean> {
 
-            } catch (Exception e) {
-                e.fillInStackTrace();
-                Log.v("ERROR", "Errorchence : " + e);
+        @Override
+        protected Boolean doInBackground(String... params) {
+            System.out.println(params[0]);
+            Bitmap myBitmap = null;
+            try {
+                URL url = new URL(params[0]);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                System.out.println(connection.getResponseCode());
+                try {
+                    InputStream input = connection.getInputStream();
+                    myBitmap = BitmapFactory.decodeStream(input);
+
+                } catch (Exception e) {
+                    e.fillInStackTrace();
+                    Log.v("ERROR", "Errorchence : " + e);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            if (myBitmap != null) {
+                AppGlobals.addBitmapToInternalMemory(myBitmap);
+                Helpers.saveBooleanToSharedPreference(AppGlobals.PROFILE_PIC_STATUS, true);
+                return true;
+            }
+            return false;
         }
-        if (myBitmap != null) {
-            AppGlobals.addBitmapToInternalMemory(myBitmap);
-            Helpers.saveBooleanToSharedPreference(AppGlobals.PROFILE_PIC_STATUS, true);
+
+        @Override
+        protected void onPostExecute(Boolean s) {
+            super.onPostExecute(s);
+            if (s) {
+                Log.i(AppGlobals.getLogTag(getClass()), "Image downloaded");
+            }
         }
     }
 

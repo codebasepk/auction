@@ -13,11 +13,14 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+
+/**
+ * class for sending multipart data to server
+ */
 public class MultiPartUtility {
 
     private static final String CRLF = "\r\n";
     private static final String CHARSET = "UTF-8";
-
     private static final int CONNECT_TIMEOUT = 15000;
     private static final int READ_TIMEOUT = 10000;
     private final HttpURLConnection connection;
@@ -26,8 +29,12 @@ public class MultiPartUtility {
     private final String boundary;
     private final URL url;
     private final long start;
+    private boolean registrationProcess = false;
+    private boolean postProductProcess = false;
 
+    // Method use for registration
     public MultiPartUtility(final URL url) throws IOException {
+        registrationProcess = true;
         start  = System.currentTimeMillis() % 1000;
         this.url = url;
         boundary = "---------------------------" + System.currentTimeMillis() % 1000;
@@ -41,13 +48,15 @@ public class MultiPartUtility {
         connection.setUseCaches(false);
         connection.setDoInput(true);
         connection.setDoOutput(true);
-
         outputStream = connection.getOutputStream();
         writer = new PrintWriter(new OutputStreamWriter(outputStream, CHARSET),
                 true);
     }
 
-    public MultiPartUtility(final URL url, String method, String userName, String password) throws IOException {
+    // constructor used to post new product to internet
+    public MultiPartUtility(final URL url, String method, String userName, String password)
+            throws IOException {
+        postProductProcess = true;
         start  = System.currentTimeMillis() % 1000;
         this.url = url;
         boundary = "---------------------------" + System.currentTimeMillis() % 1000;
@@ -55,8 +64,7 @@ public class MultiPartUtility {
         connection.setConnectTimeout(CONNECT_TIMEOUT);
         connection.setReadTimeout(READ_TIMEOUT);
         connection.setRequestMethod(method);
-        connection.setRequestProperty("Content-Type",
-                "multipart/form-data; boundary=" + boundary);
+        connection.setRequestProperty("Content-Type", " multipart/form-data; boundary=" + boundary);
         String authString = userName + ":" + password;
         String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
         connection.setUseCaches(false);
@@ -68,6 +76,7 @@ public class MultiPartUtility {
                 true);
     }
 
+    //Method to add form field to printWriter
     public void addFormField(final String name, final String value) {
         writer.append("--").append(boundary).append(CRLF)
                 .append("Content-Disposition: form-data; name=\"").append(name)
@@ -76,6 +85,7 @@ public class MultiPartUtility {
                 .append(CRLF).append(CRLF).append(value).append(CRLF);
     }
 
+    //Method to add filePart to printwriter
     public void addFilePart(final String fieldName, final File uploadFile)
             throws IOException {
         System.out.println(fieldName);
@@ -103,6 +113,7 @@ public class MultiPartUtility {
         writer.append(CRLF);
     }
 
+    // add header to printwriter
     public void addHeaderField(String name, String value) {
         writer.append(name).append(": ").append(value).append(CRLF);
     }
@@ -136,9 +147,12 @@ public class MultiPartUtility {
         System.out.println(status);
         System.out.println(connection.getErrorStream());
         System.out.println(connection.getResponseMessage());
-        if (status == 201) {
+        if (registrationProcess && status == 201) {
             AppGlobals.setUserExistResponse(status);
             System.out.println("DONE");
+        }
+        if (postProductProcess && status == 201) {
+            AppGlobals.setPostProductResponse(status);
         }
         InputStream is = connection.getInputStream();
         final ByteArrayOutputStream bytes = new ByteArrayOutputStream();

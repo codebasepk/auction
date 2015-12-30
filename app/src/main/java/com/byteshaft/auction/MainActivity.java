@@ -3,6 +3,8 @@ package com.byteshaft.auction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,7 +22,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.CategoriesFragment;
@@ -31,11 +32,14 @@ import com.byteshaft.auction.gcm.QuickstartPreferences;
 import com.byteshaft.auction.gcm.RegistrationIntentService;
 import com.byteshaft.auction.register_login.LoginActivity;
 import com.byteshaft.auction.utils.AppGlobals;
+import com.byteshaft.auction.utils.BitmapWithCharacter;
 import com.byteshaft.auction.utils.Helpers;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
-import java.io.FileNotFoundException;
+import java.util.Random;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -115,14 +119,25 @@ public class MainActivity extends AppCompatActivity
         } else {
             userEmail.setText("abc@xyz.com");
         }
-        ImageView circularImageView = (ImageView) header.findViewById(R.id.imageView);
-        try {
-            if (AppGlobals.getProfilePicBitMap() != null) {
-                circularImageView.setImageBitmap(AppGlobals.getProfilePicBitMap());
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        CircleImageView circularImageView = (CircleImageView) header.findViewById(R.id.imageView);
+//        try {
+//            if (AppGlobals.getProfilePicBitMap() != null) {
+//                circularImageView.setImageBitmap(AppGlobals.getProfilePicBitMap());
+//            } else {
+        if (Helpers.isUserLoggedIn()) {
+            final Resources res = getResources();
+            int[] array = getResources().getIntArray(R.array.letter_tile_colors);
+            final int tileSize = res.getDimensionPixelSize(R.dimen.letter_tile_size);
+            final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
+            final Bitmap letterTile = tileProvider.getLetterTile(Helpers.
+                    getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
+                    String.valueOf(array[new Random().nextInt(array.length)]), 100, 100);
+            circularImageView.setImageBitmap(letterTile);
         }
+//            }
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -168,6 +183,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
+        if (Helpers.isUserLoggedIn()) {
+            closeApplication();
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
