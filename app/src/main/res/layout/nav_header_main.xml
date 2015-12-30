@@ -12,10 +12,14 @@
     android:orientation="vertical"
     android:gravity="bottom">
 
-    <ImageView
+    <com.pkmmte.view.CircularImageView
         android:id="@+id/imageView"
-        android:layout_width="80dp"
-        android:layout_height="80dp" />
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:border="true"
+        app:border_color="#EEEEEE"
+        app:border_width="4dp"
+        app:shadow="true"/>
 
     <TextView
         android:id="@+id/nav_user_name"

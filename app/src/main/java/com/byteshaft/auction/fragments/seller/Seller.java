@@ -257,7 +257,6 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             return null;
         }
 

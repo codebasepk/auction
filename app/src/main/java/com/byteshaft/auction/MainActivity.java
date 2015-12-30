@@ -1,6 +1,8 @@
 package com.byteshaft.auction;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -13,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.CategoriesFragment;
@@ -22,9 +23,11 @@ import com.byteshaft.auction.fragments.buyer.Buyer;
 import com.byteshaft.auction.fragments.seller.Seller;
 import com.byteshaft.auction.register_login.LoginActivity;
 import com.byteshaft.auction.utils.AppGlobals;
+import com.byteshaft.auction.utils.BitmapWithCharacter;
 import com.byteshaft.auction.utils.Helpers;
+import com.pkmmte.view.CircularImageView;
 
-import java.io.FileNotFoundException;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -38,7 +41,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        instance = this;
+        instance = MainActivity.this;
         if (Helpers.isUserLoggedIn()) {
             if (!Helpers.getLastFragment().equals("")) {
                 if (Helpers.getLastFragment().contains("Buyer")) {
@@ -79,14 +82,25 @@ public class MainActivity extends AppCompatActivity
         } else {
             userEmail.setText("abc@xyz.com");
         }
-        ImageView circularImageView = (ImageView) header.findViewById(R.id.imageView);
-        try {
-            if (AppGlobals.getProfilePicBitMap() != null) {
-                circularImageView.setImageBitmap(AppGlobals.getProfilePicBitMap());
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        CircularImageView circularImageView = (CircularImageView) header.findViewById(R.id.imageView);
+//        try {
+//            if (AppGlobals.getProfilePicBitMap() != null) {
+//                circularImageView.setImageBitmap(AppGlobals.getProfilePicBitMap());
+//            } else {
+        if (Helpers.isUserLoggedIn()) {
+            final Resources res = getResources();
+            int[] array = getResources().getIntArray(R.array.letter_tile_colors);
+            final int tileSize = res.getDimensionPixelSize(R.dimen.letter_tile_size);
+            final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
+            final Bitmap letterTile = tileProvider.getLetterTile(Helpers.
+                    getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
+                    String.valueOf(array[new Random().nextInt(array.length)]), 80, 80);
+            circularImageView.setImageBitmap(letterTile);
         }
+//            }
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override

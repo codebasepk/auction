@@ -57,7 +57,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public ProgressDialog mProgressDialog;
     private boolean userAlreadyExists = false;
     private Uri selectedImageUri;
-    private String imageUrl;
+    private String imageUrl = "";
     private File destination;
     private Bitmap profilePic;
     private boolean userNotExist = false;
@@ -82,7 +82,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
-                    new CheckUserExistTask().execute(mUserNameEditText.getText().toString());
+                    if (!mUserNameEditText.getText().toString().trim().isEmpty()) {
+                        new CheckUserExistTask().execute(mUserNameEditText.getText().toString());
+                    }
                 }
             }
         });
@@ -134,10 +136,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(getApplicationContext(), "password must contain 6 character", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (imageUrl.isEmpty() || imageUrl == null) {
-                    Toast.makeText(getApplicationContext(), "please select an image", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+
                 if (!userAlreadyExists && userNotExist) {
                     String[] data = {mEmailEditText.getText().toString(),
                             mPasswordEditText.getText().toString(), mUserNameEditText.getText().toString(),
@@ -274,7 +273,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             mProgressDialog.dismiss();
             Log.i(AppGlobals.getLogTag(AppGlobals.getContext().getClass()),
                     String.valueOf(AppGlobals.getResponseCode()));
-            System.out.println(AppGlobals.getResponseCode());
             if (Integer.valueOf(AppGlobals.getResponseCode()).equals(201)) {
                 Helpers.userLogin(true);
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_EMAIL, result[0]);
