@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity
             final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
             final Bitmap letterTile = tileProvider.getLetterTile(Helpers.
                     getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
-                    String.valueOf(array[new Random().nextInt(array.length)]), 80, 80);
+                    String.valueOf(array[new Random().nextInt(array.length)]), 100, 100);
             circularImageView.setImageBitmap(letterTile);
         }
 //            }
@@ -183,6 +183,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
+        if (Helpers.isUserLoggedIn()) {
+            closeApplication();
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);

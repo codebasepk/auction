@@ -197,6 +197,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             mProgressDialog.dismiss();
             if (arrayList.get(0).equals(HttpURLConnection.HTTP_OK)) {
                 Helpers.userLogin(true);
+                finish();
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             } else if (arrayList.get(0).equals(HttpURLConnection.HTTP_FORBIDDEN)) {
                 Helpers.alertDialog(LoginActivity.this, "Authentication Error",
@@ -204,7 +205,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else if (arrayList.get(0).equals(AppGlobals.NO_INTERNET)) {
                 Helpers.alertDialog(LoginActivity.this, "No Internet", "Internet Not Available");
             }
-
         }
     }
 
