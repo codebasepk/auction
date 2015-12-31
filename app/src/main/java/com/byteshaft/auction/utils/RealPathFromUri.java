@@ -9,10 +9,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.CursorLoader;
 import android.util.Log;
 
-/**
- * Created by s9iper1 on 12/30/15.
- */
-public class RealPathToUri {
+public class RealPathFromUri {
 
     @SuppressLint("NewApi")
     public static String getRealPathFromURI_API19(Context context, Uri uri) {
