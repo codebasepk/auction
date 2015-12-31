@@ -30,7 +30,7 @@ import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.byteshaft.auction.utils.ImageAdapter;
 import com.byteshaft.auction.utils.MultiPartUtility;
-import com.byteshaft.auction.utils.RealPathToUri;
+import com.byteshaft.auction.utils.RealPathFromUri;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,7 +56,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     private File destination;
     private String imageUrl;
     private Bitmap imageForAd;
-//    private Uri selectedImageUri;
+    //    private Uri selectedImageUri;
     private ArrayList<String> imagesArray;
     private View mBaseView;
     private String currency = "";
@@ -94,7 +94,6 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 category = String.valueOf(parent.getSelectedItem());
-
             }
         });
         System.out.println(category);
@@ -104,7 +103,6 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     @Override
     public void onResume() {
         super.onResume();
-        gallery.setAdapter(new ImageAdapter(imagesArray));
     }
 
     public void onClick(View v) {
@@ -180,69 +178,84 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-//        if (data != null || data.getExtras().get("data") != null) {
         if (requestCode == REQUEST_CAMERA) {
-            if (data.getData() != null) {
-                System.out.println("Select file camera");
-                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-                File appFolder = new File(Environment.getExternalStorageDirectory().
-                        getAbsolutePath() + File.separator + "Auction");
-                if (!appFolder.exists()) {
-                    appFolder.mkdirs();
-                }
-                destination = new File(appFolder, System.currentTimeMillis() + ".jpg");
-                imageUrl = destination.getAbsolutePath();
-                System.out.println(destination);
-                FileOutputStream fo;
-                try {
-                    destination.createNewFile();
-                    fo = new FileOutputStream(destination);
-                    fo.write(bytes.toByteArray());
-                    fo.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                imageForAd = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
-                if (!imagesArray.contains(destination.getAbsolutePath()) && imagesArray.size() <= 7) {
-                    imagesArray.add(destination.getAbsolutePath());
+            System.out.println(data.getExtras() == null);
+            if (data.getExtras() != null) {
+                if (data.getExtras().get("data") != null) {
+                    System.out.println("Select file camera");
+                    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+                    File appFolder = new File(Environment.getExternalStorageDirectory().
+                            getAbsolutePath() + File.separator + "Auction");
+                    if (!appFolder.exists()) {
+                        appFolder.mkdirs();
+                    }
+                    destination = new File(appFolder, System.currentTimeMillis() + ".jpg");
+                    imageUrl = destination.getAbsolutePath();
+                    System.out.println(destination);
+                    FileOutputStream fo;
+                    try {
+                        destination.createNewFile();
+                        fo = new FileOutputStream(destination);
+                        fo.write(bytes.toByteArray());
+                        fo.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    imageForAd = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
+                    if (!imagesArray.contains(destination.getAbsolutePath()) && imagesArray.size() <= 7) {
+                        imagesArray.add(destination.getAbsolutePath());
 
+                    }
+                    System.out.println(destination.getAbsolutePath());
                 }
             }
         } else if (requestCode == SELECT_FILE) {
+            System.out.println("FILE");
+            System.out.println(data == null);
             if (data != null) {
+                System.out.println(data.getData() == null);
                 System.out.println(data.getStringExtra("data"));
-                if (Build.VERSION.SDK_INT < 19) {
-                    String[] imagesPath = data.getStringExtra("data").split("\\|");
-                    System.out.println(imagesPath);
-                } else if (Build.VERSION.SDK_INT < 19) {
-//                selectedImageUri = data.getData();
-//                System.out.println(selectedImageUri);
-                    ClipData clipData = data.getClipData();
-                    System.out.println(clipData == null);
-                    if (clipData != null) {
-                        System.out.println(clipData);
-                        for (int i = 0; i < clipData.getItemCount(); i++) {
-                            ClipData.Item item = clipData.getItemAt(i);
-                            System.out.println(item);
-                            Uri uri = item.getUri();
-                            System.out.println(uri);
-                            String path = RealPathToUri.getRealPathFromURI_API19(getActivity().
-                                    getApplicationContext(), uri);
-                            System.out.println(path);
-                            if (!imagesArray.contains(path) && imagesArray.size() <= 7) {
-                                imagesArray.add(path);
+                if (data.getData() != null) {
+                    Uri singleImageUri = data.getData();
+                    System.out.println(singleImageUri);
+                    String singlePath = RealPathFromUri.getRealPathFromURI_API19(getActivity().
+                            getApplicationContext(), singleImageUri);
+                    System.out.println(singlePath);
+                    if (!imagesArray.contains(singlePath) && imagesArray.size() <= 7) {
+                        imagesArray.add(singlePath);
+                    }
+                } else {
+                    if (Build.VERSION.SDK_INT < 19) {
+                        String[] imagesPath = data.getStringExtra("data").split("\\|");
+                        System.out.println(imagesPath);
+                    } else if (Build.VERSION.SDK_INT > 19) {
+                        ClipData clipData = data.getClipData();
+                        if (clipData != null) {
+                            for (int i = 0; i < clipData.getItemCount(); i++) {
+                                ClipData.Item item = clipData.getItemAt(i);
+                                System.out.println(item);
+                                Uri uri = item.getUri();
+                                System.out.println(uri);
+                                String path = RealPathFromUri.getRealPathFromURI_API19(getActivity().
+                                        getApplicationContext(), uri);
                                 System.out.println(path);
-                                imageForAd = Helpers.getBitMapOfProfilePic(path);
-                                imageUrl = String.valueOf(path);
+                                if (!imagesArray.contains(path) && imagesArray.size() <= 7) {
+                                    imagesArray.add(path);
+                                    System.out.println(path);
+                                    imageForAd = Helpers.getBitMapOfProfilePic(path);
+                                    imageUrl = String.valueOf(path);
+                                }
                             }
+
                         }
                     }
                 }
-                }
             }
         }
+        gallery.setAdapter(new ImageAdapter(imagesArray));
+    }
 
     /*
     Member class allow to send product data.
@@ -253,7 +266,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
         protected void onPreExecute() {
             super.onPreExecute();
             mProgressDialog = new ProgressDialog(getActivity());
-            mProgressDialog.setMessage("Logging in...");
+            mProgressDialog.setMessage("Processing...");
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.setCancelable(false);
             mProgressDialog.show();
@@ -309,6 +322,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                 itemTitle.setText("");
                 itemDescription.setText("");
                 mItemAmount.setText("");
+                gallery.setAdapter(new ImageAdapter(imagesArray));
             } else if (s.equals(AppGlobals.NO_INTERNET)) {
 
             }

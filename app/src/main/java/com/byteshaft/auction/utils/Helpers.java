@@ -199,9 +199,7 @@ public class Helpers {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("Content-Type", "application/json");
         String authString = userName + ":" + password;
-        System.out.println("auth string: " + authString);
         String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
-        System.out.println("Base64 encoded auth string: " + authStringEncoded);
         connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             InputStream is = connection.getInputStream();
