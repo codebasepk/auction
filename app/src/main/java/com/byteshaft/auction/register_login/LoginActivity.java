@@ -131,7 +131,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         MainActivity.getInstance().closeApplication();
     }
 
-    /**Member class
+    /**
+     * Member class
      * Task to send username and password to server and if success it gets back to user data
      * and save user data and profile pic if available
      */
@@ -153,8 +154,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             if (Helpers.isNetworkAvailable(getApplicationContext()) && Helpers.isInternetWorking()) {
                 String[] data;
                 try {
-                    data = Helpers.simpleGetRequest(AppGlobals.LOGIN_URL+ params[0] + "/", params[0], params[1]);
-                    System.out.println(data[0]);
+                    data = Helpers.simpleGetRequest(AppGlobals.LOGIN_URL + params[0] + "/", params[0], params[1]);
+                    System.out.println(data[1]);
                     if (Integer.valueOf(data[0]).equals(HttpURLConnection.HTTP_OK)) {
                         JSONObject jsonobject = new JSONObject(data[1]);
                         Helpers.saveDataToSharedPreferences(AppGlobals.KEY_USERNAME,
@@ -173,7 +174,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         getCategoriesAndSave(params[0], params[1]);
                         if (String.valueOf(jsonobject.get("photo")).isEmpty() ||
                                 String.valueOf(jsonobject.get("photo")) == null) {
-                           // new code goes here.
+                            // new code goes here.
                         } else {
                             profilePicUrl = String.valueOf(jsonobject.get("photo"));
                         }
@@ -252,14 +253,26 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void getCategoriesAndSave(String userName, String password) throws IOException {
-        String[] categoryList = Helpers.simpleGetRequest(AppGlobals.CATEGORY_URL+ userName + "/interests/", userName,
+        String[] categoryList = Helpers.simpleGetRequest(AppGlobals.CATEGORY_URL + userName + "/interests/", userName,
                 password);
-        Set<String> categoriesSet = new HashSet<>();
-        for (String category: categoryList) {
-            categoriesSet.add(category);
-        }
-        Helpers.saveCategories(categoriesSet);
+        if (Integer.valueOf(categoryList[0]) == HttpURLConnection.HTTP_OK) {
+            try {
+                JSONObject jsonObject = new JSONObject((categoryList[1]));
+                System.out.println(jsonObject);
+                String categories = String.valueOf(jsonObject.get("interests"));
+                String[] animalsArray = categories.split(",");
+                Set<String> categoriesSet = new HashSet<>();
+                for (String category : animalsArray) {
+                    System.out.println(category);
+                    categoriesSet.add(category);
+                }
+                Helpers.saveCategories(categoriesSet);
+                Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED, true);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
+        }
     }
 
 }
