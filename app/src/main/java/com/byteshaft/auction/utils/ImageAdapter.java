@@ -41,7 +41,6 @@ public class ImageAdapter extends BaseAdapter{
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView = new ImageView(AppGlobals.getContext());
-        System.out.println(mImages.get(position));
         imageView.setImageBitmap(Helpers.getBitMapOfProfilePic(mImages.get(position)));
         imageView.setLayoutParams(new Gallery.LayoutParams(250, 200));
         imageView.setScaleType(ImageView.ScaleType.FIT_XY);
