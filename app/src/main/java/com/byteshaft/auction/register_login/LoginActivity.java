@@ -30,6 +30,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Login Activity :
@@ -151,10 +153,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             if (Helpers.isNetworkAvailable(getApplicationContext()) && Helpers.isInternetWorking()) {
                 String[] data;
                 try {
-                    data = Helpers.loginProcess(params[0], params[1]);
+                    data = Helpers.simpleGetRequest(AppGlobals.LOGIN_URL+ params[0] + "/", params[0], params[1]);
                     System.out.println(data[0]);
                     if (Integer.valueOf(data[0]).equals(HttpURLConnection.HTTP_OK)) {
-                        System.out.println(data[1]);
                         JSONObject jsonobject = new JSONObject(data[1]);
                         Helpers.saveDataToSharedPreferences(AppGlobals.KEY_USERNAME,
                                 String.valueOf(jsonobject.get("username")));
@@ -169,6 +170,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 String.valueOf(jsonobject.get("city")));
                         Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PROFILE_PIC,
                                 String.valueOf(jsonobject.get("photo")));
+                        getCategoriesAndSave(params[0], params[1]);
                         if (String.valueOf(jsonobject.get("photo")).isEmpty() ||
                                 String.valueOf(jsonobject.get("photo")) == null) {
                            // new code goes here.
@@ -247,6 +249,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Log.i(AppGlobals.getLogTag(getClass()), "Image downloaded");
             }
         }
+    }
+
+    private void getCategoriesAndSave(String userName, String password) throws IOException {
+        String[] categoryList = Helpers.simpleGetRequest(AppGlobals.CATEGORY_URL+ userName + "/interests/", userName,
+                password);
+        Set<String> categoriesSet = new HashSet<>();
+        for (String category: categoryList) {
+            categoriesSet.add(category);
+        }
+        Helpers.saveCategories(categoriesSet);
+
     }
 
 }

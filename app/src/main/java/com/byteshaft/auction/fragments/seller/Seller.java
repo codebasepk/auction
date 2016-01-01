@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Gallery;
+import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -32,7 +33,6 @@ import com.byteshaft.auction.utils.ImageAdapter;
 import com.byteshaft.auction.utils.MultiPartUtility;
 import com.byteshaft.auction.utils.RealPathFromUri;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     private EditText itemDescription;
     private EditText mItemAmount;
     private Button submitButton;
-    private Button addImageButton;
+    private ImageButton addImageButton;
     private Spinner categorySpinner;
     private RadioGroup currencyGroup;
     private Gallery gallery;
@@ -64,6 +64,8 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     // static categories will be removed when api is connected
     private String[] list = {"Mobiles", "Electronics", "Vehicle", "Real State"};
     private ProgressDialog mProgressDialog;
+    private static Uri imageCapturedUri;
+    private static File imageCapturePath;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,7 +76,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
         itemDescription = (EditText) mBaseView.findViewById(R.id.item_description);
         mItemAmount = (EditText) mBaseView.findViewById(R.id.item_price);
         submitButton = (Button) mBaseView.findViewById(R.id.btn_submit);
-        addImageButton = (Button) mBaseView.findViewById(R.id.btn_addimage);
+        addImageButton = (ImageButton) mBaseView.findViewById(R.id.btn_add_image);
         currencyGroup = (RadioGroup) mBaseView.findViewById(R.id.currency_group);
         submitButton.setOnClickListener(this);
         addImageButton.setOnClickListener(this);
@@ -103,6 +105,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     @Override
     public void onResume() {
         super.onResume();
+        gallery.setAdapter(new ImageAdapter(imagesArray));
     }
 
     public void onClick(View v) {
@@ -132,7 +135,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                     new PostDataTask().execute(dataToUpload);
                 }
                 break;
-            case R.id.btn_addimage:
+            case R.id.btn_add_image:
                 selectImage();
         }
     }
@@ -148,16 +151,24 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
 
     // method that shows a dialog with camera and gallery option to select or capture image
     private void selectImage() {
-        final CharSequence[] items = {"Take Photo", "Choose from Library", "Cancel"};
+        final CharSequence[] items = {"Camera", "Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Add Photo!");
+        builder.setTitle("Add Photos!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Take Photo")) {
+                if (items[item].equals("Camera")) {
+                    File appFolder = new File(Environment.getExternalStorageDirectory().
+                            getAbsolutePath() + File.separator + "Auction");
+                    if (!appFolder.exists()) {
+                        appFolder.mkdirs();
+                    }
+                    imageCapturePath = new File(appFolder, System.currentTimeMillis() + ".jpg");
+                    imageCapturedUri = Uri.fromFile(imageCapturePath);
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageCapturedUri);
                     startActivityForResult(intent, REQUEST_CAMERA);
-                } else if (items[item].equals("Choose from Library")) {
+                } else if (items[item].equals("Gallery")) {
                     Intent intent = new Intent(
                             Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -179,38 +190,41 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CAMERA) {
-            System.out.println(data.getExtras() == null);
-            if (data.getExtras() != null) {
-                if (data.getExtras().get("data") != null) {
-                    System.out.println("Select file camera");
-                    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-                    File appFolder = new File(Environment.getExternalStorageDirectory().
-                            getAbsolutePath() + File.separator + "Auction");
-                    if (!appFolder.exists()) {
-                        appFolder.mkdirs();
-                    }
-                    destination = new File(appFolder, System.currentTimeMillis() + ".jpg");
-                    imageUrl = destination.getAbsolutePath();
-                    System.out.println(destination);
-                    FileOutputStream fo;
-                    try {
-                        destination.createNewFile();
-                        fo = new FileOutputStream(destination);
-                        fo.write(bytes.toByteArray());
-                        fo.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    imageForAd = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
-                    if (!imagesArray.contains(destination.getAbsolutePath()) && imagesArray.size() <= 7) {
-                        imagesArray.add(destination.getAbsolutePath());
-
-                    }
-                    System.out.println(destination.getAbsolutePath());
-                }
+            System.out.println(imageCapturePath);
+            if (!imagesArray.contains(imageCapturePath.getAbsolutePath()) && imagesArray.size() <= 7) {
+                imagesArray.add(imageCapturePath.getAbsolutePath());
             }
+//            if (data.getExtras() != null) {
+//                if (data.getExtras().get("data") != null) {
+//                    System.out.println("Select file camera");
+//                    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+//                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+//                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+//                    File appFolder = new File(Environment.getExternalStorageDirectory().
+//                            getAbsolutePath() + File.separator + "Auction");
+//                    if (!appFolder.exists()) {
+//                        appFolder.mkdirs();
+//                    }
+//                    destination = new File(appFolder, System.currentTimeMillis() + ".jpg");
+//                    imageUrl = destination.getAbsolutePath();
+//                    System.out.println(destination);
+//                    FileOutputStream fo;
+//                    try {
+//                        destination.createNewFile();
+//                        fo = new FileOutputStream(destination);
+//                        fo.write(bytes.toByteArray());
+//                        fo.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    imageForAd = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
+//                    if (!imagesArray.contains(destination.getAbsolutePath()) && imagesArray.size() <= 7) {
+//                        imagesArray.add(destination.getAbsolutePath());
+//
+//                    }
+//                    System.out.println(destination.getAbsolutePath());
+//                }
+//            }
         } else if (requestCode == SELECT_FILE) {
             System.out.println("FILE");
             System.out.println(data == null);

@@ -35,10 +35,11 @@ public class AppGlobals extends Application{
     public static final String USER_EXIST_URL = ("http://testapp-byteshaft.herokuapp.com/api/users/");
     public static final String REGISTER_URL = ("http://testapp-byteshaft.herokuapp.com/api/register");
     public static int postProductResponse;
-    public static final String CATEGORY_URL = "http://testapp-byteshaft.herokuapp.com/users/";
+    public static final String CATEGORY_URL = "http://testapp-byteshaft.herokuapp.com/api/users/";
     private static String root;
     private static String profilePicName = "profile_pic.png";
     public static final String POST_AD_URL = "http://testapp-byteshaft.herokuapp.com/api/users/";
+    public static final String ALL_CATEGORIES = "http://testapp-byteshaft.herokuapp.com/api/";
 
     @Override
     public void onCreate() {
@@ -46,7 +47,6 @@ public class AppGlobals extends Application{
         sContext = getApplicationContext();
         root = Environment.getExternalStorageDirectory().toString()
                 +"/Android/data/" + getPackageName()+ "/profilePic";
-
     }
 
     // Globally set the value for userExistResponse it takes integer value as parameter

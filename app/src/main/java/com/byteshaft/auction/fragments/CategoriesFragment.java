@@ -1,12 +1,14 @@
 package com.byteshaft.auction.fragments;
 
 
+import android.app.ProgressDialog;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +25,10 @@ import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -34,6 +40,7 @@ public class CategoriesFragment extends Fragment {
     private ArrayList<String> arrayList;
     private static final String TAG = "RecyclerViewFragment";
     private Set<String> selectedCategories;
+    private ProgressDialog mProgressDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -75,9 +82,16 @@ public class CategoriesFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.action_done:
                 if (!selectedCategories.isEmpty()) {
-//                    Helpers.saveCategoryStatus(AppGlobals.KEY_CATEGORIES_SELECTED, true);
+                    if (selectedCategories.contains("nothing")) {
+                        selectedCategories.remove("nothing");
+                    }
+                    Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED, true);
                     Helpers.saveCategories(selectedCategories);
-                    new UpdateCategories().execute();
+                    String[] strings = {Helpers.getStringDataFromSharedPreference(
+                            AppGlobals.KEY_USERNAME), Helpers.getStringDataFromSharedPreference(
+                            AppGlobals.KEY_PASSWORD
+                    )};
+                    new UpdateCategories().execute(strings);
                 }
                 return true;
         }
@@ -144,13 +158,15 @@ public class CategoriesFragment extends Fragment {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
-                        System.out.println(item.get(position));
                         selectedCategories.add(item.get(position));
                     } else {
                         selectedCategories.remove(item.get(position));
                     }
                 }
             });
+            if (selectedCategories.contains(item.get(position))) {
+                viewHolder.checkBox.setChecked(true);
+            }
         }
 
         @Override
@@ -176,10 +192,57 @@ public class CategoriesFragment extends Fragment {
     class UpdateCategories extends AsyncTask<String, String, String> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(getActivity());
+            mProgressDialog.setMessage("Updating ...");
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+        }
+
+        @Override
         protected String doInBackground(String... params) {
+            try {
+                URL url = new URL(AppGlobals.CATEGORY_URL+ params[0] + "/interests/");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestMethod("POST");
+                String authString = params[0] + ":" + params[1];
+                String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
+                connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
+                Set<String> categories = Helpers.getCategories();
+                StringBuilder stringBuilder = new StringBuilder();
+                for (String item: categories) {
+                    stringBuilder.append(item);
+                    stringBuilder.append(",");
+                }
+                String jsonFormattedData = getJsonObjectString(String.valueOf(stringBuilder));
+                sendRequestData(connection, jsonFormattedData);
+                System.out.println(connection.getResponseCode());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return null;
         }
 
+        private String getJsonObjectString(String latitude) {
+
+            return String.format("{\"interests\": \"%s\"}", latitude);
+        }
+
+        private void sendRequestData(HttpURLConnection connection, String body) throws IOException {
+            byte[] outputInBytes = body.getBytes("UTF-8");
+            OutputStream os = connection.getOutputStream();
+            os.write(outputInBytes);
+            os.close();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            mProgressDialog.dismiss();
+        }
     }
 
 }

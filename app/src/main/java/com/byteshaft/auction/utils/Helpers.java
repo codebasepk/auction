@@ -135,6 +135,8 @@ public class Helpers {
         options.inSampleSize = scale;
         options.inJustDecodeBounds = false;
         bm = BitmapFactory.decodeFile(selectedImagePath, options);
+        System.out.println(bm.getWidth());
+        System.out.println(bm.getHeight());
         return bm;
     }
 
@@ -186,16 +188,16 @@ public class Helpers {
     }
 
     /**
-     * Method for the user Login
+     * Method for the simeple get request here i am using this for login, get interest.
      * @param userName
      * @param password
      * @return String[] which include user details
      * @throws IOException
      */
-    public static String[] loginProcess(String userName, String password)
+    public static String[] simpleGetRequest(String link, String userName, String password)
             throws IOException {
         String parsedString = "";
-        URL url = new URL(AppGlobals.LOGIN_URL+ userName + "/");
+        URL url = new URL(link);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("Content-Type", "application/json");
         String authString = userName + ":" + password;
