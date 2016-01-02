@@ -3,16 +3,25 @@ package com.byteshaft.auction.gcm;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Base64;
 import android.util.Log;
 
 import com.byteshaft.auction.R;
+import com.byteshaft.auction.utils.AppGlobals;
+import com.byteshaft.auction.utils.Helpers;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 
 public class RegistrationIntentService extends IntentService {
 
@@ -63,7 +72,8 @@ public class RegistrationIntentService extends IntentService {
     }
 
     private void sendRegistrationToServer(String token) {
-        // Add custom implementation, as needed.
+        String[] data = {Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME), token};
+        new sendPushNotificationKey().execute(data);
     }
 
     // [START subscribe_topics]
@@ -74,6 +84,46 @@ public class RegistrationIntentService extends IntentService {
         }
     }
     // [END subscribe_topics]
+    class sendPushNotificationKey extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            URL url;
+            try {
+                url = new URL(AppGlobals.PUSH_NOTIFICATION_KEY+params[0] + "/push_id");
+                System.out.println(AppGlobals.PUSH_NOTIFICATION_KEY+params[0] + "/push_id");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestMethod("POST");
+                String authString = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)
+                        + ":" + Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+                String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
+                connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
+                String jsonFormattedData = getJsonObjectString(String.valueOf(params[1]));
+                sendRequestData(connection, jsonFormattedData);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        private String getJsonObjectString(String pushKey) {
+            return String.format("{\"push_key\": \"%s\"}", pushKey);
+        }
+
+        private void sendRequestData(HttpURLConnection connection, String body) throws IOException {
+            byte[] outputInBytes = body.getBytes("UTF-8");
+            OutputStream os = connection.getOutputStream();
+            os.write(outputInBytes);
+            os.close();
+            System.out.println(connection.getResponseCode());
+        }
+    }
+
 
 }
 

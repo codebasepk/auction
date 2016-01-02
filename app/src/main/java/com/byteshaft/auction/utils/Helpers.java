@@ -135,8 +135,6 @@ public class Helpers {
         options.inSampleSize = scale;
         options.inJustDecodeBounds = false;
         bm = BitmapFactory.decodeFile(selectedImagePath, options);
-        System.out.println(bm.getWidth());
-        System.out.println(bm.getHeight());
         return bm;
     }
 
