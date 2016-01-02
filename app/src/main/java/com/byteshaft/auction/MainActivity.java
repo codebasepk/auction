@@ -3,10 +3,10 @@ package com.byteshaft.auction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
@@ -57,26 +57,28 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                SharedPreferences sharedPreferences =
-                        PreferenceManager.getDefaultSharedPreferences(context);
-                boolean sentToken = sharedPreferences
-                        .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
-                if (sentToken) {
-                    System.out.println(R.string.gcm_send_message);
-                } else {
-                    System.out.println(R.string.token_error_message);
+        if (Helpers.isUserLoggedIn()) {
+            mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    SharedPreferences sharedPreferences =
+                            PreferenceManager.getDefaultSharedPreferences(context);
+                    boolean sentToken = sharedPreferences
+                            .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+                    if (sentToken) {
+                        System.out.println(R.string.gcm_send_message);
+                    } else {
+                        System.out.println(R.string.token_error_message);
+                    }
                 }
+
+            };
+
+            if (checkPlayServices()) {
+                // Start IntentService to register this application with GCM.
+                Intent intent = new Intent(this, RegistrationIntentService.class);
+                startService(intent);
             }
-
-        };
-
-        if (checkPlayServices()) {
-            // Start IntentService to register this application with GCM.
-            Intent intent = new Intent(this, RegistrationIntentService.class);
-            startService(intent);
         }
         instance = this;
         if (Helpers.isUserLoggedIn()) {
@@ -130,7 +132,7 @@ public class MainActivity extends AppCompatActivity
             final int tileSize = res.getDimensionPixelSize(R.dimen.letter_tile_size);
             final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
             final Bitmap letterTile = tileProvider.getLetterTile(Helpers.
-                    getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
+                            getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
                     String.valueOf(array[new Random().nextInt(array.length)]), 100, 100);
             circularImageView.setImageBitmap(letterTile);
         }
