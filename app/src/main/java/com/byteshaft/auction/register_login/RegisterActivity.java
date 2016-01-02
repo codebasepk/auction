@@ -283,7 +283,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, result[5]);
                 if (profilePic == null) {
                 } else {
-                    AppGlobals.addBitmapToInternalMemory(profilePic);
+                    AppGlobals.addBitmapToInternalMemory(profilePic, AppGlobals.profilePicName);
                 }
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             } else if (Integer.valueOf(result[0]).equals(AppGlobals.NO_INTERNET)) {

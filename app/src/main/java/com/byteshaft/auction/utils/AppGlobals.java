@@ -37,9 +37,10 @@ public class AppGlobals extends Application{
     public static int postProductResponse;
     public static final String CATEGORY_URL = "http://testapp-byteshaft.herokuapp.com/api/users/";
     private static String root;
-    private static String profilePicName = "profile_pic.png";
+    public static String profilePicName = "profile_pic.png";
     public static final String POST_AD_URL = "http://testapp-byteshaft.herokuapp.com/api/users/";
-    public static final String ALL_CATEGORIES = "http://testapp-byteshaft.herokuapp.com/api/";
+    public static final String ALL_CATEGORIES = "http://testapp-byteshaft.herokuapp.com/api/ads" +
+            "/categories";
     public static final String PUSH_NOTIFICATION_KEY = "http://testapp-byteshaft.herokuapp.com/api/users/";
 
     @Override
@@ -80,11 +81,11 @@ public class AppGlobals extends Application{
     }
 
     // Method to save bitmap to internal storage this method takes bitmap as parameter
-    public static void addBitmapToInternalMemory(Bitmap bitmap) {
+    public static void addBitmapToInternalMemory(Bitmap bitmap, String name) {
         File myDir = new File(root);
         File file;
         myDir.mkdirs();
-        file = new File(myDir +"/", profilePicName);
+        file = new File(myDir +"/", name);
         try {
             FileOutputStream out = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);

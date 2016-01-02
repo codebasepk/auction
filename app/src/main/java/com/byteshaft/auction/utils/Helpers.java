@@ -11,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.util.Base64;
+import android.util.Log;
 
 import org.json.JSONException;
 
@@ -296,5 +297,27 @@ public class Helpers {
             e.printStackTrace();
         }
         return success;
+    }
+
+    public static Bitmap downloadImage(String link) {
+        Bitmap myBitmap = null;
+        try {
+            URL url = new URL(link);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            System.out.println(connection.getResponseCode());
+            try {
+                InputStream input = connection.getInputStream();
+                myBitmap = BitmapFactory.decodeStream(input);
+
+            } catch (Exception e) {
+                e.fillInStackTrace();
+                Log.v("ERROR", "Errorchence : " + e);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return myBitmap;
     }
 }

@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -26,9 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -216,27 +213,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         @Override
         protected Boolean doInBackground(String... params) {
-            System.out.println(params[0]);
-            Bitmap myBitmap = null;
-            try {
-                URL url = new URL(params[0]);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                System.out.println(connection.getResponseCode());
-                try {
-                    InputStream input = connection.getInputStream();
-                    myBitmap = BitmapFactory.decodeStream(input);
-
-                } catch (Exception e) {
-                    e.fillInStackTrace();
-                    Log.v("ERROR", "Errorchence : " + e);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Bitmap myBitmap;
+            myBitmap = Helpers.downloadImage(params[0]);
             if (myBitmap != null) {
-                AppGlobals.addBitmapToInternalMemory(myBitmap);
+                AppGlobals.addBitmapToInternalMemory(myBitmap, AppGlobals.profilePicName);
                 Helpers.saveBooleanToSharedPreference(AppGlobals.PROFILE_PIC_STATUS, true);
                 return true;
             }

@@ -2,6 +2,7 @@ package com.byteshaft.auction.fragments;
 
 
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,18 +20,24 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 
 public class CategoriesFragment extends Fragment {
@@ -41,10 +49,15 @@ public class CategoriesFragment extends Fragment {
     private static final String TAG = "RecyclerViewFragment";
     private Set<String> selectedCategories;
     private ProgressDialog mProgressDialog;
+    private HashMap<String, String> linksHaspMap;
+    private ArrayList<String> categoriesList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.categories_fragment, container, false);
+        linksHaspMap = new HashMap<>();
+        categoriesList = new ArrayList<>();
+        new GetCategoriesTask().execute();
         mBaseView.setTag(TAG);
         setHasOptionsMenu(true);
         if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED)) {
@@ -65,10 +78,10 @@ public class CategoriesFragment extends Fragment {
         arrayList.add("test");
         return mBaseView;
     }
+
     @Override
     public void onResume() {
         super.onResume();
-//        }
     }
 
     @Override
@@ -99,20 +112,15 @@ public class CategoriesFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated( Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        mAdapter = new CustomAdapter(arrayList);
-        mRecyclerView.setAdapter(mAdapter);
         super.onViewCreated(view, savedInstanceState);
 
     }
-
 
     // custom RecyclerView class for inflating customView
     class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -153,7 +161,7 @@ public class CategoriesFragment extends Fragment {
             selectedCategories = Helpers.getCategories();
             holder.setIsRecyclable(false);
             viewHolder.textView.setText(item.get(position));
-            viewHolder.imageView.setImageDrawable(getImageForCategory(item.get(position)));
+//            viewHolder.imageView.setImageDrawable(getImageForCategory(item.get(position)));
             viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -175,74 +183,152 @@ public class CategoriesFragment extends Fragment {
         }
     }
 
-    // custom class getting view item by giving view in constructor.
-    public static class CustomView extends RecyclerView.ViewHolder{
-        public TextView textView;
-        public ImageView imageView;
-        public CheckBox checkBox;
-        public CustomView(View itemView) {
-            super(itemView);
-            textView =  (TextView) itemView.findViewById(R.id.all_category_title);
-            imageView = (ImageView) itemView.findViewById(R.id.all_category_image);
-            checkBox = (CheckBox) itemView.findViewById(R.id.all_categories_checkbox);
-        }
-    }
+        class GetCategoriesTask extends AsyncTask<String, String, ArrayList<String>> {
 
-    // member class to update categories on server
-    class UpdateCategories extends AsyncTask<String, String, String> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mProgressDialog = new ProgressDialog(getActivity());
-            mProgressDialog.setMessage("Updating ...");
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.show();
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                URL url = new URL(AppGlobals.CATEGORY_URL+ params[0] + "/interests/");
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestMethod("POST");
-                String authString = params[0] + ":" + params[1];
-                String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
-                connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
-                Set<String> categories = Helpers.getCategories();
-                StringBuilder stringBuilder = new StringBuilder();
-                for (String item: categories) {
-                    stringBuilder.append(item);
-                    stringBuilder.append(",");
-                }
-                String jsonFormattedData = getJsonObjectString(String.valueOf(stringBuilder));
-                sendRequestData(connection, jsonFormattedData);
-                System.out.println(connection.getResponseCode());
-            } catch (IOException e) {
-                e.printStackTrace();
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mProgressDialog = new ProgressDialog(getActivity());
+                mProgressDialog.setMessage("Updating ...");
+                mProgressDialog.setIndeterminate(false);
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.show();
             }
-            return null;
+
+            @Override
+            protected ArrayList<String> doInBackground(String... params) {
+                if (Helpers.isNetworkAvailable(getActivity().getApplicationContext()) &&
+                        Helpers.isInternetWorking()) {
+                    URL url;
+                    String parsedString;
+                    try {
+                        url = new URL(AppGlobals.ALL_CATEGORIES);
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestProperty("Content-Type", "application/json");
+                        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                            InputStream is = connection.getInputStream();
+                            parsedString = Helpers.convertInputStreamToString(is);
+                            JsonParser jsonParser = new JsonParser();
+                            JsonObject mainJsonObject = jsonParser.parse(parsedString).getAsJsonObject();
+                            JsonArray jsonArray = mainJsonObject.getAsJsonArray("results");
+                            System.out.println(jsonArray);
+                            for (int i = 0; i < jsonArray.size(); i++) {
+                                JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
+                                categoriesList.add(String.valueOf(jsonObject.get("name")).replace("\"", ""));
+                                linksHaspMap.put(String.valueOf(jsonObject.get("name")).replace("\"", ""),
+                                        String.valueOf(jsonObject.get("photo")));
+
+                            }
+                            System.out.println(categoriesList);
+                            System.out.println(linksHaspMap);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(ArrayList<String> arrayList) {
+                super.onPostExecute(arrayList);
+                mProgressDialog.dismiss();
+                mAdapter = new CustomAdapter(categoriesList);
+                mRecyclerView.setAdapter(mAdapter);
+            }
         }
 
-        private String getJsonObjectString(String latitude) {
+            class GetImagesTask extends AsyncTask<String, String, String> {
 
-            return String.format("{\"interests\": \"%s\"}", latitude);
+                @Override
+                protected String doInBackground(String... params) {
+                    Bitmap bitmap = Helpers.downloadImage(params[0]);
+                    if (bitmap != null) {
+                        AppGlobals.addBitmapToInternalMemory(bitmap, params[1]);
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(String s) {
+                    super.onPostExecute(s);
+
+                }
+            }
+
+        // custom class getting view item by giving view in constructor.
+        public class CustomView extends RecyclerView.ViewHolder {
+            public TextView textView;
+            public ImageView imageView;
+            public CheckBox checkBox;
+            public ProgressBar progressBar;
+
+            public CustomView(View itemView) {
+                super(itemView);
+                textView = (TextView) itemView.findViewById(R.id.all_category_title);
+                imageView = (ImageView) itemView.findViewById(R.id.all_category_image);
+                checkBox = (CheckBox) itemView.findViewById(R.id.all_categories_checkbox);
+                progressBar = (ProgressBar) itemView.findViewById(R.id.imageProgressBar);
+            }
         }
 
-        private void sendRequestData(HttpURLConnection connection, String body) throws IOException {
-            byte[] outputInBytes = body.getBytes("UTF-8");
-            OutputStream os = connection.getOutputStream();
-            os.write(outputInBytes);
-            os.close();
-        }
+        // member class to update categories on server
+        class UpdateCategories extends AsyncTask<String, String, Integer> {
 
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            mProgressDialog.dismiss();
-        }
-    }
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mProgressDialog = new ProgressDialog(getActivity());
+                mProgressDialog.setMessage("Updating ...");
+                mProgressDialog.setIndeterminate(false);
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.show();
+            }
 
+            @Override
+            protected Integer doInBackground(String... params) {
+                HttpURLConnection connection;
+                int status = 0;
+                try {
+                    URL url = new URL(AppGlobals.CATEGORY_URL + params[0] + "/interests/");
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setRequestMethod("POST");
+                    String authString = params[0] + ":" + params[1];
+                    String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
+                    connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
+                    Set<String> categories = Helpers.getCategories();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (String item : categories) {
+                        stringBuilder.append(item);
+                        stringBuilder.append(",");
+                    }
+                    String jsonFormattedData = getJsonObjectString(String.valueOf(stringBuilder));
+                    sendRequestData(connection, jsonFormattedData);
+                    status = connection.getResponseCode();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return status;
+            }
+
+            private String getJsonObjectString(String latitude) {
+
+                return String.format("{\"interests\": \"%s\"}", latitude);
+            }
+
+            private void sendRequestData(HttpURLConnection connection, String body) throws IOException {
+                byte[] outputInBytes = body.getBytes("UTF-8");
+                OutputStream os = connection.getOutputStream();
+                os.write(outputInBytes);
+                os.close();
+            }
+
+            @Override
+            protected void onPostExecute(Integer s) {
+                super.onPostExecute(s);
+                mProgressDialog.dismiss();
+                Log.i(AppGlobals.getLogTag(getClass()), String.valueOf(s));
+            }
+        }
 }
