@@ -40,6 +40,7 @@ public class AppGlobals extends Application{
     private static String profilePicName = "profile_pic.png";
     public static final String POST_AD_URL = "http://testapp-byteshaft.herokuapp.com/api/users/";
     public static final String ALL_CATEGORIES = "http://testapp-byteshaft.herokuapp.com/api/";
+    public static final String PUSH_NOTIFICATION_KEY = "http://testapp-byteshaft.herokuapp.com/api/users/";
 
     @Override
     public void onCreate() {
