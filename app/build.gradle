@@ -31,4 +31,5 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.0.0'
     compile 'com.google.android.gms:play-services:8.3.0'
     compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
+    compile 'com.github.jaydeepw:poly-picker:v1.0.22'
 }
