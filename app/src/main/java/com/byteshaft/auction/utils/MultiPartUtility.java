@@ -88,8 +88,6 @@ public class MultiPartUtility {
     //Method to add filePart to printwriter
     public void addFilePart(final String fieldName, final File uploadFile)
             throws IOException {
-        System.out.println(fieldName);
-        System.out.println(uploadFile);
         final String fileName = uploadFile.getName();
         writer.append("--").append(boundary).append(CRLF)
                 .append("Content-Disposition: form-data; name=\"")
@@ -97,8 +95,6 @@ public class MultiPartUtility {
                 .append("\"").append(CRLF).append("Content-Type: ")
                 .append("Content-Transfer-Encoding: binary").append(CRLF)
                 .append(CRLF);
-        System.out.println(fileName);
-        System.out.println(uploadFile);
 
         writer.flush();
         outputStream.flush();
@@ -123,11 +119,9 @@ public class MultiPartUtility {
                 .append(CRLF);
         writer.close();
         final int status = connection.getResponseCode();
-        System.out.println(status);
         if (status == 201) {
             AppGlobals.setResponseCode(status);
         }
-        System.out.println(connection.getResponseCode());
         InputStream is = connection.getInputStream();
         final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         final byte[] buffer = new byte[4096];
@@ -141,15 +135,10 @@ public class MultiPartUtility {
     public byte[] finishFilesUpload() throws IOException {
         writer.append(CRLF).append("--").append(boundary).append("--")
                     .append(CRLF);
-        System.out.println(writer.toString());
         writer.close();
         final int status = connection.getResponseCode();
-        System.out.println(status);
-        System.out.println(connection.getErrorStream());
-        System.out.println(connection.getResponseMessage());
         if (registrationProcess && status == 201) {
             AppGlobals.setUserExistResponse(status);
-            System.out.println("DONE");
         }
         if (postProductProcess && status == 201) {
             AppGlobals.setPostProductResponse(status);

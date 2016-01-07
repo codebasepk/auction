@@ -2,7 +2,6 @@ package com.byteshaft.auction.fragments.buyer;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +20,7 @@ import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * this class belongs to buyer.
@@ -32,10 +32,13 @@ public class Buyer extends Fragment {
     private CustomAdapter mAdapter;
     private ArrayList<String> arrayList;
     private static final String TAG = "RecyclerViewFragment";
+    private Set<String> categories;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.buyer_category_fragment, container, false);
+        System.out.println("buyer fragment");
+        categories = Helpers.getCategories();
         mBaseView.setTag(TAG);
         Helpers.saveLastFragmentOpened(getClass().getSimpleName());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -44,10 +47,11 @@ public class Buyer extends Fragment {
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
         arrayList = new ArrayList<>();
-        arrayList.add("Mobile");
-        arrayList.add("Electronics");
-        arrayList.add("Vehicle");
-        arrayList.add("Real State");
+        for (String category: categories) {
+            if (!category.isEmpty()) {
+                arrayList.add(category);
+            }
+        }
         return mBaseView;
     }
 
@@ -116,28 +120,13 @@ public class Buyer extends Fragment {
             return viewHolder;
         }
 
-        // this method is for getting the relevant drawable image for categories this will be
-        // removed when dynamic data will be in app
-        private Drawable getImageForCategory(String item) {
-            switch (item) {
-                case "Mobile":
-                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.mobile);
-                case "Electronics":
-                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.electronics);
-                case "Vehicle":
-                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.vehicle);
-                case "Real State":
-                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.real_state);
-                default:
-                    return AppGlobals.getContext().getResources().getDrawable(R.drawable.not_found);
-            }
-        }
-
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             holder.setIsRecyclable(false);
             viewHolder.textView.setText(items.get(position));
-            viewHolder.imageView.setImageDrawable(getImageForCategory(items.get(position)));
+            viewHolder.imageView.setImageBitmap(Helpers.getBitMapOfProfilePic(
+                    (AppGlobals.root + AppGlobals.CATEGORIES_FOLDER) + "/" +
+                            (items.get(position) + ".png")));
         }
 
         @Override
@@ -176,7 +165,7 @@ public class Buyer extends Fragment {
             public CustomView(View itemView) {
                 super(itemView);
                 textView = (TextView) itemView.findViewById(R.id.category_title);
-                imageView = (ImageView) itemView.findViewById(R.id.category_image);
+                imageView = (ImageView) itemView.findViewById(R.id.selected_category_image);
             }
         }
     }

@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
+import com.byteshaft.auction.fragments.CategoriesFragment;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 
@@ -40,14 +41,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText mEditTextUserName;
     private EditText mEditTextPassword;
     private Button mLoginButton;
-    private ProgressDialog mProgressDialog;
+    public static ProgressDialog sProgressDialog;
     private TextView forgetPassword;
     private String profilePicUrl = "";
+    private static LoginActivity sInstance;
+
+    public static LoginActivity getLoginActivityInstance() {
+        return sInstance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+        sInstance = this;
         setTitle("Login");
         mRegisterButton = (Button) findViewById(R.id.register_button);
         mEditTextUserName = (EditText) findViewById(R.id.username_login);
@@ -138,22 +145,29 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(LoginActivity.this);
-            mProgressDialog.setMessage("Logging in...");
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.show();
+            sProgressDialog = new ProgressDialog(LoginActivity.this);
+            sProgressDialog.setMessage("Logging in...");
+            sProgressDialog.setIndeterminate(false);
+            sProgressDialog.setCancelable(false);
+            sProgressDialog.show();
         }
 
         @Override
         protected ArrayList<Integer> doInBackground(String... params) {
             ArrayList<Integer> arrayList = new ArrayList<>();
-            if (Helpers.isNetworkAvailable(getApplicationContext()) && Helpers.isInternetWorking()) {
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 String[] data;
                 try {
                     data = Helpers.simpleGetRequest(AppGlobals.LOGIN_URL + params[0] + "/",
                             params[0], params[1]);
                     if (Integer.valueOf(data[0]).equals(HttpURLConnection.HTTP_OK)) {
+                        AppGlobals.sCategoriesFragmentForeGround = false;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                new CategoriesFragment.GetCategoriesTask(LoginActivity.this).execute();
+                            }
+                        });
                         JSONObject jsonobject = new JSONObject(data[1]);
                         Helpers.saveDataToSharedPreferences(AppGlobals.KEY_USERNAME,
                                 String.valueOf(jsonobject.get("username")));
@@ -174,6 +188,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             // new code goes here.
                         } else {
                             profilePicUrl = String.valueOf(jsonobject.get("photo"));
+                            Helpers.saveDataToSharedPreferences(AppGlobals.PROFILE_PIC_IMAGE_URL,
+                                    profilePicUrl);
                         }
                         arrayList.add(HttpURLConnection.HTTP_OK);
                     } else {
@@ -194,29 +210,29 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             if (!profilePicUrl.trim().isEmpty()) {
                 new DownloadProfilePic().execute(profilePicUrl);
             }
-            mProgressDialog.dismiss();
             if (arrayList.get(0).equals(HttpURLConnection.HTTP_OK)) {
                 Helpers.userLogin(true);
-                finish();
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
             } else if (arrayList.get(0).equals(HttpURLConnection.HTTP_FORBIDDEN)) {
+                sProgressDialog.dismiss();
                 Helpers.alertDialog(LoginActivity.this, "Authentication Error",
                         "Username or password is incorrect");
             } else if (arrayList.get(0).equals(AppGlobals.NO_INTERNET)) {
+                sProgressDialog.dismiss();
                 Helpers.alertDialog(LoginActivity.this, "No Internet", "Internet Not Available");
             }
         }
     }
 
     // class to download image
-    class DownloadProfilePic extends AsyncTask<String, String, Boolean> {
+     public static class DownloadProfilePic extends AsyncTask<String, String, Boolean> {
 
         @Override
         protected Boolean doInBackground(String... params) {
             Bitmap myBitmap;
             myBitmap = Helpers.downloadImage(params[0]);
             if (myBitmap != null) {
-                AppGlobals.addBitmapToInternalMemory(myBitmap, AppGlobals.profilePicName);
+                AppGlobals.addBitmapToInternalMemory(myBitmap, AppGlobals.profilePicName,
+                        AppGlobals.PROFILE_PIC_FOLDER);
                 Helpers.saveBooleanToSharedPreference(AppGlobals.PROFILE_PIC_STATUS, true);
                 return true;
             }
@@ -233,20 +249,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void getCategoriesAndSave(String userName, String password) throws IOException {
+        boolean categoriesAvailable = false;
         String[] categoryList = Helpers.simpleGetRequest(AppGlobals.CATEGORY_URL + userName +
                         "/interests/", userName, password);
         if (Integer.valueOf(categoryList[0]) == HttpURLConnection.HTTP_OK) {
             try {
                 JSONObject jsonObject = new JSONObject((categoryList[1]));
                 String categories = String.valueOf(jsonObject.get("interests"));
-                String[] animalsArray = categories.split(",");
+                String[] categoriesArray = categories.split(",");
                 Set<String> categoriesSet = new HashSet<>();
-                for (String category : animalsArray) {
-                    System.out.println(category);
+                for (String category : categoriesArray) {
                     categoriesSet.add(category);
+                    if (!category.isEmpty()) {
+                        categoriesAvailable = true;
+                    }
                 }
                 Helpers.saveCategories(categoriesSet);
-                Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED, true);
+                System.out.println(categoriesSet);
+                System.out.println(categoriesArray.length);
+                if (categoriesAvailable) {
+                    Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED, true);
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }

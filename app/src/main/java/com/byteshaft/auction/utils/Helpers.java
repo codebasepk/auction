@@ -27,6 +27,8 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.net.ssl.HttpsURLConnection;
+
 public class Helpers {
 
     // get default sharedPreferences.
@@ -109,7 +111,9 @@ public class Helpers {
             http.addFormField("address", address);
             http.addFormField("city", city);
             http.addFormField("phone_number", phoneNumber);
-            http.addFilePart("photo", uploadFile);
+            if (!imageUri.trim().isEmpty()) {
+                http.addFilePart("photo", uploadFile);
+            }
             final byte[] bytes = http.finish();
             try {
                 OutputStream os = new FileOutputStream(imageUri);
@@ -277,9 +281,9 @@ public class Helpers {
     }
 
     // Check if network is available
-    public static boolean isNetworkAvailable(final Context context) {
+    public static boolean isNetworkAvailable() {
         ConnectivityManager cm = (ConnectivityManager)
-                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                AppGlobals.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
     }
@@ -303,10 +307,8 @@ public class Helpers {
         Bitmap myBitmap = null;
         try {
             URL url = new URL(link);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.connect();
-            System.out.println(connection.getResponseCode());
             try {
                 InputStream input = connection.getInputStream();
                 myBitmap = BitmapFactory.decodeStream(input);
@@ -319,5 +321,23 @@ public class Helpers {
             e.printStackTrace();
         }
         return myBitmap;
+    }
+
+    //method to remove user information when logout
+    public static void removeUserData() {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().clear().commit();
+    }
+
+    public static void saveStringSet(String key, Set<String> value) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putStringSet(key, value).apply();
+    }
+
+    public static Set<String> getSavedStringSet(String key) {
+        Set<String> set = new HashSet<>();
+        set.add("nothing");
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getStringSet(key, set);
     }
 }

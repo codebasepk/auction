@@ -98,7 +98,6 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                 category = String.valueOf(parent.getSelectedItem());
             }
         });
-        System.out.println(category);
         return mBaseView;
     }
 
@@ -190,74 +189,31 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CAMERA) {
-            System.out.println(imageCapturePath);
             if (!imagesArray.contains(imageCapturePath.getAbsolutePath()) && imagesArray.size() <= 7) {
                 imagesArray.add(imageCapturePath.getAbsolutePath());
             }
-//            if (data.getExtras() != null) {
-//                if (data.getExtras().get("data") != null) {
-//                    System.out.println("Select file camera");
-//                    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-//                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-//                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-//                    File appFolder = new File(Environment.getExternalStorageDirectory().
-//                            getAbsolutePath() + File.separator + "Auction");
-//                    if (!appFolder.exists()) {
-//                        appFolder.mkdirs();
-//                    }
-//                    destination = new File(appFolder, System.currentTimeMillis() + ".jpg");
-//                    imageUrl = destination.getAbsolutePath();
-//                    System.out.println(destination);
-//                    FileOutputStream fo;
-//                    try {
-//                        destination.createNewFile();
-//                        fo = new FileOutputStream(destination);
-//                        fo.write(bytes.toByteArray());
-//                        fo.close();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                    imageForAd = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
-//                    if (!imagesArray.contains(destination.getAbsolutePath()) && imagesArray.size() <= 7) {
-//                        imagesArray.add(destination.getAbsolutePath());
-//
-//                    }
-//                    System.out.println(destination.getAbsolutePath());
-//                }
-//            }
         } else if (requestCode == SELECT_FILE) {
-            System.out.println("FILE");
-            System.out.println(data == null);
             if (data != null) {
-                System.out.println(data.getData() == null);
-                System.out.println(data.getStringExtra("data"));
                 if (data.getData() != null) {
                     Uri singleImageUri = data.getData();
-                    System.out.println(singleImageUri);
                     String singlePath = RealPathFromUri.getRealPathFromURI_API19(getActivity().
                             getApplicationContext(), singleImageUri);
-                    System.out.println(singlePath);
                     if (!imagesArray.contains(singlePath) && imagesArray.size() <= 7) {
                         imagesArray.add(singlePath);
                     }
                 } else {
                     if (Build.VERSION.SDK_INT < 19) {
                         String[] imagesPath = data.getStringExtra("data").split("\\|");
-                        System.out.println(imagesPath);
                     } else if (Build.VERSION.SDK_INT > 19) {
                         ClipData clipData = data.getClipData();
                         if (clipData != null) {
                             for (int i = 0; i < clipData.getItemCount(); i++) {
                                 ClipData.Item item = clipData.getItemAt(i);
-                                System.out.println(item);
                                 Uri uri = item.getUri();
-                                System.out.println(uri);
                                 String path = RealPathFromUri.getRealPathFromURI_API19(getActivity().
                                         getApplicationContext(), uri);
-                                System.out.println(path);
                                 if (!imagesArray.contains(path) && imagesArray.size() <= 7) {
                                     imagesArray.add(path);
-                                    System.out.println(path);
                                     imageForAd = Helpers.getBitMapOfProfilePic(path);
                                     imageUrl = String.valueOf(path);
                                 }
@@ -288,8 +244,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
 
         @Override
         protected Integer doInBackground(String... params) {
-            if (Helpers.isNetworkAvailable(getActivity().getApplicationContext())
-                    && Helpers.isInternetWorking()) {
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 MultiPartUtility http;
                 String username = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
                 String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
@@ -302,7 +257,6 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
 //                http.addFormField("currency", params[3]);
                     http.addFormField("category", params[4]);
                     int photo = 1;
-                    System.out.println(imagesArray);
                     for (String item : imagesArray) {
                         http.addFilePart(("photo" + photo), new File(item));
                         photo++;
@@ -328,7 +282,6 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
         @Override
         protected void onPostExecute(Integer s) {
             super.onPostExecute(s);
-            System.out.println(s);
             imagesArray.clear();
             mProgressDialog.dismiss();
             if (s.equals(201)) {

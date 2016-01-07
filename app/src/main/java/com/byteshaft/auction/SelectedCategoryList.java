@@ -132,7 +132,6 @@ public class SelectedCategoryList extends AppCompatActivity {
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
             View childView = rv.findChildViewUnder(e.getX(), e.getY());
             if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-                System.out.println(items == null);
                 mListener.onItem(items.get(rv.getChildPosition(childView)));
                 return true;
             }
