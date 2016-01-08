@@ -61,7 +61,6 @@ public class ItemDetail extends AppCompatActivity {
         setTitle(detail);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mRecyclerView = (RecyclerView) findViewById(R.id.bids_recycler_view);
-        System.out.println(mRecyclerView == null);
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout_for_item_detail);
@@ -99,7 +98,6 @@ public class ItemDetail extends AppCompatActivity {
                 , new BidsAdapter.OnItemClickListener() {
             @Override
             public void onItem(String item) {
-                System.out.println(item);
             }
         }));
 

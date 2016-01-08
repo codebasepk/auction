@@ -11,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.util.Base64;
+import android.util.Log;
 
 import org.json.JSONException;
 
@@ -25,6 +26,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class Helpers {
 
@@ -108,7 +111,9 @@ public class Helpers {
             http.addFormField("address", address);
             http.addFormField("city", city);
             http.addFormField("phone_number", phoneNumber);
-            http.addFilePart("photo", uploadFile);
+            if (!imageUri.trim().isEmpty()) {
+                http.addFilePart("photo", uploadFile);
+            }
             final byte[] bytes = http.finish();
             try {
                 OutputStream os = new FileOutputStream(imageUri);
@@ -158,7 +163,7 @@ public class Helpers {
      * @return
      * @throws IOException
      */
-    private static HttpURLConnection openConnectionForUrl(String targetUrl, String method)
+    public static HttpURLConnection openConnectionForUrl(String targetUrl, String method)
             throws IOException {
         URL url = new URL(targetUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -210,6 +215,8 @@ public class Helpers {
         }
 
     }
+
+
 
     /**
      * convert the InputStream to String, Basically its a JsonObject than we can get user details
@@ -276,9 +283,9 @@ public class Helpers {
     }
 
     // Check if network is available
-    public static boolean isNetworkAvailable(final Context context) {
+    public static boolean isNetworkAvailable() {
         ConnectivityManager cm = (ConnectivityManager)
-                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                AppGlobals.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
     }
@@ -296,5 +303,43 @@ public class Helpers {
             e.printStackTrace();
         }
         return success;
+    }
+
+    public static Bitmap downloadImage(String link) {
+        Bitmap myBitmap = null;
+        try {
+            URL url = new URL(link);
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.connect();
+            try {
+                InputStream input = connection.getInputStream();
+                myBitmap = BitmapFactory.decodeStream(input);
+
+            } catch (Exception e) {
+                e.fillInStackTrace();
+                Log.v("ERROR", "Errorchence : " + e);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return myBitmap;
+    }
+
+    //method to remove user information when logout
+    public static void removeUserData() {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().clear().commit();
+    }
+
+    public static void saveStringSet(String key, Set<String> value) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putStringSet(key, value).apply();
+    }
+
+    public static Set<String> getSavedStringSet(String key) {
+        Set<String> set = new HashSet<>();
+        set.add("nothing");
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getStringSet(key, set);
     }
 }

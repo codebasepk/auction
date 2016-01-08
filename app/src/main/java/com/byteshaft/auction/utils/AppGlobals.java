@@ -36,18 +36,31 @@ public class AppGlobals extends Application{
     public static final String REGISTER_URL = ("http://testapp-byteshaft.herokuapp.com/api/register");
     public static int postProductResponse;
     public static final String CATEGORY_URL = "http://testapp-byteshaft.herokuapp.com/api/users/";
-    private static String root;
-    private static String profilePicName = "profile_pic.png";
+    public static String root;
+    public static String profilePicName = "profile_pic.png";
     public static final String POST_AD_URL = "http://testapp-byteshaft.herokuapp.com/api/users/";
-    public static final String ALL_CATEGORIES = "http://testapp-byteshaft.herokuapp.com/api/";
+    public static final String ALL_CATEGORIES = "http://testapp-byteshaft.herokuapp.com/api/ads" +
+            "/categories";
     public static final String PUSH_NOTIFICATION_KEY = "http://testapp-byteshaft.herokuapp.com/api/users/";
+    public static final String SELECTED_CATEGORY_DETAIL_URL =
+            "http://testapp-byteshaft.herokuapp.com/api/ads/?category=";
+    public static final String PROFILE_PIC_FOLDER = "/profilePic";
+    public static final String CATEGORIES_FOLDER = "/categories_folder";
+    public static final String ALL_CATEGORIES_STATUS = "all_categories_status";
+    public static final String CATEGORIES_IMAGES_SAVED = "category_images_saved";
+    public static final String PROFILE_PIC_IMAGE_URL = "profile_pic_image";
+    public static final String ALL_CATEGORY = "all_categories";
+//    public static final String ALL_CATEGORY_STATUS = "category_status";
+    public static boolean alertDialogShownOneTimeForCategory = false;
+    public static boolean sCategoriesFragmentForeGround = true;
+    public static int sCounter = 1;
 
     @Override
     public void onCreate() {
         super.onCreate();
         sContext = getApplicationContext();
         root = Environment.getExternalStorageDirectory().toString()
-                +"/Android/data/" + getPackageName()+ "/profilePic";
+                +"/Android/data/" + getPackageName();
     }
 
     // Globally set the value for userExistResponse it takes integer value as parameter
@@ -80,11 +93,11 @@ public class AppGlobals extends Application{
     }
 
     // Method to save bitmap to internal storage this method takes bitmap as parameter
-    public static void addBitmapToInternalMemory(Bitmap bitmap) {
-        File myDir = new File(root);
+    public static void addBitmapToInternalMemory(Bitmap bitmap, String name, String folder) {
+        File myDir = new File(root + folder);
         File file;
         myDir.mkdirs();
-        file = new File(myDir +"/", profilePicName);
+        file = new File(myDir +"/", name);
         try {
             FileOutputStream out = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
@@ -97,7 +110,7 @@ public class AppGlobals extends Application{
 
     // get profile pic as bitmap when needed
     public static Bitmap getProfilePicBitMap() throws FileNotFoundException {
-        File file = new File(root,profilePicName);
+        File file = new File(root + PROFILE_PIC_FOLDER,profilePicName);
         if (file.exists()) {
             return BitmapFactory.decodeStream(new FileInputStream(file));
         } else {

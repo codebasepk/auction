@@ -225,7 +225,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 dpButton.setImageBitmap(thumbnail);
             } else if (requestCode == SELECT_FILE) {
                 selectedImageUri = data.getData();
-                System.out.println(selectedImageUri);
                 String[] projection = {MediaStore.MediaColumns.DATA};
                 CursorLoader cursorLoader = new CursorLoader(this, selectedImageUri, projection, null, null,
                         null);
@@ -255,7 +254,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         @Override
         protected String[] doInBackground(String... params) {
-            if (Helpers.isNetworkAvailable(getApplicationContext()) && Helpers.isInternetWorking()) {
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 try {
                     Helpers.sendRegisterData(params[0], params[1], params[2], params[3],
                             params[4], params[5], params[6]);
@@ -283,11 +282,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, result[5]);
                 if (profilePic == null) {
                 } else {
-                    AppGlobals.addBitmapToInternalMemory(profilePic);
+                    AppGlobals.addBitmapToInternalMemory(profilePic, AppGlobals.profilePicName,
+                            AppGlobals.PROFILE_PIC_FOLDER);
                 }
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             } else if (Integer.valueOf(result[0]).equals(AppGlobals.NO_INTERNET)) {
                 Helpers.alertDialog(RegisterActivity.this, "No Internet", "Internet Not Available");
+            } else if (AppGlobals.getResponseCode() == 500) {
+                Helpers.alertDialog(RegisterActivity.this, "500", "Internal server error, try after few moments");
             }
         }
     }
@@ -297,7 +299,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         @Override
         protected Integer doInBackground(String... params) {
-            if (Helpers.isNetworkAvailable(getApplicationContext()) && Helpers.isInternetWorking()) {
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 try {
                     Helpers.userExist(params[0]);
                 } catch (IOException | JSONException e) {
@@ -311,7 +313,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-            System.out.println(integer);
             if (integer == 404) {
                 Drawable x = getResources().getDrawable(R.drawable.tick);
                 x.setBounds(0, 0, 20, 20);

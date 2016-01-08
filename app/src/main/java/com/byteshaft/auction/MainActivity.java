@@ -37,6 +37,7 @@ import com.byteshaft.auction.utils.Helpers;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import java.io.FileNotFoundException;
 import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     private static MainActivity instance;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = "MainActivity";
+    private View header;
 
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
@@ -82,17 +84,17 @@ public class MainActivity extends AppCompatActivity
         }
         instance = this;
         if (Helpers.isUserLoggedIn()) {
+            if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED)) {
+                loadFragment(new CategoriesFragment());
+            }
             if (!Helpers.getLastFragment().equals("")) {
                 if (Helpers.getLastFragment().contains("Buyer")) {
                     loadFragment(new Buyer());
                 } else {
                     loadFragment(new Seller());
                 }
-            }
-//            else if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED)) {
-//                loadFragment(new CategoriesFragment());
-//            }
-            else {
+            } else {
+                System.out.println("OK");
                 loadFragment(new Buyer());
             }
         } else {
@@ -108,7 +110,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        View header = navigationView.getHeaderView(0);
+        header = navigationView.getHeaderView(0);
         TextView userName = (TextView) header.findViewById(R.id.nav_user_name);
         TextView userEmail = (TextView) header.findViewById(R.id.nav_user_email);
         if (!Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME).equals("")) {
@@ -121,25 +123,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             userEmail.setText("abc@xyz.com");
         }
-        CircleImageView circularImageView = (CircleImageView) header.findViewById(R.id.imageView);
-//        try {
-//            if (AppGlobals.getProfilePicBitMap() != null) {
-//                circularImageView.setImageBitmap(AppGlobals.getProfilePicBitMap());
-//            } else {
-        if (Helpers.isUserLoggedIn()) {
-            final Resources res = getResources();
-            int[] array = getResources().getIntArray(R.array.letter_tile_colors);
-            final int tileSize = res.getDimensionPixelSize(R.dimen.letter_tile_size);
-            final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
-            final Bitmap letterTile = tileProvider.getLetterTile(Helpers.
-                            getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
-                    String.valueOf(array[new Random().nextInt(array.length)]), 100, 100);
-            circularImageView.setImageBitmap(letterTile);
-        }
-//            }
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @Override
@@ -147,9 +130,42 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
-        if (AppGlobals.loginSuccessFull) {
+//        if (AppGlobals.loginSuccessFull) {
+//            loadFragment(new Buyer());
+//            AppGlobals.loginSuccessFull = false;
+//        }
+        if (Helpers.isUserLoggedIn() && !Helpers.getBooleanValueFromSharedPreference(
+                AppGlobals.KEY_CATEGORIES_SELECTED)) {
+            loadFragment(new CategoriesFragment());
+        }
+        if (Helpers.isUserLoggedIn() && !Helpers.getBooleanValueFromSharedPreference(
+                AppGlobals.PROFILE_PIC_STATUS)) {
+            new LoginActivity.DownloadProfilePic().execute(Helpers.
+                    getStringDataFromSharedPreference(AppGlobals.PROFILE_PIC_IMAGE_URL));
+        }
+
+        CircleImageView circularImageView = (CircleImageView) header.findViewById(R.id.imageView);
+        try {
+            if (AppGlobals.getProfilePicBitMap() != null) {
+                circularImageView.setImageBitmap(AppGlobals.getProfilePicBitMap());
+            } else {
+                if (Helpers.isUserLoggedIn()) {
+                    final Resources res = getResources();
+                    int[] array = getResources().getIntArray(R.array.letter_tile_colors);
+                    final int tileSize = res.getDimensionPixelSize(R.dimen.letter_tile_size);
+                    final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
+                    final Bitmap letterTile = tileProvider.getLetterTile(Helpers.
+                                    getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
+                            String.valueOf(array[new Random().nextInt(array.length)]), 100, 100);
+                    circularImageView.setImageBitmap(letterTile);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (Helpers.isUserLoggedIn() && Helpers.getLastFragment().equals("")) {
             loadFragment(new Buyer());
-            AppGlobals.loginSuccessFull = false;
         }
     }
 
@@ -198,8 +214,9 @@ public class MainActivity extends AppCompatActivity
 
     // replace the fragment according to navigation item selected
     public void selectDrawerItem(MenuItem menuItem) {
+        boolean logout = false;
         Fragment fragment = null;
-        Class fragmentClass;
+        Class fragmentClass = null;
         switch (menuItem.getItemId()) {
             case R.id.nav_buyer:
                 fragmentClass = Buyer.class;
@@ -213,19 +230,28 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_user:
                 fragmentClass = UserSettingFragment.class;
                 break;
+            case R.id.logout:
+                Helpers.removeUserData();
+                logout = true;
+                break;
             default:
                 fragmentClass = Buyer.class;
         }
 
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (logout) {
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        } else {
+
+            try {
+                fragment = (Fragment) fragmentClass.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            menuItem.setCheckable(true);
+            setTitle(menuItem.getTitle());
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
         }
-        menuItem.setCheckable(true);
-        setTitle(menuItem.getTitle());
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
     }
 
     // Method to close the application when needed

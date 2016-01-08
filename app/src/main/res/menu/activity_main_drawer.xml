@@ -16,13 +16,18 @@
         <item android:title="My Account">
             <menu>
                 <item android:id="@+id/nav_categories"
-                    android:title="My categories"
+                    android:title="Categories"
                     android:icon="@drawable/nav_category_icon">
                 </item>
                 <item android:id="@+id/nav_user"
                     android:title="My profile"
                     android:icon="@drawable/nav_user_menu"/>
             </menu>
+        </item>
+        <item
+            android:id="@+id/logout"
+            android:title="Logout"
+            android:icon="@drawable/ic_logout">
         </item>
     </group>
 

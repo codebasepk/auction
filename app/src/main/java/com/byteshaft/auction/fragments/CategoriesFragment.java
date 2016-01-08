@@ -1,14 +1,16 @@
 package com.byteshaft.auction.fragments;
 
 
+import android.app.Activity;
 import android.app.ProgressDialog;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,57 +20,79 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.byteshaft.auction.R;
+import com.byteshaft.auction.register_login.LoginActivity;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 public class CategoriesFragment extends Fragment {
 
-    private View mBaseView;
-    private RecyclerView mRecyclerView;
-    private CustomAdapter mAdapter;
-    private ArrayList<String> arrayList;
     private static final String TAG = "RecyclerViewFragment";
-    private Set<String> selectedCategories;
-    private ProgressDialog mProgressDialog;
+    private static CategoriesAdapter sAdapter;
+    private static ArrayList<String> sCategoriesList;
+    private static boolean sInternetTaskInProgress = false;
+    private static HashMap<String, String> sLinksHaspMap;
+    private static ProgressDialog sProgressDialog;
+    private static RecyclerView sRecyclerView;
+    private static CustomView sViewHolder;
+    private static Set<String> selectedCategories;
+    private Set<String> allCategories;
+    private View mBaseView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.categories_fragment, container, false);
-        mBaseView.setTag(TAG);
-        setHasOptionsMenu(true);
-        if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED)) {
-            Helpers.alertDialog(getActivity(), "Category selection",
-                    "select categories to view products of your interest");
-            Toast.makeText(getActivity(), "please select your categories", Toast.LENGTH_LONG).show();
+        AppGlobals.sCategoriesFragmentForeGround = true;
+        if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED)
+                && !AppGlobals.alertDialogShownOneTimeForCategory) {
+            Helpers.alertDialog(getActivity(), "Category selection", "select categories to view products of your interest");
+            AppGlobals.alertDialogShownOneTimeForCategory = true;
         }
+        mBaseView.setTag("RecyclerViewFragment");
+        setHasOptionsMenu(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView = (RecyclerView) mBaseView.findViewById(R.id.category_list);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
-        mRecyclerView.setHasFixedSize(true);
-        arrayList = new ArrayList<>();
-        arrayList.add("Mobile");
-        arrayList.add("Electronics");
-        arrayList.add("Vehicle");
-        arrayList.add("Real State");
-        arrayList.add("test");
+        sRecyclerView = (RecyclerView) mBaseView.findViewById(R.id.category_list);
+        sRecyclerView.setLayoutManager(linearLayoutManager);
+        sRecyclerView.canScrollVertically(1);
+        sRecyclerView.setHasFixedSize(true);
+        if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.ALL_CATEGORIES_STATUS)
+                || !Helpers.getBooleanValueFromSharedPreference(AppGlobals.CATEGORIES_IMAGES_SAVED)) {
+            sInternetTaskInProgress = true;
+            (new GetCategoriesTask(getActivity())).execute();
+        } else {
+            sLinksHaspMap = new HashMap<>();
+            sCategoriesList = new ArrayList<>();
+            allCategories = Helpers.getSavedStringSet(AppGlobals.ALL_CATEGORY);
+            for (String item : allCategories) {
+                if (!item.isEmpty()) {
+                    sCategoriesList.add(item);
+                }
+            }
+            sAdapter = new CategoriesAdapter(sCategoriesList);
+            sRecyclerView.setAdapter(sAdapter);
+        }
         return mBaseView;
     }
+
     @Override
     public void onResume() {
         super.onResume();
-//        }
     }
 
     @Override
@@ -99,28 +123,22 @@ public class CategoriesFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated( Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        mAdapter = new CustomAdapter(arrayList);
-        mRecyclerView.setAdapter(mAdapter);
         super.onViewCreated(view, savedInstanceState);
 
     }
 
-
     // custom RecyclerView class for inflating customView
-    class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    static class CategoriesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private ArrayList<String> item;
-        CustomView viewHolder;
 
-        public CustomAdapter(ArrayList<String> categories) {
+        public CategoriesAdapter(ArrayList<String> categories) {
             this.item = categories;
         }
 
@@ -128,33 +146,16 @@ public class CategoriesFragment extends Fragment {
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_layout, parent, false);
-            viewHolder = new CustomView(view);
-            return viewHolder;
-        }
-
-        private Drawable getImageForCategory(String item) {
-            switch (item) {
-                case "Mobile":
-                    return getResources().getDrawable(R.drawable.mobile);
-                case "Electronics":
-                    return getResources().getDrawable(R.drawable.electronics);
-                case "Vehicle":
-                    return getResources().getDrawable(R.drawable.vehicle);
-                case "Real State":
-                    return getResources().getDrawable(R.drawable.real_state);
-                default:
-                    return getResources().getDrawable(R.drawable.not_found);
-
-            }
+            sViewHolder = new CustomView(view);
+            return sViewHolder;
         }
 
         @Override
         public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
             selectedCategories = Helpers.getCategories();
             holder.setIsRecyclable(false);
-            viewHolder.textView.setText(item.get(position));
-            viewHolder.imageView.setImageDrawable(getImageForCategory(item.get(position)));
-            viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            sViewHolder.textView.setText(item.get(position));
+            sViewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
@@ -165,7 +166,16 @@ public class CategoriesFragment extends Fragment {
                 }
             });
             if (selectedCategories.contains(item.get(position))) {
-                viewHolder.checkBox.setChecked(true);
+                sViewHolder.checkBox.setChecked(true);
+            }
+
+            if (!CategoriesFragment.sInternetTaskInProgress && (item.get(position))
+                    .equals(CategoriesFragment.sViewHolder.textView.getText())) {
+                CategoriesFragment.sViewHolder.imageView.setImageBitmap(Helpers
+                        .getBitMapOfProfilePic((new StringBuilder()).append(AppGlobals.root)
+                                .append("/categories_folder").append("/").append(item.get(position))
+                                .append(".png").toString()));
+                CategoriesFragment.sViewHolder.progressBar.setVisibility(View.GONE);
             }
         }
 
@@ -175,21 +185,146 @@ public class CategoriesFragment extends Fragment {
         }
     }
 
+    public static class GetCategoriesTask extends AsyncTask<String, String, ArrayList<String>> {
+
+        private Activity mActivity;
+
+        public GetCategoriesTask(Activity activity) {
+            mActivity = activity;
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (AppGlobals.sCategoriesFragmentForeGround) {
+                sProgressDialog = new ProgressDialog(mActivity);
+                sProgressDialog.setMessage("Updating ...");
+                sProgressDialog.setIndeterminate(false);
+                sProgressDialog.setCancelable(false);
+                sProgressDialog.show();
+            }
+        }
+
+        @Override
+        protected ArrayList<String> doInBackground(String... params) {
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                sLinksHaspMap = new HashMap<>();
+                sCategoriesList = new ArrayList<>();
+                URL url;
+                String parsedString;
+                try {
+                    url = new URL(AppGlobals.ALL_CATEGORIES);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                        InputStream is = connection.getInputStream();
+                        parsedString = Helpers.convertInputStreamToString(is);
+                        JsonParser jsonParser = new JsonParser();
+                        JsonObject mainJsonObject = jsonParser.parse(parsedString).getAsJsonObject();
+                        JsonArray jsonArray = mainJsonObject.getAsJsonArray("results");
+                        for (int i = 0; i < jsonArray.size(); i++) {
+                            JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
+                            sCategoriesList.add(jsonObject.get("name").getAsString());
+                            sLinksHaspMap.put(jsonObject.get("name").getAsString(),
+                                    jsonObject.get("photo").getAsString());
+                        }
+                        Set<String> stringSet = new HashSet<>();
+                        for (String category : sCategoriesList) {
+                            if (!category.isEmpty()) {
+                                stringSet.add(category);
+                            }
+                        }
+                        Helpers.saveStringSet(AppGlobals.ALL_CATEGORY, stringSet);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return sCategoriesList;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<String> arrayList) {
+            super.onPostExecute(arrayList);
+            if (CategoriesFragment.sProgressDialog != null &&
+                    AppGlobals.sCategoriesFragmentForeGround) {
+                CategoriesFragment.sProgressDialog.dismiss();
+            }
+            if (arrayList.size() > 0) {
+                if (AppGlobals.sCategoriesFragmentForeGround) {
+                    sAdapter = new CategoriesAdapter(arrayList);
+                    CategoriesFragment.sRecyclerView.setAdapter(CategoriesFragment.sAdapter);
+                }
+                for (String item : arrayList) {
+                    String[] data = {sLinksHaspMap.get(item), item};
+                    new GetImagesTask().execute(data);
+                }
+
+                Helpers.saveBooleanToSharedPreference(AppGlobals.ALL_CATEGORIES_STATUS, true);
+                Log.i(AppGlobals.getLogTag(getClass()), "categories saved");
+            }
+        }
+    }
+
+    public static class GetImagesTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            Bitmap bitmap = Helpers.downloadImage(params[0]);
+            if (bitmap != null) {
+                AppGlobals.addBitmapToInternalMemory(bitmap, (params[1] + ".png"),
+                        AppGlobals.CATEGORIES_FOLDER);
+                AppGlobals.sCounter = AppGlobals.sCounter + 1;
+            }
+            if (AppGlobals.sCounter == CategoriesFragment.sCategoriesList.size()) {
+                Helpers.saveBooleanToSharedPreference(AppGlobals.CATEGORIES_IMAGES_SAVED, true);
+                Log.i(AppGlobals.getLogTag(getClass()), "images Saved");
+            }
+            return params[1];
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (AppGlobals.sCategoriesFragmentForeGround &&
+                    s.equals(CategoriesFragment.sViewHolder.textView.getText())) {
+                CategoriesFragment.sViewHolder.imageView.setImageBitmap(
+                        Helpers.getBitMapOfProfilePic((new StringBuilder()).append(AppGlobals.root)
+                                .append("/categories_folder").append("/").append(s)
+                                .append(".png").toString()));
+                CategoriesFragment.sViewHolder.progressBar.setVisibility(View.GONE);
+            }
+            if (!AppGlobals.sCategoriesFragmentForeGround &&
+                    AppGlobals.sCounter == sCategoriesList.size()) {
+                LoginActivity.sProgressDialog.dismiss();
+                LoginActivity.getLoginActivityInstance().finish();
+                Log.i("LoginActivity", "closed");
+            }
+            LoginActivity.sProgressDialog.dismiss();
+        }
+    }
+
     // custom class getting view item by giving view in constructor.
-    public static class CustomView extends RecyclerView.ViewHolder{
+    public static class CustomView extends RecyclerView.ViewHolder {
         public TextView textView;
         public ImageView imageView;
         public CheckBox checkBox;
+        public ProgressBar progressBar;
+
         public CustomView(View itemView) {
             super(itemView);
-            textView =  (TextView) itemView.findViewById(R.id.all_category_title);
-            imageView = (ImageView) itemView.findViewById(R.id.all_category_image);
+            textView = (TextView) itemView.findViewById(R.id.all_category_title);
+            imageView = (ImageView) itemView.findViewById(R.id.category_image);
             checkBox = (CheckBox) itemView.findViewById(R.id.all_categories_checkbox);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.imageProgressBar);
         }
     }
 
     // member class to update categories on server
-    class UpdateCategories extends AsyncTask<String, String, String> {
+    class UpdateCategories extends AsyncTask<String, String, Integer> {
+
+        private ProgressDialog mProgressDialog;
 
         @Override
         protected void onPreExecute() {
@@ -202,10 +337,12 @@ public class CategoriesFragment extends Fragment {
         }
 
         @Override
-        protected String doInBackground(String... params) {
+        protected Integer doInBackground(String... params) {
+            HttpURLConnection connection;
+            int status = 0;
             try {
-                URL url = new URL(AppGlobals.CATEGORY_URL+ params[0] + "/interests/");
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                URL url = new URL(AppGlobals.CATEGORY_URL + params[0] + "/interests/");
+                connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestMethod("POST");
                 String authString = params[0] + ":" + params[1];
@@ -213,17 +350,17 @@ public class CategoriesFragment extends Fragment {
                 connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
                 Set<String> categories = Helpers.getCategories();
                 StringBuilder stringBuilder = new StringBuilder();
-                for (String item: categories) {
+                for (String item : categories) {
                     stringBuilder.append(item);
                     stringBuilder.append(",");
                 }
                 String jsonFormattedData = getJsonObjectString(String.valueOf(stringBuilder));
                 sendRequestData(connection, jsonFormattedData);
-                System.out.println(connection.getResponseCode());
+                status = connection.getResponseCode();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return null;
+            return status;
         }
 
         private String getJsonObjectString(String latitude) {
@@ -239,10 +376,10 @@ public class CategoriesFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String s) {
+        protected void onPostExecute(Integer s) {
             super.onPostExecute(s);
             mProgressDialog.dismiss();
+            Log.i(AppGlobals.getLogTag(getClass()), String.valueOf(s));
         }
     }
-
 }
