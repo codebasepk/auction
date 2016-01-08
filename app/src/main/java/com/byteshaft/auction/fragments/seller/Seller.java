@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Set;
 
 
 public class Seller extends Fragment implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
@@ -62,7 +63,8 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     private String currency = "";
     private String category = "";
     // static categories will be removed when api is connected
-    private String[] list = {"Mobiles", "Electronics", "Vehicle", "Real State"};
+    private ArrayList<String> list;
+    private Set<String> categoryStringSet;
     private ProgressDialog mProgressDialog;
     private static Uri imageCapturedUri;
     private static File imageCapturePath;
@@ -71,6 +73,13 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.seller_fragment, container, false);
         Helpers.saveLastFragmentOpened(getClass().getSimpleName());
+        list = new ArrayList<>();
+        categoryStringSet = Helpers.getSavedStringSet(AppGlobals.ALL_CATEGORY);
+        for (String item: categoryStringSet) {
+            if (!item.isEmpty()) {
+                list.add(item);
+            }
+        }
         imagesArray = new ArrayList<>(7);
         itemTitle = (EditText) mBaseView.findViewById(R.id.item_title);
         itemDescription = (EditText) mBaseView.findViewById(R.id.item_description);

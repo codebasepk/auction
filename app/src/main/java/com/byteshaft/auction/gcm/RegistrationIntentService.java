@@ -73,7 +73,9 @@ public class RegistrationIntentService extends IntentService {
 
     private void sendRegistrationToServer(String token) {
         String[] data = {Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME), token};
-        new sendPushNotificationKey().execute(data);
+        if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+            new sendPushNotificationKey().execute(data);
+        }
     }
 
     // [START subscribe_topics]

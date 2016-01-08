@@ -163,7 +163,7 @@ public class Helpers {
      * @return
      * @throws IOException
      */
-    private static HttpURLConnection openConnectionForUrl(String targetUrl, String method)
+    public static HttpURLConnection openConnectionForUrl(String targetUrl, String method)
             throws IOException {
         URL url = new URL(targetUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -215,6 +215,8 @@ public class Helpers {
         }
 
     }
+
+
 
     /**
      * convert the InputStream to String, Basically its a JsonObject than we can get user details

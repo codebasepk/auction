@@ -42,13 +42,15 @@ public class AppGlobals extends Application{
     public static final String ALL_CATEGORIES = "http://testapp-byteshaft.herokuapp.com/api/ads" +
             "/categories";
     public static final String PUSH_NOTIFICATION_KEY = "http://testapp-byteshaft.herokuapp.com/api/users/";
+    public static final String SELECTED_CATEGORY_DETAIL_URL =
+            "http://testapp-byteshaft.herokuapp.com/api/ads/?category=";
     public static final String PROFILE_PIC_FOLDER = "/profilePic";
     public static final String CATEGORIES_FOLDER = "/categories_folder";
     public static final String ALL_CATEGORIES_STATUS = "all_categories_status";
     public static final String CATEGORIES_IMAGES_SAVED = "category_images_saved";
     public static final String PROFILE_PIC_IMAGE_URL = "profile_pic_image";
     public static final String ALL_CATEGORY = "all_categories";
-    public static final String ALL_CATEGORY_STATUS = "category_status";
+//    public static final String ALL_CATEGORY_STATUS = "category_status";
     public static boolean alertDialogShownOneTimeForCategory = false;
     public static boolean sCategoriesFragmentForeGround = true;
     public static int sCounter = 1;

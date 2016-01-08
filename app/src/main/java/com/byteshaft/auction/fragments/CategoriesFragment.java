@@ -155,7 +155,6 @@ public class CategoriesFragment extends Fragment {
             selectedCategories = Helpers.getCategories();
             holder.setIsRecyclable(false);
             sViewHolder.textView.setText(item.get(position));
-//            viewHolder.imageView.setImageDrawable(getImageForCategory(item.get(position)));
             sViewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -226,9 +225,9 @@ public class CategoriesFragment extends Fragment {
                         JsonArray jsonArray = mainJsonObject.getAsJsonArray("results");
                         for (int i = 0; i < jsonArray.size(); i++) {
                             JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
-                            sCategoriesList.add(String.valueOf(jsonObject.get("name")).replace("\"", ""));
-                            sLinksHaspMap.put(String.valueOf(jsonObject.get("name")).replace("\"", ""),
-                                    String.valueOf(jsonObject.get("photo")).replace("\"", ""));
+                            sCategoriesList.add(jsonObject.get("name").getAsString());
+                            sLinksHaspMap.put(jsonObject.get("name").getAsString(),
+                                    jsonObject.get("photo").getAsString());
                         }
                         Set<String> stringSet = new HashSet<>();
                         for (String category : sCategoriesList) {
