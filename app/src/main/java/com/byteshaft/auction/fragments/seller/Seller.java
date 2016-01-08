@@ -1,5 +1,6 @@
 package com.byteshaft.auction.fragments.seller;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
@@ -10,9 +11,12 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +24,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Gallery;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
@@ -39,6 +46,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+
+import nl.changer.polypicker.Config;
+import nl.changer.polypicker.ImagePickerActivity;
+import nl.changer.polypicker.utils.ImageInternalFetcher;
 
 
 public class Seller extends Fragment implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
@@ -66,11 +79,18 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     private ProgressDialog mProgressDialog;
     private static Uri imageCapturedUri;
     private static File imageCapturePath;
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int INTENT_REQUEST_GET_IMAGES = 13;
+    private static final int INTENT_REQUEST_GET_N_IMAGES = 14;
+
+    private ViewGroup mSelectedImagesContainer;
+    HashSet<Uri> mMedia = new HashSet<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.seller_fragment, container, false);
         Helpers.saveLastFragmentOpened(getClass().getSimpleName());
+        mSelectedImagesContainer = (ViewGroup) mBaseView.findViewById(R.id.selected_photos_container);
         imagesArray = new ArrayList<>(7);
         itemTitle = (EditText) mBaseView.findViewById(R.id.item_title);
         itemDescription = (EditText) mBaseView.findViewById(R.id.item_description);
@@ -80,8 +100,6 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
         currencyGroup = (RadioGroup) mBaseView.findViewById(R.id.currency_group);
         submitButton.setOnClickListener(this);
         addImageButton.setOnClickListener(this);
-        // gallery View for images
-        gallery = (Gallery) mBaseView.findViewById(R.id.gallery);
         categorySpinner = (Spinner) mBaseView.findViewById(R.id.spinner);
         currencyGroup.setOnCheckedChangeListener(this);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
@@ -105,7 +123,6 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     @Override
     public void onResume() {
         super.onResume();
-        gallery.setAdapter(new ImageAdapter(imagesArray));
     }
 
     public void onClick(View v) {
@@ -136,8 +153,61 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                 }
                 break;
             case R.id.btn_add_image:
-                selectImage();
+                getNImages();
         }
+    }
+
+    private void showMedia() {
+        // Remove all views before
+        // adding the new ones.
+        mSelectedImagesContainer.removeAllViews();
+
+        Iterator<Uri> iterator = mMedia.iterator();
+        ImageInternalFetcher imageFetcher = new ImageInternalFetcher(getActivity(), 500);
+        while (iterator.hasNext()) {
+            Uri uri = iterator.next();
+
+            // showImage(uri);
+            Log.i(TAG, " uri: " + uri);
+            if (mMedia.size() >= 1) {
+                mSelectedImagesContainer.setVisibility(View.VISIBLE);
+            }
+
+            View imageHolder = LayoutInflater.from(getActivity()).inflate(R.layout.media_layout, null);
+
+            // View removeBtn = imageHolder.findViewById(R.id.remove_media);
+            // initRemoveBtn(removeBtn, imageHolder, uri);
+            ImageView thumbnail = (ImageView) imageHolder.findViewById(R.id.media_image);
+
+            if (!uri.toString().contains("content://")) {
+                // probably a relative uri
+                uri = Uri.fromFile(new File(uri.toString()));
+            }
+
+            imageFetcher.loadImage(uri, thumbnail);
+
+            mSelectedImagesContainer.addView(imageHolder);
+
+            // set the dimension to correctly
+            // show the image thumbnail.
+            int wdpx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50,
+                    getResources().getDisplayMetrics());
+            int htpx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50,
+                    getResources().getDisplayMetrics());
+            thumbnail.setLayoutParams(new FrameLayout.LayoutParams(wdpx, htpx));
+        }
+    }
+
+    private void getNImages() {
+        Intent intent = new Intent(getActivity(), ImagePickerActivity.class);
+        Config config = new Config.Builder()
+                .setTabBackgroundColor(R.color.white)    // set tab background color. Default white.
+                .setTabSelectionIndicatorColor(R.color.blue)
+                .setCameraButtonColor(R.color.orange)
+                .setSelectionLimit(100)    // set photo selection limit. Default unlimited selection.
+                .build();
+        ImagePickerActivity.setConfig(config);
+        startActivityForResult(intent, INTENT_REQUEST_GET_N_IMAGES);
     }
 
     @Override
@@ -225,50 +295,29 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
 //                    System.out.println(destination.getAbsolutePath());
 //                }
 //            }
-        } else if (requestCode == SELECT_FILE) {
-            System.out.println("FILE");
-            System.out.println(data == null);
-            if (data != null) {
-                System.out.println(data.getData() == null);
-                System.out.println(data.getStringExtra("data"));
-                if (data.getData() != null) {
-                    Uri singleImageUri = data.getData();
-                    System.out.println(singleImageUri);
-                    String singlePath = RealPathFromUri.getRealPathFromURI_API19(getActivity().
-                            getApplicationContext(), singleImageUri);
-                    System.out.println(singlePath);
-                    if (!imagesArray.contains(singlePath) && imagesArray.size() <= 7) {
-                        imagesArray.add(singlePath);
-                    }
-                } else {
-                    if (Build.VERSION.SDK_INT < 19) {
-                        String[] imagesPath = data.getStringExtra("data").split("\\|");
-                        System.out.println(imagesPath);
-                    } else if (Build.VERSION.SDK_INT > 19) {
-                        ClipData clipData = data.getClipData();
-                        if (clipData != null) {
-                            for (int i = 0; i < clipData.getItemCount(); i++) {
-                                ClipData.Item item = clipData.getItemAt(i);
-                                System.out.println(item);
-                                Uri uri = item.getUri();
-                                System.out.println(uri);
-                                String path = RealPathFromUri.getRealPathFromURI_API19(getActivity().
-                                        getApplicationContext(), uri);
-                                System.out.println(path);
-                                if (!imagesArray.contains(path) && imagesArray.size() <= 7) {
-                                    imagesArray.add(path);
-                                    System.out.println(path);
-                                    imageForAd = Helpers.getBitMapOfProfilePic(path);
-                                    imageUrl = String.valueOf(path);
-                                }
-                            }
+        } else if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == INTENT_REQUEST_GET_IMAGES || requestCode == INTENT_REQUEST_GET_N_IMAGES) {
+                Parcelable[] parcelableUris = data.getParcelableArrayExtra(ImagePickerActivity.EXTRA_IMAGE_URIS);
 
-                        }
+                if (parcelableUris == null) {
+                    return;
+                }
+
+                // Java doesn't allow array casting, this is a little hack
+                Uri[] uris = new Uri[parcelableUris.length];
+                System.arraycopy(parcelableUris, 0, uris, 0, parcelableUris.length);
+
+                if (uris != null) {
+                    for (Uri uri : uris) {
+                        Log.i(TAG, " uri: " + uri);
+                        mMedia.add(uri);
                     }
+
+                    showMedia();
                 }
             }
         }
-        gallery.setAdapter(new ImageAdapter(imagesArray));
+
     }
 
     /*
