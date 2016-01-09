@@ -229,7 +229,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         @Override
         protected Boolean doInBackground(String... params) {
             Bitmap myBitmap;
-            System.out.println(params[0]);
             myBitmap = Helpers.downloadImage(params[0]);
             if (myBitmap != null) {
                 AppGlobals.addBitmapToInternalMemory(myBitmap, AppGlobals.profilePicName,

@@ -127,7 +127,7 @@ public class SelectedCategoryList extends AppCompatActivity {
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             holder.setIsRecyclable(false);
-            viewHolder.idTextView.setText(items.get(position));
+            viewHolder.idTextView.setText(String.valueOf(items.get(position)));
             viewHolder.titleTextView.setText(titleHashMap.get(items.get(position)));
             System.out.println(items);
             viewHolder.description.setText(descriptionHashMap.get(items.get(position)));
@@ -220,7 +220,6 @@ public class SelectedCategoryList extends AppCompatActivity {
                             imagesUrlHashMap.put(object.get("id").getAsInt(),
                                     object.get("photo1").getAsString());
                         }
-
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -258,6 +257,7 @@ public class SelectedCategoryList extends AppCompatActivity {
         protected Integer doInBackground(String... params) {
             Bitmap bitmap = Helpers.downloadImage(params[0]);
             if (bitmap != null) {
+                System.out.println(params[1]);
                 AppGlobals.addBitmapToInternalMemory(bitmap, (params[1] + ".png"),
                         (File.separator+params[1]+titleHashMap.get(Integer.valueOf(params[1]))));
             }
@@ -267,11 +267,11 @@ public class SelectedCategoryList extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-            System.out.println(viewHolder.idTextView.getText().equals(integer));
-            if (viewHolder.idTextView.getText().equals(integer)) {
+            System.out.println(Integer.parseInt(viewHolder.idTextView.getText().toString()) == (integer));
+            if (Integer.parseInt(viewHolder.idTextView.getText().toString()) == (integer)) {
                 viewHolder.imageView.setImageBitmap(Helpers.getBitMapOfProfilePic(
-                        (AppGlobals.root + (File.separator+integer+titleHashMap.get(integer)+ File.separator+
-                                integer+".png"))));
+                        (AppGlobals.root + (File.separator + integer + titleHashMap.get(integer) + File.separator +
+                                integer + ".png"))));
 
             }
 

@@ -262,7 +262,6 @@ public class CategoriesFragment extends Fragment {
                     sAdapter = new CategoriesAdapter(arrayList);
                     CategoriesFragment.sRecyclerView.setAdapter(CategoriesFragment.sAdapter);
                 }
-                System.out.println(arrayList);
                 for (String item : arrayList) {
                     String[] data = {sLinksHaspMap.get(item), item};
                     Log.i("IMAGE TASK", "running");
@@ -296,10 +295,9 @@ public class CategoriesFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            System.out.println(s);
             Log.i("Category Fragment", String.valueOf(AppGlobals.sCategoriesFragmentForeGround));
             if (AppGlobals.sCategoriesFragmentForeGround &&
-                    s.equals(CategoriesFragment.sViewHolder.textView.getText())) {
+                    s.equals(CategoriesFragment.sViewHolder.textView.getText().toString())) {
                 CategoriesFragment.sViewHolder.imageView.setImageBitmap(
                         Helpers.getBitMapOfProfilePic((new StringBuilder()).append(AppGlobals.root)
                                 .append("/categories_folder").append("/").append(s)
@@ -349,7 +347,6 @@ public class CategoriesFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            System.out.println("THISJSJSHSH");
             mProgressDialog = new ProgressDialog(getActivity());
             mProgressDialog.setMessage("Updating ...");
             mProgressDialog.setIndeterminate(false);

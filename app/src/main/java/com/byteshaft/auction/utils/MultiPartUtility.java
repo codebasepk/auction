@@ -143,6 +143,7 @@ public class MultiPartUtility {
         if (postProductProcess && status == 201) {
             AppGlobals.setPostProductResponse(status);
         }
+        System.out.println(connection.getResponseCode());
         InputStream is = connection.getInputStream();
         final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         final byte[] buffer = new byte[4096];
