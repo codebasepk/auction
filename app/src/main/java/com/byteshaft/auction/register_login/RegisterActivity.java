@@ -25,8 +25,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
+import com.byteshaft.auction.fragments.CategoriesFragment;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 
@@ -54,19 +54,25 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private EditText mPhoneNumber;
     private EditText mAddress;
     private EditText mCity;
-    public ProgressDialog mProgressDialog;
+    public static ProgressDialog sRegisterProgressDialog;
     private boolean userAlreadyExists = false;
     private Uri selectedImageUri;
     private String imageUrl = "";
     private File destination;
     private Bitmap profilePic;
     private boolean userNotExist = false;
+    private static RegisterActivity sRegisterActivityInstance;
+
+    public static RegisterActivity getInstance() {
+        return sRegisterActivityInstance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register_fragment);
         setTitle("Register");
+        sRegisterActivityInstance = this;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mUserNameEditText = (EditText) findViewById(R.id.user_name_edit_text);
         mEmailEditText = (EditText) findViewById(R.id.email_edit_text);
@@ -245,11 +251,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(RegisterActivity.this);
-            mProgressDialog.setMessage("Registering...");
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.show();
+            sRegisterProgressDialog = new ProgressDialog(RegisterActivity.this);
+            sRegisterProgressDialog.setMessage("Registering...");
+            sRegisterProgressDialog.setIndeterminate(false);
+            sRegisterProgressDialog.setCancelable(false);
+            sRegisterProgressDialog.show();
         }
 
         @Override
@@ -269,10 +275,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         @Override
         protected void onPostExecute(String[] result) {
             super.onPostExecute(result);
-            mProgressDialog.dismiss();
             Log.i(AppGlobals.getLogTag(AppGlobals.getContext().getClass()),
                     String.valueOf(AppGlobals.getResponseCode()));
+
             if (Integer.valueOf(AppGlobals.getResponseCode()).equals(201)) {
+                AppGlobals.sRegisterProcess = true;
                 Helpers.userLogin(true);
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_EMAIL, result[0]);
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PASSWORD, result[1]);
@@ -283,12 +290,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 if (profilePic == null) {
                 } else {
                     AppGlobals.addBitmapToInternalMemory(profilePic, AppGlobals.profilePicName,
-                            AppGlobals.PROFILE_PIC_FOLDER);
-                }
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            AppGlobals.PROFILE_PIC_FOLDER);                }
+                AppGlobals.sCategoriesFragmentForeGround = false;
+                new CategoriesFragment.GetCategoriesTask(RegisterActivity.this).execute();
+            } else if (AppGlobals.getResponseCode() == 0) {
+                sRegisterProgressDialog.dismiss();
+                Helpers.alertDialog(RegisterActivity.this, "Request Failed", "There was an issue, " +
+                        "Please try again");
             } else if (Integer.valueOf(result[0]).equals(AppGlobals.NO_INTERNET)) {
+                sRegisterProgressDialog.dismiss();
                 Helpers.alertDialog(RegisterActivity.this, "No Internet", "Internet Not Available");
             } else if (AppGlobals.getResponseCode() == 500) {
+                sRegisterProgressDialog.dismiss();
                 Helpers.alertDialog(RegisterActivity.this, "500", "Internal server error, try after few moments");
             }
         }

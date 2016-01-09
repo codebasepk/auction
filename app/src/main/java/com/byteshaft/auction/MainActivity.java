@@ -128,20 +128,21 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        System.out.println("OnResume");
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
 //        if (AppGlobals.loginSuccessFull) {
 //            loadFragment(new Buyer());
 //            AppGlobals.loginSuccessFull = false;
 //        }
+        System.out.println(Helpers.isUserLoggedIn());
+        System.out.println(Helpers.getBooleanValueFromSharedPreference(
+                AppGlobals.KEY_CATEGORIES_SELECTED));
         if (Helpers.isUserLoggedIn() && !Helpers.getBooleanValueFromSharedPreference(
                 AppGlobals.KEY_CATEGORIES_SELECTED)) {
             loadFragment(new CategoriesFragment());
-        }
-        if (Helpers.isUserLoggedIn() && !Helpers.getBooleanValueFromSharedPreference(
-                AppGlobals.PROFILE_PIC_STATUS)) {
-            new LoginActivity.DownloadProfilePic().execute(Helpers.
-                    getStringDataFromSharedPreference(AppGlobals.PROFILE_PIC_IMAGE_URL));
+        } else if (Helpers.isUserLoggedIn() && Helpers.getLastFragment().equals("")) {
+            loadFragment(new Buyer());
         }
 
         CircleImageView circularImageView = (CircleImageView) header.findViewById(R.id.imageView);
@@ -164,8 +165,11 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        if (Helpers.isUserLoggedIn() && Helpers.getLastFragment().equals("")) {
-            loadFragment(new Buyer());
+        if (Helpers.isUserLoggedIn() && !Helpers.getBooleanValueFromSharedPreference(
+                AppGlobals.PROFILE_PIC_STATUS) && !Helpers.getStringDataFromSharedPreference(
+                AppGlobals.PROFILE_PIC_IMAGE_URL).equals("")) {
+            new LoginActivity.DownloadProfilePic().execute(Helpers.
+                    getStringDataFromSharedPreference(AppGlobals.PROFILE_PIC_IMAGE_URL));
         }
     }
 
