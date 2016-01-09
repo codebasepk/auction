@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.register_login.LoginActivity;
+import com.byteshaft.auction.register_login.RegisterActivity;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.google.gson.JsonArray;
@@ -71,6 +72,10 @@ public class CategoriesFragment extends Fragment {
         sRecyclerView.setLayoutManager(linearLayoutManager);
         sRecyclerView.canScrollVertically(1);
         sRecyclerView.setHasFixedSize(true);
+        Log.i("ALL_CATEGORIES_STATUS", String.valueOf(Helpers.getBooleanValueFromSharedPreference(
+                AppGlobals.ALL_CATEGORIES_STATUS)));
+        Log.i("CATEGORIES_IMAGES_SAVED", String.valueOf(Helpers.getBooleanValueFromSharedPreference(
+                AppGlobals.CATEGORIES_IMAGES_SAVED)));
         if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.ALL_CATEGORIES_STATUS)
                 || !Helpers.getBooleanValueFromSharedPreference(AppGlobals.CATEGORIES_IMAGES_SAVED)) {
             sInternetTaskInProgress = true;
@@ -247,6 +252,7 @@ public class CategoriesFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<String> arrayList) {
             super.onPostExecute(arrayList);
+            Log.i("POST_EXECUTE", "that");
             if (CategoriesFragment.sProgressDialog != null &&
                     AppGlobals.sCategoriesFragmentForeGround) {
                 CategoriesFragment.sProgressDialog.dismiss();
@@ -256,11 +262,12 @@ public class CategoriesFragment extends Fragment {
                     sAdapter = new CategoriesAdapter(arrayList);
                     CategoriesFragment.sRecyclerView.setAdapter(CategoriesFragment.sAdapter);
                 }
+                System.out.println(arrayList);
                 for (String item : arrayList) {
                     String[] data = {sLinksHaspMap.get(item), item};
+                    Log.i("IMAGE TASK", "running");
                     new GetImagesTask().execute(data);
                 }
-
                 Helpers.saveBooleanToSharedPreference(AppGlobals.ALL_CATEGORIES_STATUS, true);
                 Log.i(AppGlobals.getLogTag(getClass()), "categories saved");
             }
@@ -269,17 +276,19 @@ public class CategoriesFragment extends Fragment {
 
     public static class GetImagesTask extends AsyncTask<String, String, String> {
 
+        private boolean imagesSaved = false;
+
         @Override
         protected String doInBackground(String... params) {
             Bitmap bitmap = Helpers.downloadImage(params[0]);
             if (bitmap != null) {
                 AppGlobals.addBitmapToInternalMemory(bitmap, (params[1] + ".png"),
                         AppGlobals.CATEGORIES_FOLDER);
-                AppGlobals.sCounter = AppGlobals.sCounter + 1;
             }
-            if (AppGlobals.sCounter == CategoriesFragment.sCategoriesList.size()) {
+            if (Helpers.getCategoriesImagesCount() == sCategoriesList.size()) {
                 Helpers.saveBooleanToSharedPreference(AppGlobals.CATEGORIES_IMAGES_SAVED, true);
                 Log.i(AppGlobals.getLogTag(getClass()), "images Saved");
+                imagesSaved = true;
             }
             return params[1];
         }
@@ -287,6 +296,8 @@ public class CategoriesFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            System.out.println(s);
+            Log.i("Category Fragment", String.valueOf(AppGlobals.sCategoriesFragmentForeGround));
             if (AppGlobals.sCategoriesFragmentForeGround &&
                     s.equals(CategoriesFragment.sViewHolder.textView.getText())) {
                 CategoriesFragment.sViewHolder.imageView.setImageBitmap(
@@ -295,13 +306,22 @@ public class CategoriesFragment extends Fragment {
                                 .append(".png").toString()));
                 CategoriesFragment.sViewHolder.progressBar.setVisibility(View.GONE);
             }
-            if (!AppGlobals.sCategoriesFragmentForeGround &&
-                    AppGlobals.sCounter == sCategoriesList.size()) {
-                LoginActivity.sProgressDialog.dismiss();
+            if (imagesSaved && Helpers.getCategoriesImagesCount() == sCategoriesList.size()) {
+                Log.i("CONDITION", "MATCHED");
+                if (LoginActivity.sProgressDialog != null) {
+                    LoginActivity.sProgressDialog.dismiss();
+                }
+                if (RegisterActivity.sRegisterProgressDialog != null && AppGlobals.sRegisterProcess) {
+                    RegisterActivity.sRegisterProgressDialog.dismiss();
+                    RegisterActivity.getInstance().finish();
+                }
                 LoginActivity.getLoginActivityInstance().finish();
+
                 Log.i("LoginActivity", "closed");
             }
-            LoginActivity.sProgressDialog.dismiss();
+            if (LoginActivity.sProgressDialog != null) {
+                LoginActivity.sProgressDialog.dismiss();
+            }
         }
     }
 
@@ -329,6 +349,7 @@ public class CategoriesFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            System.out.println("THISJSJSHSH");
             mProgressDialog = new ProgressDialog(getActivity());
             mProgressDialog.setMessage("Updating ...");
             mProgressDialog.setIndeterminate(false);

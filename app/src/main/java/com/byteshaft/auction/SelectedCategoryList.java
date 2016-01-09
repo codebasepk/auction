@@ -188,7 +188,6 @@ public class SelectedCategoryList extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mSwipeRefreshLayout.setRefreshing(true);
         }
 
         @Override

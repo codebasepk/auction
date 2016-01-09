@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -108,6 +109,7 @@ public class Helpers {
             http.addFormField("username", userName);
             http.addFormField("password", password);
             http.addFormField("email", email);
+            System.out.println(address);
             http.addFormField("address", address);
             http.addFormField("city", city);
             http.addFormField("phone_number", phoneNumber);
@@ -329,6 +331,30 @@ public class Helpers {
     public static void removeUserData() {
         SharedPreferences sharedPreferences = getPreferenceManager();
         sharedPreferences.edit().clear().commit();
+        File file = new File(AppGlobals.root);
+        if (file.exists()) {
+            File[] folders = file.listFiles();
+            System.out.println(Arrays.toString(folders));
+            for (File folder: folders) {
+                if (folder.exists()) {
+                    removeFiles(folder.getAbsolutePath());
+                }
+                }
+            }
+
+        }
+
+    private static void removeFiles(String path) {
+        File file = new File(path);
+        if (file.exists()) {
+            String deleteCmd = "rm -r " + path;
+            Runtime runtime = Runtime.getRuntime();
+            try {
+                runtime.exec(deleteCmd);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void saveStringSet(String key, Set<String> value) {
@@ -341,5 +367,11 @@ public class Helpers {
         set.add("nothing");
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getStringSet(key, set);
+    }
+
+    public static int getCategoriesImagesCount() {
+        File file = new File(AppGlobals.root + AppGlobals.CATEGORIES_FOLDER);
+        File[] files = file.listFiles();
+        return files.length;
     }
 }

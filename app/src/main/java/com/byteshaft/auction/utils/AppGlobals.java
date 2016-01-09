@@ -53,7 +53,7 @@ public class AppGlobals extends Application{
 //    public static final String ALL_CATEGORY_STATUS = "category_status";
     public static boolean alertDialogShownOneTimeForCategory = false;
     public static boolean sCategoriesFragmentForeGround = true;
-    public static int sCounter = 1;
+    public static boolean sRegisterProcess = false;
 
     @Override
     public void onCreate() {
