@@ -48,7 +48,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private static final int SELECT_FILE = 1245;
     private EditText mEmailEditText;
     private EditText mPasswordEditText;
+    private EditText mConfPasswordEditText;
     private Button mRegisterButton;
+    private boolean mPasswordMatched = false;
     private ImageButton dpButton;
     private String[] registrationData;
     private EditText mPhoneNumber;
@@ -77,6 +79,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         mUserNameEditText = (EditText) findViewById(R.id.user_name_edit_text);
         mEmailEditText = (EditText) findViewById(R.id.email_edit_text);
         mPasswordEditText = (EditText) findViewById(R.id.password_login);
+        mConfPasswordEditText = (EditText) findViewById(R.id.password_cof);
         mPhoneNumber = (EditText) findViewById(R.id.user_phone);
         mAddress = (EditText) findViewById(R.id.user_address);
         mCity = (EditText) findViewById(R.id.user_city);
@@ -84,6 +87,29 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         dpButton = (ImageButton) findViewById(R.id.button_dp);
         dpButton.setOnClickListener(this);
         mRegisterButton.setOnClickListener(this);
+        mConfPasswordEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                mPasswordMatched = false;
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mPasswordMatched = false;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (mPasswordEditText.getText().toString().equals
+                        (mConfPasswordEditText.getText().toString())) {
+                    Drawable x = getResources().getDrawable(R.drawable.tick);
+                    x.setBounds(0, 0, 20, 20);
+                    mConfPasswordEditText.setCompoundDrawables(null, null, x, null);
+                    mPasswordMatched = true;
+                }
+
+            }
+        });
         mUserNameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -134,18 +160,33 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(getApplicationContext(), "please enter a valid email", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (!Helpers.containsDigit(mPasswordEditText.getText().toString())) {
+
+                if (!Helpers.containsDigit(mPasswordEditText.getText().toString()) ||
+                        !Helpers.containsDigit(mConfPasswordEditText.getText().toString())) {
                     Toast.makeText(getApplicationContext(), "password must contain 0-9", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (mPasswordEditText.getText().toString().length() < 6) {
+
+                if (!mConfPasswordEditText.getText().toString().isEmpty()) {
+                    if (mPasswordEditText.getText().toString().equals
+                            (mConfPasswordEditText.getText().toString())) {
+                        mPasswordMatched = true;
+                    } else {
+                        Toast.makeText(getApplicationContext(), "password does not match", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
+                if (mPasswordEditText.getText().toString().length() < 6 &&
+                        mConfPasswordEditText.getText().toString().length() < 6) {
                     Toast.makeText(getApplicationContext(), "password must contain 6 character", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if (!userAlreadyExists && userNotExist) {
+                if (!userAlreadyExists && userNotExist && mPasswordMatched) {
                     String[] data = {mEmailEditText.getText().toString(),
-                            mPasswordEditText.getText().toString(), mUserNameEditText.getText().toString(),
+                            mPasswordEditText.getText().toString(),
+                            mUserNameEditText.getText().toString(),
                             mPhoneNumber.getText().toString(), mCity.getText().toString(),
                             mAddress.getText().toString(), imageUrl};
                     new RegistrationTask().execute(data);
