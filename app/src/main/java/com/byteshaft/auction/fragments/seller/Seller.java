@@ -106,7 +106,6 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 category = String.valueOf(parent.getItemAtPosition(position));
-                System.out.println(category);
             }
 
             @Override
@@ -275,7 +274,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                     http.addFormField("description", params[1]);
                     http.addFormField("price", params[2]);
                     http.addFormField("currency", params[3]);
-                    http.addFormField("category", params[4]);
+                    http.addFormField("category", params[4].toLowerCase());
                     int photo = 1;
                     for (Uri item : imagesArray) {
                         http.addFilePart(("photo" + photo), new File(item.getPath()));

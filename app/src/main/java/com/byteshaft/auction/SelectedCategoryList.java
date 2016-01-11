@@ -166,17 +166,18 @@ public class SelectedCategoryList extends AppCompatActivity {
     }
 
     // custom viewHolder to access xml elements requires a view in constructor
-    public static class CustomView extends RecyclerView.ViewHolder{
+    public static class CustomView extends RecyclerView.ViewHolder {
         public TextView idTextView;
         public TextView titleTextView;
         public ImageView imageView;
         public TextView description;
         public TextView price;
         public ProgressBar progressBar;
+
         public CustomView(View itemView) {
             super(itemView);
             idTextView = (TextView) itemView.findViewById(R.id.id_invisible_textView);
-            titleTextView =  (TextView) itemView.findViewById(R.id.specific_category_title);
+            titleTextView = (TextView) itemView.findViewById(R.id.specific_category_title);
             imageView = (ImageView) itemView.findViewById(R.id.specific_category_image);
             description = (TextView) itemView.findViewById(R.id.specific_category_description);
             price = (TextView) itemView.findViewById(R.id.specific_category_price);
@@ -245,9 +246,9 @@ public class SelectedCategoryList extends AppCompatActivity {
 
                         }
                     }));
-            for (Integer item: idsList) {
+            for (Integer item : idsList) {
                 String[] data = {imagesUrlHashMap.get(item), String.valueOf(item)};
-                new  DownloadImageForEachItem().execute(data);
+                new DownloadImageForEachItem().execute(data);
             }
         }
     }
@@ -259,7 +260,7 @@ public class SelectedCategoryList extends AppCompatActivity {
             Bitmap bitmap = Helpers.downloadImage(params[0]);
             if (bitmap != null) {
                 AppGlobals.addBitmapToInternalMemory(bitmap, (params[1] + ".png"),
-                        (File.separator+params[1]+titleHashMap.get(Integer.valueOf(params[1]))));
+                        (File.separator + params[1] + titleHashMap.get(Integer.valueOf(params[1]))));
             }
             Intent intent = new Intent(AppGlobals.SETIMAGEINTENT);
             intent.putExtra("image", String.valueOf(params[1]));
