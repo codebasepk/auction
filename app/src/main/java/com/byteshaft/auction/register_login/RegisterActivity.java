@@ -95,19 +95,24 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mPasswordMatched = false;
+                if (mPasswordEditText.getText().toString().equals
+                        (mConfPasswordEditText.getText().toString())) {
+                    mConfPasswordEditText.setCompoundDrawables(null, null, null, null);
+                } else {
+                    mConfPasswordEditText.setError("password does not match");
+                    mPasswordMatched = false;
+                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 if (mPasswordEditText.getText().toString().equals
                         (mConfPasswordEditText.getText().toString())) {
-                    Drawable x = getResources().getDrawable(R.drawable.tick);
-                    x.setBounds(0, 0, 20, 20);
-                    mConfPasswordEditText.setCompoundDrawables(null, null, x, null);
+                    Drawable drawable = getResources().getDrawable(R.drawable.tick);
+                    drawable.setBounds(0, 0, 20, 20);
+                    mConfPasswordEditText.setCompoundDrawables(null, null, drawable, null);
                     mPasswordMatched = true;
                 }
-
             }
         });
         mUserNameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -148,7 +153,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         .toString().trim().isEmpty() || mAddress.getText().toString().trim().isEmpty()
                         || mCity.getText().toString().trim().isEmpty()) {
                     Toast.makeText(getApplicationContext(), "All fields are required", Toast.LENGTH_SHORT).show();
-                      return;
+                    return;
                 }
                 if (mUserNameEditText.getText().toString().contains(" ")) {
                     Toast.makeText(getApplicationContext(), "username should not contain any spaces",
@@ -310,7 +315,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 }
                 return new String[]{params[0], params[1], params[2], params[3], params[4], params[5]};
             }
-            return new String[] {String.valueOf(AppGlobals.NO_INTERNET)};
+            return new String[]{String.valueOf(AppGlobals.NO_INTERNET)};
         }
 
         @Override
@@ -331,7 +336,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 if (profilePic == null) {
                 } else {
                     AppGlobals.addBitmapToInternalMemory(profilePic, AppGlobals.profilePicName,
-                            AppGlobals.PROFILE_PIC_FOLDER);                }
+                            AppGlobals.PROFILE_PIC_FOLDER);
+                }
                 AppGlobals.sCategoriesFragmentForeGround = false;
                 new CategoriesFragment.GetCategoriesTask(RegisterActivity.this).execute();
             } else if (AppGlobals.getResponseCode() == 0) {
@@ -368,9 +374,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
             if (integer == 404) {
-                Drawable x = getResources().getDrawable(R.drawable.tick);
-                x.setBounds(0, 0, 20, 20);
-                mUserNameEditText.setCompoundDrawables(null, null, x, null);
+                Drawable drawable = getResources().getDrawable(R.drawable.tick);
+                drawable.setBounds(0, 0, 20, 20);
+                mUserNameEditText.setCompoundDrawables(null, null, drawable, null);
                 userNotExist = true;
             } else if (integer == 200) {
                 mUserNameEditText.setError("Username already exist");
