@@ -48,7 +48,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private static final int SELECT_FILE = 1245;
     private EditText mEmailEditText;
     private EditText mPasswordEditText;
+    private EditText mConfPasswordEditText;
     private Button mRegisterButton;
+    private boolean mPasswordMatched = false;
     private ImageButton dpButton;
     private String[] registrationData;
     private EditText mPhoneNumber;
@@ -77,6 +79,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         mUserNameEditText = (EditText) findViewById(R.id.user_name_edit_text);
         mEmailEditText = (EditText) findViewById(R.id.email_edit_text);
         mPasswordEditText = (EditText) findViewById(R.id.password_login);
+        mConfPasswordEditText = (EditText) findViewById(R.id.password_cof);
         mPhoneNumber = (EditText) findViewById(R.id.user_phone);
         mAddress = (EditText) findViewById(R.id.user_address);
         mCity = (EditText) findViewById(R.id.user_city);
@@ -84,6 +87,34 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         dpButton = (ImageButton) findViewById(R.id.button_dp);
         dpButton.setOnClickListener(this);
         mRegisterButton.setOnClickListener(this);
+        mConfPasswordEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                mPasswordMatched = false;
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (mPasswordEditText.getText().toString().equals
+                        (mConfPasswordEditText.getText().toString())) {
+                    mConfPasswordEditText.setCompoundDrawables(null, null, null, null);
+                } else {
+                    mConfPasswordEditText.setError("password does not match");
+                    mPasswordMatched = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (mPasswordEditText.getText().toString().equals
+                        (mConfPasswordEditText.getText().toString())) {
+                    Drawable drawable = getResources().getDrawable(R.drawable.tick);
+                    drawable.setBounds(0, 0, 20, 20);
+                    mConfPasswordEditText.setCompoundDrawables(null, null, drawable, null);
+                    mPasswordMatched = true;
+                }
+            }
+        });
         mUserNameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -122,7 +153,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         .toString().trim().isEmpty() || mAddress.getText().toString().trim().isEmpty()
                         || mCity.getText().toString().trim().isEmpty()) {
                     Toast.makeText(getApplicationContext(), "All fields are required", Toast.LENGTH_SHORT).show();
-                      return;
+                    return;
                 }
                 if (mUserNameEditText.getText().toString().contains(" ")) {
                     Toast.makeText(getApplicationContext(), "username should not contain any spaces",
@@ -134,18 +165,33 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(getApplicationContext(), "please enter a valid email", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (!Helpers.containsDigit(mPasswordEditText.getText().toString())) {
+
+                if (!Helpers.containsDigit(mPasswordEditText.getText().toString()) ||
+                        !Helpers.containsDigit(mConfPasswordEditText.getText().toString())) {
                     Toast.makeText(getApplicationContext(), "password must contain 0-9", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (mPasswordEditText.getText().toString().length() < 6) {
+
+                if (!mConfPasswordEditText.getText().toString().isEmpty()) {
+                    if (mPasswordEditText.getText().toString().equals
+                            (mConfPasswordEditText.getText().toString())) {
+                        mPasswordMatched = true;
+                    } else {
+                        Toast.makeText(getApplicationContext(), "password does not match", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
+                if (mPasswordEditText.getText().toString().length() < 6 &&
+                        mConfPasswordEditText.getText().toString().length() < 6) {
                     Toast.makeText(getApplicationContext(), "password must contain 6 character", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if (!userAlreadyExists && userNotExist) {
+                if (!userAlreadyExists && userNotExist && mPasswordMatched) {
                     String[] data = {mEmailEditText.getText().toString(),
-                            mPasswordEditText.getText().toString(), mUserNameEditText.getText().toString(),
+                            mPasswordEditText.getText().toString(),
+                            mUserNameEditText.getText().toString(),
                             mPhoneNumber.getText().toString(), mCity.getText().toString(),
                             mAddress.getText().toString(), imageUrl};
                     new RegistrationTask().execute(data);
@@ -269,7 +315,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 }
                 return new String[]{params[0], params[1], params[2], params[3], params[4], params[5]};
             }
-            return new String[] {String.valueOf(AppGlobals.NO_INTERNET)};
+            return new String[]{String.valueOf(AppGlobals.NO_INTERNET)};
         }
 
         @Override
@@ -290,7 +336,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 if (profilePic == null) {
                 } else {
                     AppGlobals.addBitmapToInternalMemory(profilePic, AppGlobals.profilePicName,
-                            AppGlobals.PROFILE_PIC_FOLDER);                }
+                            AppGlobals.PROFILE_PIC_FOLDER);
+                }
                 AppGlobals.sCategoriesFragmentForeGround = false;
                 new CategoriesFragment.GetCategoriesTask(RegisterActivity.this).execute();
             } else if (AppGlobals.getResponseCode() == 0) {
@@ -327,9 +374,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
             if (integer == 404) {
-                Drawable x = getResources().getDrawable(R.drawable.tick);
-                x.setBounds(0, 0, 20, 20);
-                mUserNameEditText.setCompoundDrawables(null, null, x, null);
+                Drawable drawable = getResources().getDrawable(R.drawable.tick);
+                drawable.setBounds(0, 0, 20, 20);
+                mUserNameEditText.setCompoundDrawables(null, null, drawable, null);
                 userNotExist = true;
             } else if (integer == 200) {
                 mUserNameEditText.setError("Username already exist");
