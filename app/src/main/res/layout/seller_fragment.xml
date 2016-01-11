@@ -63,8 +63,9 @@
         android:layout_toEndOf="@+id/amount_layout">
 
         <RadioButton
-            android:id="@+id/radio_doller"
-            android:text="US Doller"
+            android:id="@+id/radio_dollar"
+            android:text="US Dollar"
+            android:checked="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

@@ -229,7 +229,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         @Override
         protected Boolean doInBackground(String... params) {
             Bitmap myBitmap;
-            System.out.println(params[0]);
             myBitmap = Helpers.downloadImage(params[0]);
             if (myBitmap != null) {
                 AppGlobals.addBitmapToInternalMemory(myBitmap, AppGlobals.profilePicName,
@@ -266,16 +265,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }
                 }
                 Helpers.saveCategories(categoriesSet);
-                System.out.println(categoriesSet);
-                System.out.println(categoriesArray.length);
                 if (categoriesAvailable) {
                     Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED, true);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
         }
     }
-
 }

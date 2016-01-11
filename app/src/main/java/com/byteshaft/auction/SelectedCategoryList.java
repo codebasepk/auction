@@ -1,5 +1,6 @@
 package com.byteshaft.auction;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -126,8 +127,8 @@ public class SelectedCategoryList extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            holder.setIsRecyclable(false);
-            viewHolder.idTextView.setText(items.get(position));
+//            holder.setIsRecyclable(false);
+            viewHolder.idTextView.setText(String.valueOf(items.get(position)));
             viewHolder.titleTextView.setText(titleHashMap.get(items.get(position)));
             System.out.println(items);
             viewHolder.description.setText(descriptionHashMap.get(items.get(position)));
@@ -220,7 +221,6 @@ public class SelectedCategoryList extends AppCompatActivity {
                             imagesUrlHashMap.put(object.get("id").getAsInt(),
                                     object.get("photo1").getAsString());
                         }
-
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -261,20 +261,45 @@ public class SelectedCategoryList extends AppCompatActivity {
                 AppGlobals.addBitmapToInternalMemory(bitmap, (params[1] + ".png"),
                         (File.separator+params[1]+titleHashMap.get(Integer.valueOf(params[1]))));
             }
+            Intent intent = new Intent(AppGlobals.SETIMAGEINTENT);
+            intent.putExtra("image", String.valueOf(params[1]));
+            sendBroadcast(intent);
             return Integer.valueOf(params[1]);
         }
 
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-            System.out.println(viewHolder.idTextView.getText().equals(integer));
-            if (viewHolder.idTextView.getText().equals(integer)) {
+//            System.out.println(Integer.parseInt(viewHolder.idTextView.getText().toString()));
+//            System.out.println(Integer.parseInt(viewHolder.idTextView.getText().toString()) == (integer));
+//            if (Integer.parseInt(viewHolder.idTextView.getText().toString()) == (integer)) {
+//                viewHolder.imageView.setImageBitmap(Helpers.getBitMapOfProfilePic(
+//                        (AppGlobals.root + (File.separator + integer + titleHashMap.get(integer) + File.separator +
+//                                integer + ".png"))));
+//
+//            }
+        }
+    }
+
+    public static class SetImageReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+//            System.out.println("BroadCast"+ intent.getIntExtra("image", 0));
+            String imageviewFor = intent.getStringExtra("image");
+            int integerValue = Integer.valueOf(imageviewFor);
+            System.out.println(imageviewFor);
+            System.out.println();
+            if (Integer.parseInt(viewHolder.idTextView.getText().toString()) == (integerValue)) {
                 viewHolder.imageView.setImageBitmap(Helpers.getBitMapOfProfilePic(
-                        (AppGlobals.root + (File.separator+integer+titleHashMap.get(integer)+ File.separator+
-                                integer+".png"))));
+                        (AppGlobals.root + (File.separator + integerValue + titleHashMap.get(integerValue) + File.separator +
+                                integerValue + ".png"))));
 
             }
 
+
         }
     }
+
+
 }

@@ -94,7 +94,6 @@ public class MainActivity extends AppCompatActivity
                     loadFragment(new Seller());
                 }
             } else {
-                System.out.println("OK");
                 loadFragment(new Buyer());
             }
         } else {
@@ -128,16 +127,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("OnResume");
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
-//        if (AppGlobals.loginSuccessFull) {
-//            loadFragment(new Buyer());
-//            AppGlobals.loginSuccessFull = false;
-//        }
-        System.out.println(Helpers.isUserLoggedIn());
-        System.out.println(Helpers.getBooleanValueFromSharedPreference(
-                AppGlobals.KEY_CATEGORIES_SELECTED));
         if (Helpers.isUserLoggedIn() && !Helpers.getBooleanValueFromSharedPreference(
                 AppGlobals.KEY_CATEGORIES_SELECTED)) {
             loadFragment(new CategoriesFragment());

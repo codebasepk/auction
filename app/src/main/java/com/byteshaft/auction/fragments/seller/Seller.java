@@ -2,19 +2,13 @@ package com.byteshaft.auction.fragments.seller;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ClipData;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Parcelable;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -36,7 +30,6 @@ import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.byteshaft.auction.utils.MultiPartUtility;
-import com.byteshaft.auction.utils.RealPathFromUri;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -68,7 +61,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     private String imageUrl;
     private Bitmap imageForAd;
     //    private Uri selectedImageUri;
-    private ArrayList<String> imagesArray;
+    private ArrayList<Uri> imagesArray;
     private View mBaseView;
     private String currency = "";
     private String category = "";
@@ -76,14 +69,11 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     private ArrayList<String> list;
     private Set<String> categoryStringSet;
     private ProgressDialog mProgressDialog;
-    private static Uri imageCapturedUri;
-    private static File imageCapturePath;
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int INTENT_REQUEST_GET_IMAGES = 13;
     private static final int INTENT_REQUEST_GET_N_IMAGES = 14;
-
     private ViewGroup mSelectedImagesContainer;
-    HashSet<Uri> mMedia = new HashSet<>();
+    private HashSet<Uri> mMedia = new HashSet<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -108,21 +98,34 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
         addImageButton.setOnClickListener(this);
         categorySpinner = (Spinner) mBaseView.findViewById(R.id.spinner);
         currencyGroup.setOnCheckedChangeListener(this);
+        currency = getSelectedCurrency(currencyGroup.getCheckedRadioButtonId());
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_dropdown_item, list);
         categorySpinner.setAdapter(adapter);
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                category = String.valueOf(parent.getItemIdAtPosition(position));
+                category = String.valueOf(parent.getItemAtPosition(position));
+                System.out.println(category);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                category = String.valueOf(parent.getSelectedItem());
             }
         });
+        categorySpinner.setSelection(0, true);
+        category = (String) categorySpinner.getSelectedItem();
+        System.out.println(category);
         return mBaseView;
+    }
+
+    // get the relevant currency method takes radioButtonId as parameter
+    private String getSelectedCurrency(int buttonId) {
+        if (buttonId == R.id.radio_dollar) {
+            return "USD";
+        } else {
+            return "SAR";
+        }
     }
 
     @Override
@@ -151,6 +154,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                         !itemDescription.getText().toString().trim().isEmpty() &&
                         !mItemAmount.getText().toString().isEmpty() && imagesArray.size() > 0 &&
                         !currency.trim().isEmpty()) {
+                    category = categorySpinner.getSelectedItem().toString();
                     String[] dataToUpload = {itemTitle.getText().toString(),
                             itemDescription.getText().toString(), mItemAmount.getText().toString(),
                             currency, category};
@@ -166,16 +170,22 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
         // Remove all views before
         // adding the new ones.
         mSelectedImagesContainer.removeAllViews();
-        Iterator<Uri> iterator = mMedia.iterator();
+        final Iterator<Uri> iterator = mMedia.iterator();
         ImageInternalFetcher imageFetcher = new ImageInternalFetcher(getActivity(), 500);
         while (iterator.hasNext()) {
             Uri uri = iterator.next();
             Log.i(TAG, " uri: " + uri);
-            if (mMedia.size() >= 1) {
+            if (mMedia.size() >= 1 && mMedia.size()<=8) {
                 mSelectedImagesContainer.setVisibility(View.VISIBLE);
             }
             View imageHolder = LayoutInflater.from(getActivity()).inflate(R.layout.media_layout, null);
             ImageView thumbnail = (ImageView) imageHolder.findViewById(R.id.media_image);
+            thumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    System.out.println(v.getId());
+                }
+            });
 
             if (!uri.toString().contains("content://")) {
                 // probably a relative uri
@@ -185,11 +195,11 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
             mSelectedImagesContainer.addView(imageHolder);
             // set the dimension to correctly
             // show the image thumbnail.
-            int wdpx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50,
+            int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50,
                     getResources().getDisplayMetrics());
-            int htpx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50,
+            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50,
                     getResources().getDisplayMetrics());
-            thumbnail.setLayoutParams(new FrameLayout.LayoutParams(wdpx, htpx));
+            thumbnail.setLayoutParams(new FrameLayout.LayoutParams(width, height));
         }
     }
 
@@ -199,7 +209,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                 .setTabBackgroundColor(R.color.white)    // set tab background color. Default white.
                 .setTabSelectionIndicatorColor(R.color.blue)
                 .setCameraButtonColor(R.color.orange)
-                .setSelectionLimit(100)    // set photo selection limit. Default unlimited selection.
+                .setSelectionLimit(8)    // set photo selection limit. Default unlimited selection.
                 .build();
         ImagePickerActivity.setConfig(config);
         startActivityForResult(intent, INTENT_REQUEST_GET_N_IMAGES);
@@ -207,51 +217,13 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        if (checkedId == R.id.radio_doller) {
-            currency = "dollar";
-        } else if (checkedId == R.id.radio_riyal) {
-            currency = "riyal";
-        }
+        currency = getSelectedCurrency(checkedId);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CAMERA) {
-            if (!imagesArray.contains(imageCapturePath.getAbsolutePath()) && imagesArray.size() <= 7) {
-                imagesArray.add(imageCapturePath.getAbsolutePath());
-            }
-        } else if (requestCode == SELECT_FILE) {
-            if (data != null) {
-                if (data.getData() != null) {
-                    Uri singleImageUri = data.getData();
-                    String singlePath = RealPathFromUri.getRealPathFromURI_API19(getActivity().
-                            getApplicationContext(), singleImageUri);
-                    if (!imagesArray.contains(singlePath) && imagesArray.size() <= 7) {
-                        imagesArray.add(singlePath);
-                    }
-                }
-            } else {
-                if (Build.VERSION.SDK_INT < 19) {
-                    String[] imagesPath = data.getStringExtra("data").split("\\|");
-                } else if (Build.VERSION.SDK_INT > 19) {
-                    ClipData clipData = data.getClipData();
-                    if (clipData != null) {
-                        for (int i = 0; i < clipData.getItemCount(); i++) {
-                            ClipData.Item item = clipData.getItemAt(i);
-                            Uri uri = item.getUri();
-                            String path = RealPathFromUri.getRealPathFromURI_API19(getActivity().
-                                    getApplicationContext(), uri);
-                            if (!imagesArray.contains(path) && imagesArray.size() <= 7) {
-                                imagesArray.add(path);
-                                imageForAd = Helpers.getBitMapOfProfilePic(path);
-                                imageUrl = String.valueOf(path);
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             if (requestCode == INTENT_REQUEST_GET_IMAGES || requestCode == INTENT_REQUEST_GET_N_IMAGES) {
                 Parcelable[] parcelableUris = data.getParcelableArrayExtra(ImagePickerActivity.EXTRA_IMAGE_URIS);
                 if (parcelableUris == null) {
@@ -263,6 +235,9 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                 if (uris != null) {
                     for (Uri uri : uris) {
                         Log.i(TAG, " uri: " + uri);
+                        if (!imagesArray.contains(uri)) {
+                            imagesArray.add(uri);
+                        }
                         mMedia.add(uri);
                     }
                     showMedia();
@@ -271,6 +246,7 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
         }
 
     }
+
     /*
     Member class allow to send product data.
      */
@@ -298,17 +274,19 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
                     http.addFormField("title", params[0]);
                     http.addFormField("description", params[1]);
                     http.addFormField("price", params[2]);
-//                http.addFormField("currency", params[3]);
+                    http.addFormField("currency", params[3]);
                     http.addFormField("category", params[4]);
                     int photo = 1;
-                    for (String item : imagesArray) {
-                        http.addFilePart(("photo" + photo), new File(item));
+                    for (Uri item : imagesArray) {
+                        http.addFilePart(("photo" + photo), new File(item.getPath()));
+                        System.out.println(item.getPath());
+                        System.out.println(photo);
                         photo++;
                     }
                     final byte[] bytes = http.finishFilesUpload();
-                    for (String item : imagesArray) {
+                    for (Uri item : imagesArray) {
                         try {
-                            OutputStream os = new FileOutputStream(item);
+                            OutputStream os = new FileOutputStream(item.getPath());
                             os.write(bytes);
                         } catch (IOException e) {
 
@@ -326,15 +304,18 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
         @Override
         protected void onPostExecute(Integer s) {
             super.onPostExecute(s);
-            imagesArray.clear();
+            System.out.println(s);
             mProgressDialog.dismiss();
             if (s.equals(201)) {
+                imagesArray.clear();
+                showMedia();
                 Helpers.alertDialog(getActivity(), "Success!", "Your Product is posted");
                 itemTitle.setText("");
                 itemDescription.setText("");
                 mItemAmount.setText("");
             } else if (s.equals(AppGlobals.NO_INTERNET)) {
-
+                Helpers.alertDialog(getActivity(), "No Internet", "please check your internet" +
+                        " and try again");
             }
         }
     }
