@@ -105,7 +105,8 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                category = String.valueOf(parent.getItemIdAtPosition(position));
+                category = String.valueOf(parent.getItemAtPosition(position));
+                System.out.println(category);
             }
 
             @Override

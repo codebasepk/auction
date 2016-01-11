@@ -54,6 +54,7 @@ public class AppGlobals extends Application{
     public static boolean alertDialogShownOneTimeForCategory = false;
     public static boolean sCategoriesFragmentForeGround = true;
     public static boolean sRegisterProcess = false;
+    public static final String SETIMAGEINTENT = "com.byteshaft.set_image";
 
     @Override
     public void onCreate() {

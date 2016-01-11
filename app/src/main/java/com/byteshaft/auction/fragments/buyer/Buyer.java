@@ -82,6 +82,9 @@ public class Buyer extends Fragment {
         }));
     }
 
+    /**
+     * custom adapter to display selected categories of user
+     */
     static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
             RecyclerView.OnItemTouchListener {
 
