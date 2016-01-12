@@ -26,21 +26,20 @@ import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.CategoriesFragment;
 import com.byteshaft.auction.fragments.UserSettingFragment;
-import com.byteshaft.auction.fragments.buyer.Buyer;
-import com.byteshaft.auction.fragments.seller.Seller;
+import com.byteshaft.auction.fragments.buyer.Buy;
+import com.byteshaft.auction.fragments.seller.Sell;
 import com.byteshaft.auction.gcm.QuickstartPreferences;
 import com.byteshaft.auction.gcm.RegistrationIntentService;
 import com.byteshaft.auction.register_login.LoginActivity;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.BitmapWithCharacter;
 import com.byteshaft.auction.utils.Helpers;
+import com.github.siyamed.shapeimageview.CircularImageView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.io.FileNotFoundException;
 import java.util.Random;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -88,13 +87,13 @@ public class MainActivity extends AppCompatActivity
                 loadFragment(new CategoriesFragment());
             }
             if (!Helpers.getLastFragment().equals("")) {
-                if (Helpers.getLastFragment().contains("Buyer")) {
-                    loadFragment(new Buyer());
+                if (Helpers.getLastFragment().contains("Buy")) {
+                    loadFragment(new Buy());
                 } else {
-                    loadFragment(new Seller());
+                    loadFragment(new Sell());
                 }
             } else {
-                loadFragment(new Buyer());
+                loadFragment(new Buy());
             }
         } else {
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
@@ -133,10 +132,10 @@ public class MainActivity extends AppCompatActivity
                 AppGlobals.KEY_CATEGORIES_SELECTED)) {
             loadFragment(new CategoriesFragment());
         } else if (Helpers.isUserLoggedIn() && Helpers.getLastFragment().equals("")) {
-            loadFragment(new Buyer());
+            loadFragment(new Buy());
         }
 
-        CircleImageView circularImageView = (CircleImageView) header.findViewById(R.id.imageView);
+        CircularImageView circularImageView = (CircularImageView) header.findViewById(R.id.imageView);
         try {
             if (AppGlobals.getProfilePicBitMap() != null) {
                 circularImageView.setImageBitmap(AppGlobals.getProfilePicBitMap());
@@ -168,7 +167,6 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
-        super.onPause();
     }
 
     private boolean checkPlayServices() {
@@ -214,10 +212,10 @@ public class MainActivity extends AppCompatActivity
         Class fragmentClass = null;
         switch (menuItem.getItemId()) {
             case R.id.nav_buyer:
-                fragmentClass = Buyer.class;
+                fragmentClass = Buy.class;
                 break;
             case R.id.nav_seller:
-                fragmentClass = Seller.class;
+                fragmentClass = Sell.class;
                 break;
             case R.id.nav_categories:
                 fragmentClass = CategoriesFragment.class;
@@ -230,7 +228,7 @@ public class MainActivity extends AppCompatActivity
                 logout = true;
                 break;
             default:
-                fragmentClass = Buyer.class;
+                fragmentClass = Buy.class;
         }
 
         if (logout) {

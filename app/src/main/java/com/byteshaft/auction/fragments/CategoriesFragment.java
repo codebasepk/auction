@@ -22,6 +22,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.register_login.LoginActivity;
@@ -60,6 +61,7 @@ public class CategoriesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.categories_fragment, container, false);
         AppGlobals.sCategoriesFragmentForeGround = true;
+        selectedCategories = new HashSet<>();
         if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED)
                 && !AppGlobals.alertDialogShownOneTimeForCategory) {
             Helpers.alertDialog(getActivity(), "Category selection", "select categories to view products of your interest");
@@ -114,8 +116,6 @@ public class CategoriesFragment extends Fragment {
                     if (selectedCategories.contains("nothing")) {
                         selectedCategories.remove("nothing");
                     }
-                    Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED, true);
-                    Helpers.saveCategories(selectedCategories);
                     String[] strings = {Helpers.getStringDataFromSharedPreference(
                             AppGlobals.KEY_USERNAME), Helpers.getStringDataFromSharedPreference(
                             AppGlobals.KEY_PASSWORD
@@ -165,8 +165,10 @@ public class CategoriesFragment extends Fragment {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
                         selectedCategories.add(item.get(position));
+                        System.out.println(item.get(position));
                     } else {
                         selectedCategories.remove(item.get(position));
+                        System.out.println(item.get(position));
                     }
                 }
             });
@@ -356,29 +358,33 @@ public class CategoriesFragment extends Fragment {
 
         @Override
         protected Integer doInBackground(String... params) {
-            HttpURLConnection connection;
-            int status = 0;
-            try {
-                URL url = new URL(AppGlobals.CATEGORY_URL + params[0] + "/interests/");
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestMethod("POST");
-                String authString = params[0] + ":" + params[1];
-                String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
-                connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
-                Set<String> categories = Helpers.getCategories();
-                StringBuilder stringBuilder = new StringBuilder();
-                for (String item : categories) {
-                    stringBuilder.append(item);
-                    stringBuilder.append(",");
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                HttpURLConnection connection;
+                int status = 0;
+                try {
+                    URL url = new URL(AppGlobals.CATEGORY_URL + params[0] + "/interests/");
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setRequestMethod("POST");
+                    String authString = params[0] + ":" + params[1];
+                    String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
+                    connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
+                    Set<String> categories = Helpers.getCategories();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (String item : categories) {
+                        stringBuilder.append(item);
+                        stringBuilder.append(",");
+                    }
+                    String jsonFormattedData = getJsonObjectString(String.valueOf(stringBuilder));
+                    sendRequestData(connection, jsonFormattedData);
+                    status = connection.getResponseCode();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                String jsonFormattedData = getJsonObjectString(String.valueOf(stringBuilder));
-                sendRequestData(connection, jsonFormattedData);
-                status = connection.getResponseCode();
-            } catch (IOException e) {
-                e.printStackTrace();
+                return status;
+            } else {
+                return AppGlobals.NO_INTERNET;
             }
-            return status;
         }
 
         private String getJsonObjectString(String latitude) {
@@ -396,8 +402,20 @@ public class CategoriesFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer s) {
             super.onPostExecute(s);
-            mProgressDialog.dismiss();
+            if (mProgressDialog != null) {
+                mProgressDialog.dismiss();
+            }
             Log.i(AppGlobals.getLogTag(getClass()), String.valueOf(s));
+            if (s == AppGlobals.NO_INTERNET) {
+                Helpers.alertDialog(getActivity(), "No internet", "Internet not available");
+                return;
+            }
+            if (s == HttpURLConnection.HTTP_OK) {
+                Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED, true);
+                System.out.println(selectedCategories);
+                Helpers.saveCategories(selectedCategories);
+                Toast.makeText(getActivity(), "success", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

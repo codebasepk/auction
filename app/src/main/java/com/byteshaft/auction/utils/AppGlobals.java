@@ -54,7 +54,7 @@ public class AppGlobals extends Application{
     public static boolean alertDialogShownOneTimeForCategory = false;
     public static boolean sCategoriesFragmentForeGround = true;
     public static boolean sRegisterProcess = false;
-    public static final String SETIMAGEINTENT = "com.byteshaft.set_image";
+    private static boolean sAdsFetchingStatus = false;
 
     @Override
     public void onCreate() {
@@ -62,6 +62,10 @@ public class AppGlobals extends Application{
         sContext = getApplicationContext();
         root = Environment.getExternalStorageDirectory().toString()
                 +"/Android/data/" + getPackageName();
+    }
+
+    public static void setsAdsFetchingStatus(boolean status) {
+        sAdsFetchingStatus = status;
     }
 
     // Globally set the value for userExistResponse it takes integer value as parameter

@@ -78,6 +78,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.commonsware.cwac/camera/0.6.10/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.jaydeepw/poly-picker/v1.0.22/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.siyamed/android-shape-imageview/0.9.3/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-ads/8.3.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-analytics/8.3.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-appindexing/8.3.0/jars" />
@@ -103,7 +104,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-wallet/8.3.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-wearable/8.3.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services/8.3.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/de.hdodenhof/circleimageview/2.0.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
@@ -118,10 +118,9 @@
     <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="design-23.1.1" level="project" />
-    <orderEntry type="library" exported="" name="circleimageview-2.0.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-ads-8.3.0" level="project" />
-    <orderEntry type="library" exported="" name="commons-io-2.4" level="project" />
     <orderEntry type="library" exported="" name="picasso-2.3.3" level="project" />
+    <orderEntry type="library" exported="" name="commons-io-2.4" level="project" />
     <orderEntry type="library" exported="" name="play-services-fitness-8.3.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-measurement-8.3.0" level="project" />
     <orderEntry type="library" exported="" name="camera-0.6.10" level="project" />
@@ -133,6 +132,7 @@
     <orderEntry type="library" exported="" name="play-services-appindexing-8.3.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-auth-8.3.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-drive-8.3.0" level="project" />
+    <orderEntry type="library" exported="" name="android-shape-imageview-0.9.3" level="project" />
     <orderEntry type="library" exported="" name="play-services-identity-8.3.0" level="project" />
     <orderEntry type="library" exported="" name="support-v13-22.0.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-appstate-8.3.0" level="project" />

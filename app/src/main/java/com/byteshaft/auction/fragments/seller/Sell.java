@@ -3,7 +3,6 @@ package com.byteshaft.auction.fragments.seller;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -46,7 +45,7 @@ import nl.changer.polypicker.ImagePickerActivity;
 import nl.changer.polypicker.utils.ImageInternalFetcher;
 
 
-public class Seller extends Fragment implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
+public class Sell extends Fragment implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
 
     private static final int REQUEST_CAMERA = 122;
     private static final int SELECT_FILE = 123;
@@ -57,10 +56,6 @@ public class Seller extends Fragment implements View.OnClickListener, RadioGroup
     private ImageButton addImageButton;
     private Spinner categorySpinner;
     private RadioGroup currencyGroup;
-    private File destination;
-    private String imageUrl;
-    private Bitmap imageForAd;
-    //    private Uri selectedImageUri;
     private ArrayList<Uri> imagesArray;
     private View mBaseView;
     private String currency = "";
