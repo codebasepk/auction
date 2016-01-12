@@ -40,12 +40,12 @@ import java.util.HashMap;
  */
 public class SelectedCategoryList extends AppCompatActivity {
 
-    public static RecyclerView mRecyclerView;
+    public static RecyclerView sRecyclerView;
     private CustomAdapter mAdapter;
     private ArrayList<String> arrayList;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private String category;
-    private static String nextUrl;
+    private String nextUrl;
     private static HashMap<Integer, String> descriptionHashMap;
     private static ArrayList<Integer> idsArray;
     private static HashMap<Integer, String> priceHashMap;
@@ -60,32 +60,22 @@ public class SelectedCategoryList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         category = getIntent().getStringExtra(AppGlobals.SELECTED_CATEGORIES);
         setContentView(R.layout.specific_category);
-        idsArray = new ArrayList<>();
-        descriptionHashMap = new HashMap<>();
-        priceHashMap = new HashMap<>();
-        imagesUrlHashMap = new HashMap<>();
-        currencyHashMap = new HashMap<>();
-        titleHashMap = new HashMap<>();
         setTitle(category);
+        initializeArrayAndHashMap();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Toast.makeText(getApplicationContext(), category, Toast.LENGTH_SHORT).show();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mRecyclerView = (RecyclerView) findViewById(R.id.specific_recycler);
+        sRecyclerView = (RecyclerView) findViewById(R.id.specific_recycler);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.specific_category_refresh);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.orange, R.color.green,
                 R.color.colorPrimary, R.color.gray);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
-        mRecyclerView.setHasFixedSize(true);
+        sRecyclerView.setLayoutManager(linearLayoutManager);
+        sRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
+        sRecyclerView.setHasFixedSize(true);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                idsArray = new ArrayList<>();
-                descriptionHashMap = new HashMap<>();
-                priceHashMap = new HashMap<>();
-                imagesUrlHashMap = new HashMap<>();
-                currencyHashMap = new HashMap<>();
-                titleHashMap = new HashMap<>();
+                initializeArrayAndHashMap();
                 new GetSpecificDataTask().execute();
             }
         });
@@ -100,6 +90,22 @@ public class SelectedCategoryList extends AppCompatActivity {
                 return true;
         }
         return false;
+    }
+
+    public static void initializeArrayAndHashMap() {
+        idsArray = new ArrayList<>();
+        descriptionHashMap = new HashMap<>();
+        priceHashMap = new HashMap<>();
+        imagesUrlHashMap = new HashMap<>();
+        currencyHashMap = new HashMap<>();
+        titleHashMap = new HashMap<>();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        initializeArrayAndHashMap();
+        finish();
     }
 
     // custom Member class to represent the categories selected by user and its images
@@ -130,7 +136,8 @@ public class SelectedCategoryList extends AppCompatActivity {
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.specific_category_detail, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(
+                    R.layout.specific_category_detail, parent, false);
             viewHolder = new CustomView(view);
             return viewHolder;
         }
@@ -149,16 +156,21 @@ public class SelectedCategoryList extends AppCompatActivity {
                     .into(viewHolder.imageView, new Callback() {
                         @Override
                         public void onSuccess() {
-                            mRecyclerView.findViewHolderForAdapterPosition(position).
-                                    itemView.findViewById(R.id.specific_image_progressBar)
-                                    .setVisibility(View.GONE);
+                            if (sRecyclerView.findViewHolderForAdapterPosition(position) != null) {
+                                sRecyclerView.findViewHolderForAdapterPosition(position).
+                                        itemView.findViewById(R.id.specific_image_progressBar)
+                                        .setVisibility(View.GONE);
+                            }
                         }
 
                         @Override
                         public void onError() {
-                            mRecyclerView.findViewHolderForAdapterPosition(position).
-                                    itemView.findViewById(R.id.specific_image_progressBar)
-                                    .setVisibility(View.GONE);
+                            if (sRecyclerView.findViewHolderForAdapterPosition(position) != null) {
+                                System.out.println(sRecyclerView.findViewHolderForAdapterPosition(position) == null);
+                                sRecyclerView.findViewHolderForAdapterPosition(position).
+                                        itemView.findViewById(R.id.specific_image_progressBar)
+                                        .setVisibility(View.GONE);
+                            }
 
                         }
                     });
@@ -270,9 +282,9 @@ public class SelectedCategoryList extends AppCompatActivity {
                 mProgressDialog.dismiss();
             }
             mAdapter = new CustomAdapter(idsList, SelectedCategoryList.this);
-            mRecyclerView.setAdapter(mAdapter);
+            sRecyclerView.setAdapter(mAdapter);
             mSwipeRefreshLayout.setRefreshing(false);
-            mRecyclerView.addOnItemTouchListener(new CustomAdapter(idsList, getApplicationContext(),
+            sRecyclerView.addOnItemTouchListener(new CustomAdapter(idsList, getApplicationContext(),
                     new CustomAdapter.OnItemClickListener() {
                         @Override
                         public void onItem(Integer item) {
