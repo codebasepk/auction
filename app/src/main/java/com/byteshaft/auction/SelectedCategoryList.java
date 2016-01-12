@@ -1,9 +1,9 @@
 package com.byteshaft.auction;
 
-import android.content.BroadcastReceiver;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -26,8 +26,9 @@ import com.byteshaft.auction.utils.Helpers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -39,7 +40,7 @@ import java.util.HashMap;
  */
 public class SelectedCategoryList extends AppCompatActivity {
 
-    private RecyclerView mRecyclerView;
+    public static RecyclerView mRecyclerView;
     private CustomAdapter mAdapter;
     private ArrayList<String> arrayList;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -52,6 +53,7 @@ public class SelectedCategoryList extends AppCompatActivity {
     private static HashMap<Integer, String> currencyHashMap;
     private static HashMap<Integer, String> titleHashMap;
     private static CustomView viewHolder;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,12 @@ public class SelectedCategoryList extends AppCompatActivity {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                idsArray = new ArrayList<>();
+                descriptionHashMap = new HashMap<>();
+                priceHashMap = new HashMap<>();
+                imagesUrlHashMap = new HashMap<>();
+                currencyHashMap = new HashMap<>();
+                titleHashMap = new HashMap<>();
                 new GetSpecificDataTask().execute();
             }
         });
@@ -101,6 +109,7 @@ public class SelectedCategoryList extends AppCompatActivity {
         private ArrayList<Integer> items;
         private OnItemClickListener mListener;
         private GestureDetector mGestureDetector;
+        private Activity mActivity;
 
         public CustomAdapter(ArrayList<Integer> categories, Context context, OnItemClickListener listener) {
             this.items = categories;
@@ -113,8 +122,9 @@ public class SelectedCategoryList extends AppCompatActivity {
             });
         }
 
-        public CustomAdapter(ArrayList<Integer> categories) {
+        public CustomAdapter(ArrayList<Integer> categories, Activity activity) {
             this.items = categories;
+            this.mActivity = activity;
         }
 
 
@@ -126,13 +136,32 @@ public class SelectedCategoryList extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-//            holder.setIsRecyclable(false);
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+            holder.setIsRecyclable(false);
             viewHolder.idTextView.setText(String.valueOf(items.get(position)));
-            viewHolder.titleTextView.setText(titleHashMap.get(items.get(position)));
-            System.out.println(items);
+            viewHolder.titleTextView.setText(titleHashMap.get(items.get(position)).toUpperCase());
             viewHolder.description.setText(descriptionHashMap.get(items.get(position)));
             viewHolder.price.setText(priceHashMap.get(items.get(position)));
+            Picasso.with(mActivity)
+                    .load(imagesUrlHashMap.get(items.get(position)))
+                    .resize(200, 200)
+                    .centerCrop()
+                    .into(viewHolder.imageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            mRecyclerView.findViewHolderForAdapterPosition(position).
+                                    itemView.findViewById(R.id.specific_image_progressBar)
+                                    .setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onError() {
+                            mRecyclerView.findViewHolderForAdapterPosition(position).
+                                    itemView.findViewById(R.id.specific_image_progressBar)
+                                    .setVisibility(View.GONE);
+
+                        }
+                    });
         }
 
         @Override
@@ -190,6 +219,11 @@ public class SelectedCategoryList extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            mProgressDialog = new ProgressDialog(SelectedCategoryList.this);
+            mProgressDialog.setMessage("fetching ads...");
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
         }
 
         @Override
@@ -208,7 +242,6 @@ public class SelectedCategoryList extends AppCompatActivity {
                         nextUrl = jsonObject.get("next").getAsString();
                     }
                     JsonArray jsonArray = jsonObject.getAsJsonArray("results");
-                    System.out.println(jsonArray);
                     for (int i = 0; i < jsonArray.size(); i++) {
                         JsonObject object = jsonArray.get(i).getAsJsonObject();
                         if (!idsArray.contains(object.get("id").getAsInt())) {
@@ -233,7 +266,10 @@ public class SelectedCategoryList extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<Integer> idsList) {
             super.onPostExecute(idsList);
-            mAdapter = new CustomAdapter(idsList);
+            if (mProgressDialog != null) {
+                mProgressDialog.dismiss();
+            }
+            mAdapter = new CustomAdapter(idsList, SelectedCategoryList.this);
             mRecyclerView.setAdapter(mAdapter);
             mSwipeRefreshLayout.setRefreshing(false);
             mRecyclerView.addOnItemTouchListener(new CustomAdapter(idsList, getApplicationContext(),
@@ -243,64 +279,8 @@ public class SelectedCategoryList extends AppCompatActivity {
                             Intent intent = new Intent(getApplicationContext(), ItemDetail.class);
                             intent.putExtra(AppGlobals.detail, item);
                             startActivity(intent);
-
                         }
                     }));
-            for (Integer item : idsList) {
-                String[] data = {imagesUrlHashMap.get(item), String.valueOf(item)};
-                new DownloadImageForEachItem().execute(data);
-            }
         }
     }
-
-    class DownloadImageForEachItem extends AsyncTask<String, String, Integer> {
-
-        @Override
-        protected Integer doInBackground(String... params) {
-            Bitmap bitmap = Helpers.downloadImage(params[0]);
-            if (bitmap != null) {
-                AppGlobals.addBitmapToInternalMemory(bitmap, (params[1] + ".png"),
-                        (File.separator + params[1] + titleHashMap.get(Integer.valueOf(params[1]))));
-            }
-            Intent intent = new Intent(AppGlobals.SETIMAGEINTENT);
-            intent.putExtra("image", String.valueOf(params[1]));
-            sendBroadcast(intent);
-            return Integer.valueOf(params[1]);
-        }
-
-        @Override
-        protected void onPostExecute(Integer integer) {
-            super.onPostExecute(integer);
-//            System.out.println(Integer.parseInt(viewHolder.idTextView.getText().toString()));
-//            System.out.println(Integer.parseInt(viewHolder.idTextView.getText().toString()) == (integer));
-//            if (Integer.parseInt(viewHolder.idTextView.getText().toString()) == (integer)) {
-//                viewHolder.imageView.setImageBitmap(Helpers.getBitMapOfProfilePic(
-//                        (AppGlobals.root + (File.separator + integer + titleHashMap.get(integer) + File.separator +
-//                                integer + ".png"))));
-//
-//            }
-        }
-    }
-
-    public static class SetImageReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-//            System.out.println("BroadCast"+ intent.getIntExtra("image", 0));
-            String imageviewFor = intent.getStringExtra("image");
-            int integerValue = Integer.valueOf(imageviewFor);
-            System.out.println(imageviewFor);
-            System.out.println();
-            if (Integer.parseInt(viewHolder.idTextView.getText().toString()) == (integerValue)) {
-                viewHolder.imageView.setImageBitmap(Helpers.getBitMapOfProfilePic(
-                        (AppGlobals.root + (File.separator + integerValue + titleHashMap.get(integerValue) + File.separator +
-                                integerValue + ".png"))));
-
-            }
-
-
-        }
-    }
-
-
 }
