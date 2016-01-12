@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -36,26 +37,28 @@
                     android:layout_alignParentTop="true"
                     style="?android:attr/progressBarStyle"/>
 
-                <ImageView
+                <com.github.siyamed.shapeimageview.mask.PorterShapeImageView
                     android:id="@+id/specific_category_image"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:scaleType="centerCrop"
+                    app:siShape="@drawable/image_background"
                     android:layout_gravity="left"
+                    app:siSquare="true"
                     android:layout_margin="2dp" />
 
                 <TextView
                     android:id="@+id/specific_category_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
                     android:layout_alignLeft="@id/specific_category_image"
                     android:layout_below="@id/specific_category_image"
+                    android:textSize="8sp"
                     android:layout_gravity="center"
-                    android:layout_margin="10dp"
-                    android:text="Rs: 1000" />
+                    android:layout_margin="2dp"/>
 
                 <TextView
                     android:id="@+id/specific_category_title"

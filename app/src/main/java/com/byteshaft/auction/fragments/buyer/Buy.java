@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * this class belongs to buyer.
  */
-public class Buyer extends Fragment {
+public class Buy extends Fragment {
 
     private View mBaseView;
     private RecyclerView mRecyclerView;
@@ -37,7 +37,6 @@ public class Buyer extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.buyer_category_fragment, container, false);
-        System.out.println("buyer fragment");
         categories = Helpers.getCategories();
         mBaseView.setTag(TAG);
         Helpers.saveLastFragmentOpened(getClass().getSimpleName());
@@ -47,6 +46,7 @@ public class Buyer extends Fragment {
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
         arrayList = new ArrayList<>();
+        System.out.println(categories);
         for (String category: categories) {
             if (!category.isEmpty()) {
                 arrayList.add(category);

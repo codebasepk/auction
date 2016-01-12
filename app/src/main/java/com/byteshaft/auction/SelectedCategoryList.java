@@ -92,6 +92,7 @@ public class SelectedCategoryList extends AppCompatActivity {
         return false;
     }
 
+    // Method to initialize the array each time for new ads if available
     public static void initializeArrayAndHashMap() {
         idsArray = new ArrayList<>();
         descriptionHashMap = new HashMap<>();
@@ -104,7 +105,7 @@ public class SelectedCategoryList extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        initializeArrayAndHashMap();
+//        initializeArrayAndHashMap();
         finish();
     }
 
@@ -148,7 +149,8 @@ public class SelectedCategoryList extends AppCompatActivity {
             viewHolder.idTextView.setText(String.valueOf(items.get(position)));
             viewHolder.titleTextView.setText(titleHashMap.get(items.get(position)).toUpperCase());
             viewHolder.description.setText(descriptionHashMap.get(items.get(position)));
-            viewHolder.price.setText(priceHashMap.get(items.get(position)));
+            viewHolder.price.setText(priceHashMap.get(items.get(position)) + " "+
+                    currencyHashMap.get(items.get(position)));
             Picasso.with(mActivity)
                     .load(imagesUrlHashMap.get(items.get(position)))
                     .resize(200, 200)
@@ -228,6 +230,8 @@ public class SelectedCategoryList extends AppCompatActivity {
 
     class GetSpecificDataTask extends AsyncTask<String, String, ArrayList<Integer>> {
 
+        private boolean noInternet = false;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -266,11 +270,18 @@ public class SelectedCategoryList extends AppCompatActivity {
                                     object.get("price").getAsString());
                             imagesUrlHashMap.put(object.get("id").getAsInt(),
                                     object.get("photo1").getAsString());
+                            if (!object.get("currency").isJsonNull()) {
+                                currencyHashMap.put(object.get("id").getAsInt(),
+                                        object.get("currency").getAsString());
+                            }
                         }
                     }
+                    System.out.println(currencyHashMap);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            } else {
+                noInternet = true;
             }
             return idsArray;
         }
@@ -280,6 +291,10 @@ public class SelectedCategoryList extends AppCompatActivity {
             super.onPostExecute(idsList);
             if (mProgressDialog != null) {
                 mProgressDialog.dismiss();
+            }
+            if (noInternet) {
+                Helpers.alertDialog(SelectedCategoryList.this, "No internet", "Internet not available");
+                return;
             }
             mAdapter = new CustomAdapter(idsList, SelectedCategoryList.this);
             sRecyclerView.setAdapter(mAdapter);

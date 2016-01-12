@@ -1,16 +1,15 @@
-package com.byteshaft.auction.fragments.seller;
+package com.byteshaft.auction.fragments;
 
 
-import android.content.Context;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -18,25 +17,22 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.byteshaft.auction.R;
-import com.byteshaft.auction.SelectedCategoryList;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import org.json.JSONObject;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class AdsDetailFragment extends Fragment {
 
     private View mBaseView;
-    private RecyclerView mRecyclerView;
+    public static RecyclerView mRecyclerView;
     private CustomAdapter customAdapter;
     private String catagories;
     public static String nextUrl;
@@ -48,6 +44,7 @@ public class AdsDetailFragment extends Fragment {
     private static HashMap<Integer, String> titleHashMap;
     public ArrayList<Integer> arrayList;
     public static CustomView customView;
+    private ProgressDialog mProgressDialog;
 
 
     @Nullable
@@ -57,7 +54,7 @@ public class AdsDetailFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new
                 LinearLayoutManager(getActivity().getApplicationContext());
         idsArray = new ArrayList<>();
-        arrayList = new ArrayList<Integer>();
+        arrayList = new ArrayList<>();
         descriptionHashMap = new HashMap<>();
         priceHashMap = new HashMap<>();
         imagesUrlHashMap = new HashMap<>();
@@ -74,9 +71,11 @@ public class AdsDetailFragment extends Fragment {
     static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private ArrayList<Integer> items;
+        private Activity mActivity;
 
-        public CustomAdapter(ArrayList<Integer> categories) {
+        public CustomAdapter(ArrayList<Integer> categories, Activity activity) {
             this.items = categories;
+            this.mActivity = activity;
         }
 
         @Override
@@ -88,11 +87,40 @@ public class AdsDetailFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+            holder.setIsRecyclable(false);
             customView.idTextView.setText(String.valueOf(items.get(position)));
             customView.titleTextView.setText(titleHashMap.get(items.get(position)));
             customView.descriptionTextView.setText(descriptionHashMap.get(items.get(position)));
             customView.priceTextView.setText(priceHashMap.get(items.get(position)));
+            Picasso.with(mActivity)
+                    .load(imagesUrlHashMap.get(items.get(position)))
+                    .resize(200, 200)
+                    .centerCrop()
+                    .into(customView.imageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            if (mRecyclerView.findViewHolderForAdapterPosition(position) != null) {
+                                if (mRecyclerView.findViewHolderForAdapterPosition(position).
+                                        itemView.findViewById(R.id.specific_image_progressBar) != null) {
+                                    mRecyclerView.findViewHolderForAdapterPosition(position).
+                                            itemView.findViewById(R.id.specific_image_progressBar)
+                                            .setVisibility(View.GONE);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onError() {
+                            if (mRecyclerView.findViewHolderForAdapterPosition(position) != null) {
+                                System.out.println(mRecyclerView.findViewHolderForAdapterPosition(position) == null);
+                                mRecyclerView.findViewHolderForAdapterPosition(position).
+                                        itemView.findViewById(R.id.specific_image_progressBar)
+                                        .setVisibility(View.GONE);
+                            }
+
+                        }
+                    });
 
         }
 
@@ -121,7 +149,22 @@ public class AdsDetailFragment extends Fragment {
         }
     }
 
+    /**
+     * task to get per user ads.
+     */
     class GetAllAdsDetail extends AsyncTask<String, String, ArrayList<Integer>> {
+
+        private boolean internetAvailable = false;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(getActivity());
+            mProgressDialog.setMessage("fetching your ads...");
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+        }
 
         @Override
         protected ArrayList<Integer> doInBackground(String... params) {
@@ -157,6 +200,8 @@ public class AdsDetailFragment extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            } else {
+                internetAvailable = true;
             }
             return idsArray;
         }
@@ -164,7 +209,12 @@ public class AdsDetailFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<Integer> integers) {
             super.onPostExecute(integers);
-            customAdapter = new CustomAdapter(idsArray);
+            mProgressDialog.dismiss();
+            if (internetAvailable) {
+                Helpers.alertDialog(getActivity(), "No internet", "Internet Not available");
+                return;
+            }
+            customAdapter = new CustomAdapter(idsArray, getActivity());
             mRecyclerView.setAdapter(customAdapter);
         }
     }
