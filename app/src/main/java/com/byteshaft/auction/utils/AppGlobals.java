@@ -55,6 +55,9 @@ public class AppGlobals extends Application{
     public static boolean sCategoriesFragmentForeGround = true;
     public static boolean sRegisterProcess = false;
     public static final String SETIMAGEINTENT = "com.byteshaft.set_image";
+    public static final String USER_SPECIFIC_ADS =
+            "http://testapp-byteshaft.herokuapp.com/api/users/";
+    public static final String USER_SPECIFIC_ADS_APPEND = "/ads/list";
 
     @Override
     public void onCreate() {

@@ -27,6 +27,7 @@ import android.widget.TextView;
 import com.byteshaft.auction.fragments.CategoriesFragment;
 import com.byteshaft.auction.fragments.UserSettingFragment;
 import com.byteshaft.auction.fragments.buyer.Buyer;
+import com.byteshaft.auction.fragments.seller.AdsDetailFragment;
 import com.byteshaft.auction.fragments.seller.Seller;
 import com.byteshaft.auction.gcm.QuickstartPreferences;
 import com.byteshaft.auction.gcm.RegistrationIntentService;
@@ -221,6 +222,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_categories:
                 fragmentClass = CategoriesFragment.class;
+                break;
+            case R.id.my_ads_detail:
+                fragmentClass = AdsDetailFragment.class;
                 break;
             case R.id.nav_user:
                 fragmentClass = UserSettingFragment.class;
