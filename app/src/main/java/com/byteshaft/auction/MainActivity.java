@@ -27,7 +27,7 @@ import android.widget.TextView;
 import com.byteshaft.auction.fragments.CategoriesFragment;
 import com.byteshaft.auction.fragments.UserSettingFragment;
 import com.byteshaft.auction.fragments.buyer.Buy;
-import com.byteshaft.auction.fragments.seller.AdsDetailFragment;
+import com.byteshaft.auction.fragments.AdsDetailFragment;
 import com.byteshaft.auction.fragments.seller.Sell;
 import com.byteshaft.auction.gcm.QuickstartPreferences;
 import com.byteshaft.auction.gcm.RegistrationIntentService;
