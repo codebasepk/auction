@@ -16,10 +16,11 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
@@ -38,7 +39,7 @@ import java.util.HashMap;
 /**
  * Activity that represent the selected categories of user
  */
-public class SelectedCategoryList extends AppCompatActivity {
+public class SelectedCategoryList extends AppCompatActivity implements View.OnClickListener {
 
     public static RecyclerView sRecyclerView;
     private CustomAdapter mAdapter;
@@ -54,16 +55,29 @@ public class SelectedCategoryList extends AppCompatActivity {
     private static HashMap<Integer, String> titleHashMap;
     private static CustomView viewHolder;
     private ProgressDialog mProgressDialog;
+    private boolean refresh = false;
+    private int countValue;
+    private LinearLayout showMoreLinearLayout;
+    private Button showMoreButton;
+    private ProgressBar mShowMoreProgress;
+    private String categorySpecificUrl;
+    private boolean showMore = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         category = getIntent().getStringExtra(AppGlobals.SELECTED_CATEGORIES);
         setContentView(R.layout.specific_category);
+        showMoreLinearLayout = (LinearLayout) findViewById(R.id.show_more_layout);
+        showMoreLinearLayout.setVisibility(View.GONE);
+        showMoreButton = (Button) findViewById(R.id.show_more);
+        mShowMoreProgress = (ProgressBar) findViewById(R.id.show_progressBar);
+        mShowMoreProgress.setVisibility(View.INVISIBLE);
+        showMoreButton.setOnClickListener(this);
+        categorySpecificUrl = AppGlobals.SELECTED_CATEGORY_DETAIL_URL + category.toLowerCase();
         setTitle(category);
         initializeArrayAndHashMap();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        Toast.makeText(getApplicationContext(), category, Toast.LENGTH_SHORT).show();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         sRecyclerView = (RecyclerView) findViewById(R.id.specific_recycler);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.specific_category_refresh);
@@ -76,10 +90,11 @@ public class SelectedCategoryList extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 initializeArrayAndHashMap();
-                new GetSpecificDataTask().execute();
+                refresh = true;
+                new GetSpecificDataTask().execute(categorySpecificUrl);
             }
         });
-        new GetSpecificDataTask().execute();
+        new GetSpecificDataTask().execute(categorySpecificUrl);
     }
 
     @Override
@@ -105,8 +120,21 @@ public class SelectedCategoryList extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-//        initializeArrayAndHashMap();
         finish();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.show_more:
+                if (countValue > 5 && !nextUrl.trim().isEmpty()) {
+                    showMore = true;
+                    mShowMoreProgress.setVisibility(View.VISIBLE);
+                    System.out.println(nextUrl);
+                    new GetSpecificDataTask().execute(nextUrl);
+                }
+                break;
+        }
     }
 
     // custom Member class to represent the categories selected by user and its images
@@ -235,11 +263,13 @@ public class SelectedCategoryList extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(SelectedCategoryList.this);
-            mProgressDialog.setMessage("fetching ads...");
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.show();
+            if (!refresh || !showMore) {
+                mProgressDialog = new ProgressDialog(SelectedCategoryList.this);
+                mProgressDialog.setMessage("loading ...");
+                mProgressDialog.setIndeterminate(false);
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.show();
+            }
         }
 
         @Override
@@ -247,13 +277,14 @@ public class SelectedCategoryList extends AppCompatActivity {
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 String parsedString;
                 try {
-                    HttpURLConnection httpURLConnection = Helpers.openConnectionForUrl(
-                            AppGlobals.SELECTED_CATEGORY_DETAIL_URL + category.toLowerCase(), "GET");
+                    HttpURLConnection httpURLConnection = Helpers.openConnectionForUrl(params[0], "GET");
+                    System.out.println(httpURLConnection.getResponseCode());
                     InputStream inputStream = httpURLConnection.getInputStream();
                     parsedString = Helpers.convertInputStreamToString(inputStream);
                     System.out.println(parsedString);
                     JsonParser jsonParser = new JsonParser();
                     JsonObject jsonObject = jsonParser.parse(parsedString).getAsJsonObject();
+                    countValue = jsonObject.get("count").getAsInt();
                     if (!jsonObject.get("next").isJsonNull()) {
                         nextUrl = jsonObject.get("next").getAsString();
                     }
@@ -289,12 +320,18 @@ public class SelectedCategoryList extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<Integer> idsList) {
             super.onPostExecute(idsList);
+            if (showMore) {
+                mShowMoreProgress.setVisibility(View.INVISIBLE);
+            }
             if (mProgressDialog != null) {
                 mProgressDialog.dismiss();
             }
             if (noInternet) {
                 Helpers.alertDialog(SelectedCategoryList.this, "No internet", "Internet not available");
                 return;
+            }
+            if (countValue > 5) {
+                showMoreLinearLayout.setVisibility(View.VISIBLE);
             }
             mAdapter = new CustomAdapter(idsList, SelectedCategoryList.this);
             sRecyclerView.setAdapter(mAdapter);
@@ -303,7 +340,7 @@ public class SelectedCategoryList extends AppCompatActivity {
                     new CustomAdapter.OnItemClickListener() {
                         @Override
                         public void onItem(Integer item) {
-                            Intent intent = new Intent(getApplicationContext(), ItemDetail.class);
+                            Intent intent = new Intent(getApplicationContext(), SelectedAdDetail.class);
                             intent.putExtra(AppGlobals.detail, item);
                             startActivity(intent);
                         }

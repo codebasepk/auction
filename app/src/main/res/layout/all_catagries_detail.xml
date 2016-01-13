@@ -21,7 +21,8 @@
                 <TextView
                     android:id="@+id/all_categories_invisible_textview"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"/>
 
                 <ProgressBar
                     android:layout_width="40dp"
@@ -67,6 +68,7 @@
 
                 <TextView
                     android:id="@+id/all_categories_description"
+                    android:layout_toRightOf="@+id/all_categories_image"
                     android:textStyle="italic"
                     android:text="test"
                     android:layout_width="wrap_content"
