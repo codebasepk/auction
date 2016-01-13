@@ -7,7 +7,7 @@ android {
 
 
     defaultConfig {
-        applicationId "com.byteshaft.hussi.auction"
+        applicationId "com.byteshaft.auction"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
