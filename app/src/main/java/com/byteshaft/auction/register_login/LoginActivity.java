@@ -1,11 +1,15 @@
 package com.byteshaft.auction.register_login;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -45,6 +49,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextView forgetPassword;
     private String profilePicUrl = "";
     private static LoginActivity sInstance;
+    String[] loginData;
+    public static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
+    public static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE2 = 1;
 
     public static LoginActivity getLoginActivityInstance() {
         return sInstance;
@@ -70,7 +77,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.register_button:
-                startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+                if (ContextCompat.checkSelfPermission(LoginActivity.this,
+                        Manifest.permission.READ_CONTACTS)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(LoginActivity.this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                } else {
+                    startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+                }
                 break;
             case R.id.btn_login:
                 if (mEditTextUserName.getText().toString().trim().isEmpty()
@@ -87,15 +102,47 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         || !mEditTextPassword.getText().toString().trim().isEmpty()) {
                     String userName = mEditTextUserName.getText().toString();
                     String password = mEditTextPassword.getText().toString();
-                    String[] loginData = {userName, password};
-                    new LoginTask().execute(loginData);
+                    loginData = new String[]{userName, password};
+                    if (ContextCompat.checkSelfPermission(LoginActivity.this,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(LoginActivity.this,
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE2);
+                    } else {
+                        new LoginTask().execute(loginData);
+                    }
                 }
                 break;
             case R.id.forget_password:
                 showCustomDialog();
-
                 break;
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "Permission denied!"
+                    , Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE2: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    new LoginTask().execute(loginData);
+                }
+            }
+        }
+
     }
 
     // password recovery dialog
