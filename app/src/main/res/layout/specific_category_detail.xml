@@ -39,8 +39,8 @@
 
                 <com.github.siyamed.shapeimageview.mask.PorterShapeImageView
                     android:id="@+id/specific_category_image"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
@@ -68,15 +68,23 @@
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:layout_gravity="center"
-                    android:layout_marginTop="10dp" />
+                    android:layout_marginTop="5dp" />
 
                 <TextView
                     android:id="@+id/specific_category_description"
                     android:textStyle="italic"
                     android:layout_toRightOf="@+id/specific_category_image"
-                    android:layout_marginLeft="2dp"
+                    android:layout_toEndOf="@+id/specific_category_image"
+                    android:layout_below="@+id/specific_category_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxLength="150"
+                    android:maxLines="3"
+                    android:maxWidth="200dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
                     android:layout_gravity="center"
                     android:layout_above="@+id/specific_category_price"
                     android:layout_centerHorizontal="true" />
