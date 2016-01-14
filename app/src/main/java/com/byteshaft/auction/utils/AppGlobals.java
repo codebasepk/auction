@@ -31,19 +31,18 @@ public class AppGlobals extends Application{
     public static int responseCode;
     public static int userExistResponse;
     public static int NO_INTERNET = 2112;
-    public static final String LOGIN_URL = ("http://testapp-byteshaft.herokuapp.com/api/users/");
-    public static final String USER_EXIST_URL = ("http://testapp-byteshaft.herokuapp.com/api/users/");
-    public static final String REGISTER_URL = ("http://testapp-byteshaft.herokuapp.com/api/register");
+    public static final String BASE_URL = "http://testapp-byteshaft.herokuapp.com";
+    public static final String LOGIN_URL = String.format("%s/api/users/", BASE_URL);
+    public static final String USER_EXIST_URL = String.format("%s/api/users/", BASE_URL);
+    public static final String REGISTER_URL = String.format("%s/api/register", BASE_URL);
     public static int postProductResponse;
-    public static final String CATEGORY_URL = "http://testapp-byteshaft.herokuapp.com/api/users/";
+    public static final String CATEGORY_URL = String.format("%s/api/users/", BASE_URL);
     public static String root;
     public static String profilePicName = "profile_pic.png";
-    public static final String POST_AD_URL = "http://testapp-byteshaft.herokuapp.com/api/users/";
-    public static final String ALL_CATEGORIES = "http://testapp-byteshaft.herokuapp.com/api/ads" +
-            "/categories";
-    public static final String PUSH_NOTIFICATION_KEY = "http://testapp-byteshaft.herokuapp.com/api/users/";
-    public static final String SELECTED_CATEGORY_DETAIL_URL =
-            "http://testapp-byteshaft.herokuapp.com/api/ads/?category=";
+    public static final String POST_AD_URL = String.format("%s/api/users/", BASE_URL);
+    public static final String ALL_CATEGORIES = String.format("%s/api/ads/categories", BASE_URL);
+    public static final String PUSH_NOTIFICATION_KEY = String.format("%s/api/users/", BASE_URL);
+    public static final String SELECTED_CATEGORY_DETAIL_URL = String.format("%s/api/ads/?category=",BASE_URL);
     public static final String PROFILE_PIC_FOLDER = "/profilePic";
     public static final String CATEGORIES_FOLDER = "/categories_folder";
     public static final String ALL_CATEGORIES_STATUS = "all_categories_status";
@@ -54,9 +53,11 @@ public class AppGlobals extends Application{
     public static boolean alertDialogShownOneTimeForCategory = false;
     public static boolean sCategoriesFragmentForeGround = true;
     public static boolean sRegisterProcess = false;
-    public static final String USER_SPECIFIC_ADS =
-            "http://testapp-byteshaft.herokuapp.com/api/users/";
+    public static final String USER_SPECIFIC_ADS = String.format("%s/api/users/", BASE_URL);
     public static final String USER_SPECIFIC_ADS_APPEND = "/ads/list";
+    public static final String SINGLE_AD_DETAILS = String.format("%s/", BASE_URL);
+    public static final String SINGLE_AD_DETAILS_APPEND = "/api/users/";
+    public static final String SINGLE_AD_DETAILS_APPEND_END = "ads/";
 
     @Override
     public void onCreate() {

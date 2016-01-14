@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * Class to show the details if a product which will include item images, bids, rating of the seller
  * product description, price and option of chatting with the client
  */
-public class ItemDetail extends AppCompatActivity {
+public class SelectedAdDetail extends AppCompatActivity {
 
     final static int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
     final static int cacheSize = maxMemory / 8;
