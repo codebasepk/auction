@@ -164,8 +164,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 if (ContextCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.CAMERA)
                         != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(),
-                            new String[]{Manifest.permission.CAMERA},
+                    requestPermissions(new String[]{Manifest.permission.CAMERA},
                             MY_PERMISSIONS_REQUEST_ACCESS_CAMERA);
                 } else {
                     getNImages();
@@ -179,14 +178,11 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ACCESS_CAMERA: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     getNImages();
-
                 } else {
                     Toast.makeText(getActivity(), "Permission Denied!", Toast.LENGTH_LONG).show();
                 }
-                return;
             }
         }
 
