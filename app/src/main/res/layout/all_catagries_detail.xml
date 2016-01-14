@@ -80,7 +80,6 @@
                     android:maxWidth="200dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginEnd="10dp"
-                    android:layout_toRightOf="@+id/all_categories_image"
                     android:layout_toEndOf="@+id/all_categories_image"
                     android:layout_below="@+id/all_categories_title"
                     android:layout_marginLeft="10dp"
