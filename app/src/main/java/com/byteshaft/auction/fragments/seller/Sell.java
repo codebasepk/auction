@@ -1,13 +1,17 @@
 package com.byteshaft.auction.fragments.seller;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -47,8 +51,6 @@ import nl.changer.polypicker.utils.ImageInternalFetcher;
 
 public class Sell extends Fragment implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
 
-    private static final int REQUEST_CAMERA = 122;
-    private static final int SELECT_FILE = 123;
     private EditText itemTitle;
     private EditText itemDescription;
     private EditText mItemAmount;
@@ -69,6 +71,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
     private static final int INTENT_REQUEST_GET_N_IMAGES = 14;
     private ViewGroup mSelectedImagesContainer;
     private HashSet<Uri> mMedia = new HashSet<>();
+    public static final int MY_PERMISSIONS_REQUEST_ACCESS_CAMERA = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -156,8 +159,37 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 }
                 break;
             case R.id.btn_add_image:
-                getNImages();
+                // here we check for camera permission
+                if (ContextCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    // if not granted request it from user
+                    requestPermissions(new String[]{Manifest.permission.CAMERA},
+                            MY_PERMISSIONS_REQUEST_ACCESS_CAMERA);
+                } else {
+                    getNImages();
+                }
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // this code will be executed if the permission is either denied or given by the user
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCESS_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // code in this statement will be executed if the requested permission is
+                    // granted by the user
+                    getNImages();
+                } else {
+                    // if not granted show something
+                    Toast.makeText(getActivity(), "Permission Denied!", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
     }
 
     private void showMedia() {
@@ -198,6 +230,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
     }
 
     private void getNImages() {
+        Log.i("Auction", "Get Images Method called");
         Intent intent = new Intent(getActivity(), ImagePickerActivity.class);
         Config config = new Config.Builder()
                 .setTabBackgroundColor(R.color.white)    // set tab background color. Default white.
