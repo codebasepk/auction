@@ -160,6 +160,8 @@ public class MainActivity extends AppCompatActivity
         if (Helpers.isUserLoggedIn() && !Helpers.getBooleanValueFromSharedPreference(
                 AppGlobals.PROFILE_PIC_STATUS) && !Helpers.getStringDataFromSharedPreference(
                 AppGlobals.PROFILE_PIC_IMAGE_URL).equals("")) {
+            System.out.println(Helpers.getStringDataFromSharedPreference(
+                    AppGlobals.PROFILE_PIC_IMAGE_URL));
             new LoginActivity.DownloadProfilePic().execute(Helpers.
                     getStringDataFromSharedPreference(AppGlobals.PROFILE_PIC_IMAGE_URL));
         }

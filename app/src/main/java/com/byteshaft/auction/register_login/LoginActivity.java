@@ -217,6 +217,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 new CategoriesFragment.GetCategoriesTask(LoginActivity.this).execute();
                             }
                         });
+                        System.out.println(data[1]);
                         JSONObject jsonobject = new JSONObject(data[1]);
                         Helpers.saveDataToSharedPreferences(AppGlobals.KEY_USERNAME,
                                 String.valueOf(jsonobject.get("username")));
@@ -237,6 +238,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             // new code goes here.
                         } else {
                             profilePicUrl = String.valueOf(jsonobject.get("photo"));
+                            System.out.println(profilePicUrl);
                             Helpers.saveDataToSharedPreferences(AppGlobals.PROFILE_PIC_IMAGE_URL,
                                     profilePicUrl);
                         }

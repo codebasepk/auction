@@ -281,6 +281,7 @@ public class CategoriesFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... params) {
+            System.out.println(params[0]);
             Bitmap bitmap = Helpers.downloadImage(params[0]);
             if (bitmap != null) {
                 AppGlobals.addBitmapToInternalMemory(bitmap, (params[1] + ".png"),
@@ -307,7 +308,6 @@ public class CategoriesFragment extends Fragment {
                 CategoriesFragment.sViewHolder.progressBar.setVisibility(View.GONE);
             }
             if (imagesSaved && Helpers.getCategoriesImagesCount() == sCategoriesList.size()) {
-                Log.i("CONDITION", "MATCHED");
                 if (LoginActivity.sProgressDialog != null) {
                     LoginActivity.sProgressDialog.dismiss();
                 }
