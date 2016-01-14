@@ -90,9 +90,10 @@ public class AdsDetailFragment extends Fragment {
         public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
             holder.setIsRecyclable(false);
             customView.idTextView.setText(String.valueOf(items.get(position)));
-            customView.titleTextView.setText(titleHashMap.get(items.get(position)));
+            customView.titleTextView.setText(titleHashMap.get(items.get(position)).toUpperCase());
             customView.descriptionTextView.setText(descriptionHashMap.get(items.get(position)));
-            customView.priceTextView.setText(priceHashMap.get(items.get(position)));
+            customView.priceTextView.setText(priceHashMap.get(items.get(position)) + " "+
+                    currencyHashMap.get(items.get(position)));
             Picasso.with(mActivity)
                     .load(imagesUrlHashMap.get(items.get(position)))
                     .resize(200, 200)
@@ -121,7 +122,6 @@ public class AdsDetailFragment extends Fragment {
 
                         }
                     });
-
         }
 
         @Override
@@ -195,6 +195,10 @@ public class AdsDetailFragment extends Fragment {
                                     object.get("price").getAsString());
                             imagesUrlHashMap.put(object.get("id").getAsInt(),
                                     object.get("photo1").getAsString());
+                            if (!object.get("currency").isJsonNull()) {
+                                currencyHashMap.put(object.get("id").getAsInt(),
+                                        object.get("currency").getAsString());
+                            }
                         }
                     }
                 } catch (IOException e) {
