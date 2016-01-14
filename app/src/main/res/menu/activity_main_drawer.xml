@@ -29,6 +29,12 @@
 
                 </item>
                 <item
+                    android:id="@+id/user_bids_detail"
+                    android:icon="@drawable/my_bids"
+                    android:title="My Bids Detail">
+
+                </item>
+                <item
                     android:id="@+id/nav_user"
                     android:icon="@drawable/nav_user_menu"
                     android:title="My profile" />

@@ -39,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Email address"
-                android:textColorHint="@color/colorDefault"
+                android:textColorHint="@color/gray"
                 android:inputType="textEmailAddress" />
         </android.support.design.widget.TextInputLayout>
 
@@ -54,7 +54,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Current Password"
-                android:textColorHint="@color/colorDefault"
+                android:textColorHint="@color/gray"
                 android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
 
@@ -69,19 +69,63 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="New password"
-                android:textColorHint="@color/colorDefault"
+                android:textColorHint="@color/gray"
                 android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/user_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Phone Number"
+                android:textColorHint="@color/gray"
+                android:inputType="phone" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/user_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Address"
+                android:textColorHint="@color/gray"
+                android:inputType="text" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/user_city"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="City"
+                android:textColorHint="@color/gray"
+                android:inputType="text" />
+        </android.support.design.widget.TextInputLayout>
+
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_done"
             android:layout_width="fill_parent"
-            android:textColor="@color/colorPrimaryDark"
-            android:hapticFeedbackEnabled="true"
             android:layout_height="wrap_content"
+            android:hapticFeedbackEnabled="true"
             android:layout_marginBottom="16dp"
-            android:layout_marginTop="20dp"
-            android:padding="12dp"
+            android:layout_marginTop="5dp"
+            android:padding="10dp"
             android:text="Done" />
 
     </LinearLayout>
