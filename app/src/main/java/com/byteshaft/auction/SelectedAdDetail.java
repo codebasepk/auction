@@ -1,11 +1,11 @@
 package com.byteshaft.auction;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.util.LruCache;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,47 +18,58 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.ChatActivity;
 import com.byteshaft.auction.utils.AppGlobals;
+import com.byteshaft.auction.utils.Helpers;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 /**
  * Class to show the details if a product which will include item images, bids, rating of the seller
- * product description, price and option of chatting with the client
+ * product description, price and option of chatting with the client / buyer
  */
 public class SelectedAdDetail extends AppCompatActivity {
 
-    final static int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-    final static int cacheSize = maxMemory / 8;
-    private LruCache<String, Bitmap> mMemoryCache;
     private ArrayList<Bitmap> bitmapArrayList;
     private GridView mGrid;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private BidsAdapter mBidsAdapter;
     private ArrayList<String> arrayList;
+    private int adPrimaryKey;
+    public int id;
+    public String description;
+    public String price;
+    public ArrayList<String> imagesUrls;
+    public String currency;
+    public String title;
+    public TextView descriptionTextView;
+    public TextView adPrice;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_detials);
-        if (mMemoryCache == null) {
-            mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
-                @Override
-                protected int sizeOf(String key, Bitmap bitmap) {
-                    return bitmap.getByteCount() / 1024;
-                }
-            };
-        }
-//        mGrid = (GridView) findViewById(R.id.grid_view);
-        String detail = getIntent().getStringExtra(AppGlobals.detail);
-        setTitle(detail);
+        adPrimaryKey = getIntent().getIntExtra(AppGlobals.detail, 0);
+        String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
+        descriptionTextView = (TextView) findViewById(R.id.ad_description);
+        imagesUrls = new ArrayList<>();
+        adPrice = (TextView) findViewById(R.id.ad_price);
+        setTitle(productName);
+        mGrid = (GridView) findViewById(R.id.grid_view);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mRecyclerView = (RecyclerView) findViewById(R.id.bids_recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -86,20 +97,21 @@ public class SelectedAdDetail extends AppCompatActivity {
         arrayList.add("falak");
         arrayList.add("jamal");
         arrayList.add("that");
-//        new GetItemDetailsTask().execute();
+        new GetItemDetailsTask().execute();
+
+//        mBidsAdapter = new BidsAdapter(arrayList);
+//        mRecyclerView.setAdapter(mBidsAdapter);
+//        mRecyclerView.addOnItemTouchListener(new BidsAdapter(arrayList, getApplicationContext()
+//                , new BidsAdapter.OnItemClickListener() {
+//            @Override
+//            public void onItem(String item) {
+//            }
+//        }));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mBidsAdapter = new BidsAdapter(arrayList);
-        mRecyclerView.setAdapter(mBidsAdapter);
-        mRecyclerView.addOnItemTouchListener(new BidsAdapter(arrayList, getApplicationContext()
-                , new BidsAdapter.OnItemClickListener() {
-            @Override
-            public void onItem(String item) {
-            }
-        }));
 
     }
 
@@ -126,56 +138,105 @@ public class SelectedAdDetail extends AppCompatActivity {
     /**
      * Custom Member class for to show images in grid view
      */
-    class CustomAdapter extends ArrayAdapter<Bitmap> {
+    class CustomAdapter extends BaseAdapter {
 
-        private ArrayList<Bitmap> items;
-        private CustomView customView;
-        private int mResource;
+        private ArrayList<String> images;
 
-        public CustomAdapter(Context context, int resource, ArrayList<Bitmap> arrayList) {
-            super(context, resource, arrayList);
-            items = arrayList;
-            mResource = resource;
+
+        public CustomAdapter(ArrayList<String> urlsList) {
+            this.images = urlsList;
         }
 
-        @Override
+        public int getCount() {
+            return images.size();
+        }
+
+        public Object getItem(int position) {
+            return null;
+        }
+
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        // create a new ImageView for each item referenced by the Adapter
         public View getView(int position, View convertView, ViewGroup parent) {
+            ImageView imageView;
             if (convertView == null) {
-                customView = new CustomView();
-                LayoutInflater inflater = getLayoutInflater();
-                convertView = inflater.inflate(mResource, parent, false);
-                customView.imageView = (ImageView) convertView.findViewById
-                        (R.id.grid_item);
+                // if it's not recycled, initialize some attributes
+                imageView = new ImageView(getApplicationContext());
+                imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                imageView.setPadding(8, 8, 8, 8);
             } else {
-                customView = (CustomView) convertView.getTag();
+                imageView = (ImageView) convertView;
             }
-//            customView.imageView.setImageBitmap(items.get(position));
-            return convertView;
+
+            Picasso.with(SelectedAdDetail.this)
+                    .load(images.get(position))
+                    .resize(200, 200)
+                    .centerCrop()
+                    .into(imageView);
+            return imageView;
         }
 
-    }
-
-    public class CustomView {
-        public ImageView imageView;
     }
 
     class GetItemDetailsTask extends AsyncTask<String, String, ArrayList<Bitmap>> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(SelectedAdDetail.this);
+            mProgressDialog.setMessage("loading ...");
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+        }
+
+        @Override
         protected ArrayList<Bitmap> doInBackground(String... params) {
-            ArrayList<Bitmap> myBitmap = null;
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+                String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+                try {
+                    String[] strings = Helpers.simpleGetRequest(AppGlobals.SINGLE_AD_DETAILS + userName
+                            + File.separator + AppGlobals.SINGLE_AD_DETAILS_APPEND_END + adPrimaryKey + "/",
+                            userName, password);
+                    System.out.println(strings[0]);
+                    System.out.println(strings[1]);
+                    if (HttpURLConnection.HTTP_OK == Integer.valueOf(strings[0])) {
+                        JsonParser jsonParser = new JsonParser();
+                        JsonObject jsonObject = jsonParser.parse(strings[1]).getAsJsonObject();
+                        id = jsonObject.get("id").getAsInt();
+                        description = jsonObject.get("description").getAsString();
+                        price = jsonObject.get("price").getAsString();
+                        title = jsonObject.get("title").getAsString();
+
+                        for (int i = 1;i < 9; i++) {
+                            String photoCounter = ("photo")+i;
+                            if (!jsonObject.get(photoCounter).isJsonNull()) {
+                                imagesUrls.add(photoCounter);
+                            }
+                        }
+                        JsonArray jsonArray = jsonObject.getAsJsonArray("comments");
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 //
-            return myBitmap;
+            return null;
         }
-
-        private int getBitmapNameLocally(int num) {
-            return num + 1;
-        }
-
 
         @Override
         protected void onPostExecute(ArrayList<Bitmap> bitmap) {
             super.onPostExecute(bitmap);
+            mProgressDialog.dismiss();
+            descriptionTextView.setText(description);
+            adPrice.setText(price);
+            mGrid.setAdapter(new CustomAdapter(imagesUrls));
 
         }
     }

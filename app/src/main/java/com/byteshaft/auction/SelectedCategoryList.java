@@ -61,7 +61,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     private Button showMoreButton;
     private ProgressBar mShowMoreProgress;
     private String categorySpecificUrl;
-    private boolean showMore = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +127,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         switch (v.getId()) {
             case R.id.show_more:
                 if (countValue > 5 && !nextUrl.trim().isEmpty()) {
-                    showMore = true;
                     mShowMoreProgress.setVisibility(View.VISIBLE);
                     System.out.println(nextUrl);
                     new GetSpecificDataTask().execute(nextUrl);
@@ -196,7 +194,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                         @Override
                         public void onError() {
                             if (sRecyclerView.findViewHolderForAdapterPosition(position) != null) {
-                                System.out.println(sRecyclerView.findViewHolderForAdapterPosition(position) == null);
                                 sRecyclerView.findViewHolderForAdapterPosition(position).
                                         itemView.findViewById(R.id.specific_image_progressBar)
                                         .setVisibility(View.GONE);
@@ -215,7 +212,9 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
             View childView = rv.findChildViewUnder(e.getX(), e.getY());
             if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-                mListener.onItem(items.get(rv.getChildPosition(childView)));
+                mListener.onItem(items.get(rv.getChildPosition(childView)),(TextView)
+                        rv.findViewHolderForAdapterPosition(rv.getChildPosition(childView)).
+                                itemView.findViewById(R.id.specific_category_title));
                 return true;
             }
             return false;
@@ -232,7 +231,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         }
 
         public interface OnItemClickListener {
-            void onItem(Integer item);
+            void onItem(Integer item, TextView textView);
         }
     }
 
@@ -263,7 +262,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if (!refresh || !showMore) {
+            if (!refresh) {
                 mProgressDialog = new ProgressDialog(SelectedCategoryList.this);
                 mProgressDialog.setMessage("loading ...");
                 mProgressDialog.setIndeterminate(false);
@@ -301,10 +300,10 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                                     object.get("price").getAsString());
                             imagesUrlHashMap.put(object.get("id").getAsInt(),
                                     object.get("photo1").getAsString());
-                            if (!object.get("currency").isJsonNull()) {
-                                currencyHashMap.put(object.get("id").getAsInt(),
-                                        object.get("currency").getAsString());
-                            }
+//                            if (!object.get("currency").isJsonNull()) {
+//                                currencyHashMap.put(object.get("id").getAsInt(),
+//                                        object.get("currency").getAsString());
+//                            }
                         }
                     }
                     System.out.println(currencyHashMap);
@@ -320,9 +319,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         @Override
         protected void onPostExecute(ArrayList<Integer> idsList) {
             super.onPostExecute(idsList);
-            if (showMore) {
                 mShowMoreProgress.setVisibility(View.INVISIBLE);
-            }
             if (mProgressDialog != null) {
                 mProgressDialog.dismiss();
             }
@@ -339,9 +336,10 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
             sRecyclerView.addOnItemTouchListener(new CustomAdapter(idsList, getApplicationContext(),
                     new CustomAdapter.OnItemClickListener() {
                         @Override
-                        public void onItem(Integer item) {
+                        public void onItem(Integer item, TextView textView) {
                             Intent intent = new Intent(getApplicationContext(), SelectedAdDetail.class);
                             intent.putExtra(AppGlobals.detail, item);
+                            intent.putExtra(AppGlobals.SINGLE_PRODUCT_NAME, textView.getText());
                             startActivity(intent);
                         }
                     }));

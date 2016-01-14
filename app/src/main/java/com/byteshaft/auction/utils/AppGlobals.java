@@ -31,7 +31,7 @@ public class AppGlobals extends Application{
     public static int responseCode;
     public static int userExistResponse;
     public static int NO_INTERNET = 2112;
-    public static final String BASE_URL = "http://testapp-byteshaft.herokuapp.com";
+    public static final String BASE_URL = "http://46.101.75.194:8000";
     public static final String LOGIN_URL = String.format("%s/api/users/", BASE_URL);
     public static final String USER_EXIST_URL = String.format("%s/api/users/", BASE_URL);
     public static final String REGISTER_URL = String.format("%s/api/register", BASE_URL);
@@ -55,9 +55,9 @@ public class AppGlobals extends Application{
     public static boolean sRegisterProcess = false;
     public static final String USER_SPECIFIC_ADS = String.format("%s/api/users/", BASE_URL);
     public static final String USER_SPECIFIC_ADS_APPEND = "/ads/list";
-    public static final String SINGLE_AD_DETAILS = String.format("%s/", BASE_URL);
-    public static final String SINGLE_AD_DETAILS_APPEND = "/api/users/";
+    public static final String SINGLE_AD_DETAILS = String.format("%s/api/users/", BASE_URL);
     public static final String SINGLE_AD_DETAILS_APPEND_END = "ads/";
+    public static final String SINGLE_PRODUCT_NAME = "product_name";
 
     @Override
     public void onCreate() {

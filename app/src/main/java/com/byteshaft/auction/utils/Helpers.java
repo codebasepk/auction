@@ -28,8 +28,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.net.ssl.HttpsURLConnection;
-
 public class Helpers {
 
     // get default sharedPreferences.
@@ -311,7 +309,7 @@ public class Helpers {
         Bitmap myBitmap = null;
         try {
             URL url = new URL(link);
-            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.connect();
             try {
                 InputStream input = connection.getInputStream();
