@@ -51,8 +51,6 @@ import nl.changer.polypicker.utils.ImageInternalFetcher;
 
 public class Sell extends Fragment implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
 
-    private static final int REQUEST_CAMERA = 122;
-    private static final int SELECT_FILE = 123;
     private EditText itemTitle;
     private EditText itemDescription;
     private EditText mItemAmount;
@@ -161,9 +159,11 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 }
                 break;
             case R.id.btn_add_image:
+                // here we check for camera permission
                 if (ContextCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.CAMERA)
                         != PackageManager.PERMISSION_GRANTED) {
+                    // if not granted request it from user
                     requestPermissions(new String[]{Manifest.permission.CAMERA},
                             MY_PERMISSIONS_REQUEST_ACCESS_CAMERA);
                 } else {
@@ -174,13 +174,17 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // this code will be executed if the permission is either denied or given by the user
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ACCESS_CAMERA: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // code in this statement will be executed if the requested permission is
+                    // granted by the user
                     getNImages();
                 } else {
+                    // if not granted show something
                     Toast.makeText(getActivity(), "Permission Denied!", Toast.LENGTH_LONG).show();
                 }
             }

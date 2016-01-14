@@ -103,6 +103,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     String userName = mEditTextUserName.getText().toString();
                     String password = mEditTextPassword.getText().toString();
                     loginData = new String[]{userName, password};
+                    // check for external storage permission before login task
                     if (ContextCompat.checkSelfPermission(LoginActivity.this,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             != PackageManager.PERMISSION_GRANTED) {
@@ -110,6 +111,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                 MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE2);
                     } else {
+                        // if the permission granted execute the login task
                         new LoginTask().execute(loginData);
                     }
                 }
@@ -122,6 +124,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // this code will be executed if the permissions are either denied or given by the user
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
@@ -129,7 +132,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
-
                 } else {
                     Toast.makeText(getApplicationContext(), "Permission denied!"
                     , Toast.LENGTH_LONG).show();
