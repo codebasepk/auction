@@ -74,7 +74,6 @@
 
                 <TextView
                     android:id="@+id/all_categories_description"
-                    android:layout_toRightOf="@+id/all_categories_image"
                     android:textStyle="italic"
                     android:maxLength="150"
                     android:maxLines="3"
