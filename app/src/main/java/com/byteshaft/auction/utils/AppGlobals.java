@@ -58,6 +58,7 @@ public class AppGlobals extends Application{
     public static final String SINGLE_AD_DETAILS = String.format("%s/api/users/", BASE_URL);
     public static final String SINGLE_AD_DETAILS_APPEND_END = "ads/";
     public static final String SINGLE_PRODUCT_NAME = "product_name";
+    public static String loginResponseMessage;
 
     @Override
     public void onCreate() {
@@ -65,6 +66,14 @@ public class AppGlobals extends Application{
         sContext = getApplicationContext();
         root = Environment.getExternalStorageDirectory().toString()
                 +"/Android/data/" + getPackageName();
+    }
+
+    public static void setLoginResponseMessage(String responseMessage) {
+        loginResponseMessage = responseMessage;
+    }
+
+    public static String getLoginResponseMessage() {
+        return loginResponseMessage;
     }
 
     // Globally set the value for userExistResponse it takes integer value as parameter

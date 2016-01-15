@@ -165,7 +165,7 @@ public class SelectedAdDetail extends AppCompatActivity {
             if (convertView == null) {
                 // if it's not recycled, initialize some attributes
                 imageView = new ImageView(getApplicationContext());
-                imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
+                imageView.setLayoutParams(new GridView.LayoutParams(200, 200));
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 imageView.setPadding(8, 8, 8, 8);
             } else {
@@ -203,8 +203,6 @@ public class SelectedAdDetail extends AppCompatActivity {
                     String[] strings = Helpers.simpleGetRequest(AppGlobals.SINGLE_AD_DETAILS + userName
                             + File.separator + AppGlobals.SINGLE_AD_DETAILS_APPEND_END + adPrimaryKey + "/",
                             userName, password);
-                    System.out.println(strings[0]);
-                    System.out.println(strings[1]);
                     if (HttpURLConnection.HTTP_OK == Integer.valueOf(strings[0])) {
                         JsonParser jsonParser = new JsonParser();
                         JsonObject jsonObject = jsonParser.parse(strings[1]).getAsJsonObject();
@@ -216,10 +214,12 @@ public class SelectedAdDetail extends AppCompatActivity {
                         for (int i = 1;i < 9; i++) {
                             String photoCounter = ("photo")+i;
                             if (!jsonObject.get(photoCounter).isJsonNull()) {
-                                imagesUrls.add(photoCounter);
+                                imagesUrls.add((AppGlobals.BASE_URL +
+                                        jsonObject.get(photoCounter).getAsString()));
                             }
                         }
                         JsonArray jsonArray = jsonObject.getAsJsonArray("comments");
+                        System.out.println(imagesUrls);
 
                     }
                 } catch (IOException e) {
