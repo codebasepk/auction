@@ -167,7 +167,7 @@ public class SelectedAdDetail extends AppCompatActivity {
                 imageView = new ImageView(getApplicationContext());
                 imageView.setLayoutParams(new GridView.LayoutParams(200, 200));
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                imageView.setPadding(8, 8, 8, 8);
+                imageView.setPadding(2, 4, 2, 4);
             } else {
                 imageView = (ImageView) convertView;
             }
@@ -179,7 +179,6 @@ public class SelectedAdDetail extends AppCompatActivity {
                     .into(imageView);
             return imageView;
         }
-
     }
 
     class GetItemDetailsTask extends AsyncTask<String, String, ArrayList<Bitmap>> {
@@ -234,7 +233,7 @@ public class SelectedAdDetail extends AppCompatActivity {
         protected void onPostExecute(ArrayList<Bitmap> bitmap) {
             super.onPostExecute(bitmap);
             mProgressDialog.dismiss();
-            descriptionTextView.setText(description);
+            descriptionTextView.setText("Description: \n \n" + description);
             adPrice.setText(price);
             mGrid.setAdapter(new CustomAdapter(imagesUrls));
 
