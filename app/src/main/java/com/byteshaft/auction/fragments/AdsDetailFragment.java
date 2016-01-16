@@ -64,7 +64,7 @@ public class AdsDetailFragment extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
-        new GetAllAdsDetail().execute();
+        new GetAllAdsDetailTask().execute();
         return mBaseView;
     }
 
@@ -114,7 +114,6 @@ public class AdsDetailFragment extends Fragment {
                         @Override
                         public void onError() {
                             if (mRecyclerView.findViewHolderForAdapterPosition(position) != null) {
-                                System.out.println(mRecyclerView.findViewHolderForAdapterPosition(position) == null);
                                 mRecyclerView.findViewHolderForAdapterPosition(position).
                                         itemView.findViewById(R.id.specific_image_progressBar)
                                         .setVisibility(View.GONE);
@@ -152,7 +151,7 @@ public class AdsDetailFragment extends Fragment {
     /**
      * task to get per user ads.
      */
-    class GetAllAdsDetail extends AsyncTask<String, String, ArrayList<Integer>> {
+    class GetAllAdsDetailTask extends AsyncTask<String, String, ArrayList<Integer>> {
 
         private boolean internetAvailable = false;
 
@@ -174,8 +173,6 @@ public class AdsDetailFragment extends Fragment {
                 try {
                     String[] response = Helpers.simpleGetRequest(AppGlobals.USER_SPECIFIC_ADS +
                             userName + AppGlobals.USER_SPECIFIC_ADS_APPEND, userName, passWod);
-                    System.out.println(response[0]);
-                    System.out.println(response[1]);
                     JsonParser jsonParser = new JsonParser();
                     JsonObject jsonObject = jsonParser.parse(response[1]).getAsJsonObject();
                     if (!jsonObject.get("next").isJsonNull()) {

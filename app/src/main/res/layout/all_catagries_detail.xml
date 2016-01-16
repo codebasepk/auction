@@ -54,7 +54,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="4dp"
                     android:layout_marginStart="4dp"
-                    android:textSize="8dp"
+                    android:textSize="12dp"
                     android:layout_alignLeft="@id/all_categories_image"
                     android:layout_alignStart="@+id/all_categories_image"
                     android:layout_below="@id/all_categories_image"

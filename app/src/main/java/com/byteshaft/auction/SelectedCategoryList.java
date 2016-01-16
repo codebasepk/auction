@@ -175,7 +175,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
             viewHolder.idTextView.setText(String.valueOf(items.get(position)));
             viewHolder.titleTextView.setText(titleHashMap.get(items.get(position)).toUpperCase());
             viewHolder.description.setText(descriptionHashMap.get(items.get(position)));
-            viewHolder.price.setText(priceHashMap.get(items.get(position)) + " "+
+            viewHolder.price.setText(priceHashMap.get(items.get(position)) + " " +
                     currencyHashMap.get(items.get(position)));
             Picasso.with(mActivity)
                     .load(imagesUrlHashMap.get(items.get(position)))
@@ -212,7 +212,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
             View childView = rv.findChildViewUnder(e.getX(), e.getY());
             if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-                mListener.onItem(items.get(rv.getChildPosition(childView)),(TextView)
+                mListener.onItem(items.get(rv.getChildPosition(childView)), (TextView)
                         rv.findViewHolderForAdapterPosition(rv.getChildPosition(childView)).
                                 itemView.findViewById(R.id.specific_category_title));
                 return true;
@@ -300,10 +300,10 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                                     object.get("price").getAsString());
                             imagesUrlHashMap.put(object.get("id").getAsInt(),
                                     object.get("photo1").getAsString());
-//                            if (!object.get("currency").isJsonNull()) {
-//                                currencyHashMap.put(object.get("id").getAsInt(),
-//                                        object.get("currency").getAsString());
-//                            }
+                            if (!object.get("currency").isJsonNull()) {
+                                currencyHashMap.put(object.get("id").getAsInt(),
+                                        object.get("currency").getAsString());
+                            }
                         }
                     }
                     System.out.println(currencyHashMap);
@@ -319,7 +319,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         @Override
         protected void onPostExecute(ArrayList<Integer> idsList) {
             super.onPostExecute(idsList);
-                mShowMoreProgress.setVisibility(View.INVISIBLE);
+            mShowMoreProgress.setVisibility(View.INVISIBLE);
             if (mProgressDialog != null) {
                 mProgressDialog.dismiss();
             }

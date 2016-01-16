@@ -30,6 +30,7 @@
         <activity android:name=".register_login.LoginActivity"/>
         <activity android:name=".SelectedCategoryList"/>
         <activity android:name=".SelectedAdDetail"/>
+        <activity android:name=".fragments.seller.ProductImageView" />
         <activity android:name=".fragments.ChatActivity"/>
 
         <receiver
