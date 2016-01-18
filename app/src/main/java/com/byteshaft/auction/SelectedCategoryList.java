@@ -77,7 +77,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         setTitle(category);
         initializeArrayAndHashMap();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         sRecyclerView = (RecyclerView) findViewById(R.id.specific_recycler);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.specific_category_refresh);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.orange, R.color.green,
@@ -93,7 +93,46 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                 new GetSpecificDataTask().execute(categorySpecificUrl);
             }
         });
+        sRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (!recyclerView.canScrollVertically(-1)) {
+                    onScrolledToTop();
+                } else if (!recyclerView.canScrollVertically(1)) {
+                    onScrolledToBottom();
+                } else if (dy < 0) {
+                    onScrolledUp();
+                } else if (dy > 0) {
+                    onScrolledDown();
+                }
+            }
+        });
         new GetSpecificDataTask().execute(categorySpecificUrl);
+    }
+
+    public void onScrolledUp() {
+        System.out.println("onScrolledUp");
+        showMoreLinearLayout.setVisibility(View.GONE);
+    }
+
+    public void onScrolledDown() {
+        System.out.println("onScrolledDown");
+    }
+
+    public void onScrolledToTop() {
+        System.out.println("onScrolledToTop");
+        showMoreLinearLayout.setVisibility(View.GONE);
+    }
+
+    public void onScrolledToBottom() {
+        System.out.println("onScrolledToBottom");
+        System.out.println(countValue);
+        System.out.println(idsArray.size());
+        if (countValue > idsArray.size()) {
+            showMoreLinearLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -117,6 +156,12 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        initializeArrayAndHashMap();
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
         finish();
@@ -128,6 +173,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
             case R.id.show_more:
                 if (countValue > 5 && !nextUrl.trim().isEmpty()) {
                     mShowMoreProgress.setVisibility(View.VISIBLE);
+                    refresh = true;
                     System.out.println(nextUrl);
                     new GetSpecificDataTask().execute(nextUrl);
                 }
@@ -319,6 +365,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         @Override
         protected void onPostExecute(ArrayList<Integer> idsList) {
             super.onPostExecute(idsList);
+            refresh = false;
                 mShowMoreProgress.setVisibility(View.INVISIBLE);
             if (mProgressDialog != null) {
                 mProgressDialog.dismiss();
@@ -327,9 +374,8 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                 Helpers.alertDialog(SelectedCategoryList.this, "No internet", "Internet not available");
                 return;
             }
-            if (countValue > 5) {
-                showMoreLinearLayout.setVisibility(View.VISIBLE);
-            }
+            System.out.println("countvalue:" +countValue);
+            showMoreLinearLayout.setVisibility(View.VISIBLE);
             mAdapter = new CustomAdapter(idsList, SelectedCategoryList.this);
             sRecyclerView.setAdapter(mAdapter);
             mSwipeRefreshLayout.setRefreshing(false);

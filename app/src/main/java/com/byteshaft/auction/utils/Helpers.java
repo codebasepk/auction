@@ -313,13 +313,17 @@ public class Helpers {
         return success;
     }
 
+    public static String getValidatedUrl(String url) {
+        if (!URLUtil.isValidUrl(url) || !Patterns.WEB_URL.matcher(url).matches()) {
+            url =  AppGlobals.BASE_URL  +url;
+        }
+        return url;
+    }
+
     public static Bitmap downloadImage(String link) {
         Bitmap myBitmap = null;
         try {
-            if (!URLUtil.isValidUrl(link) || !Patterns.WEB_URL.matcher(link).matches()) {
-                link = AppGlobals.BASE_URL  +link;
-            }
-            URL url = new URL(link);
+            URL url = new URL(getValidatedUrl(link));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.connect();
             try {
