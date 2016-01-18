@@ -56,7 +56,7 @@
                     android:layout_marginLeft="4dp"
                     android:layout_alignLeft="@id/specific_category_image"
                     android:layout_below="@id/specific_category_image"
-                    android:textSize="8sp"
+                    android:textSize="12dp"
                     android:layout_gravity="center"
                     android:layout_margin="2dp"/>
 

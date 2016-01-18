@@ -1,5 +1,6 @@
 package com.byteshaft.auction;
 
+import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -145,7 +146,6 @@ public class MainActivity extends AppCompatActivity
                 if (Helpers.isUserLoggedIn()) {
                     final Resources res = getResources();
                     int[] array = getResources().getIntArray(R.array.letter_tile_colors);
-                    final int tileSize = res.getDimensionPixelSize(R.dimen.letter_tile_size);
                     final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
                     final Bitmap letterTile = tileProvider.getLetterTile(Helpers.
                                     getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),

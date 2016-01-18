@@ -84,7 +84,7 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.user_profile:
+            case R.id.user_profile_button:
                 mUserEmail.setEnabled(true);
                 mUserEmail.setSelection(mUserEmail.getText().length());
                 mUserCurrentPassword.setEnabled(true);

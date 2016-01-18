@@ -18,12 +18,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.ChatActivity;
+import com.byteshaft.auction.fragments.seller.ProductImageView;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.google.gson.JsonArray;
@@ -63,6 +65,7 @@ public class SelectedAdDetail extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_detials);
+        final ProductImageView productImageView = new ProductImageView();
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.detail, 0);
         String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
         descriptionTextView = (TextView) findViewById(R.id.ad_description);
@@ -70,6 +73,14 @@ public class SelectedAdDetail extends AppCompatActivity {
         adPrice = (TextView) findViewById(R.id.ad_price);
         setTitle(productName);
         mGrid = (GridView) findViewById(R.id.grid_view);
+        mGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(), productImageView.getClass());
+                intent.putExtra("url", imagesUrls.get(position));
+                startActivity(intent);
+            }
+        });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mRecyclerView = (RecyclerView) findViewById(R.id.bids_recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -174,7 +185,8 @@ public class SelectedAdDetail extends AppCompatActivity {
 
             Picasso.with(SelectedAdDetail.this)
                     .load(images.get(position))
-                    .resize(200, 200)
+
+                    .resize(640, 480)
                     .centerCrop()
                     .into(imageView);
             return imageView;
@@ -200,7 +212,7 @@ public class SelectedAdDetail extends AppCompatActivity {
                 String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
                 try {
                     String[] strings = Helpers.simpleGetRequest(AppGlobals.SINGLE_AD_DETAILS + userName
-                            + File.separator + AppGlobals.SINGLE_AD_DETAILS_APPEND_END + adPrimaryKey + "/",
+                                    + File.separator + AppGlobals.SINGLE_AD_DETAILS_APPEND_END + adPrimaryKey + "/",
                             userName, password);
                     if (HttpURLConnection.HTTP_OK == Integer.valueOf(strings[0])) {
                         JsonParser jsonParser = new JsonParser();
@@ -210,8 +222,8 @@ public class SelectedAdDetail extends AppCompatActivity {
                         price = jsonObject.get("price").getAsString();
                         title = jsonObject.get("title").getAsString();
 
-                        for (int i = 1;i < 9; i++) {
-                            String photoCounter = ("photo")+i;
+                        for (int i = 1; i < 9; i++) {
+                            String photoCounter = ("photo") + i;
                             if (!jsonObject.get(photoCounter).isJsonNull()) {
                                 imagesUrls.add((AppGlobals.BASE_URL +
                                         jsonObject.get(photoCounter).getAsString()));
