@@ -197,19 +197,23 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         // adding the new ones.
         mSelectedImagesContainer.removeAllViews();
         final Iterator<Uri> iterator = mMedia.iterator();
-        ImageInternalFetcher imageFetcher = new ImageInternalFetcher(getActivity(), 500);
+        final ImageInternalFetcher imageFetcher = new ImageInternalFetcher(getActivity(), 500);
         while (iterator.hasNext()) {
             Uri uri = iterator.next();
             Log.i(TAG, " uri: " + uri);
             if (mMedia.size() >= 1 && mMedia.size()<=8) {
                 mSelectedImagesContainer.setVisibility(View.VISIBLE);
             }
-            View imageHolder = LayoutInflater.from(getActivity()).inflate(R.layout.media_layout, null);
-            ImageView thumbnail = (ImageView) imageHolder.findViewById(R.id.media_image);
+            final View imageHolder = LayoutInflater.from(getActivity()).inflate(R.layout.media_layout, null);
+            final ImageView thumbnail = (ImageView) imageHolder.findViewById(R.id.media_image);
+            final Uri finalUri = uri;
             thumbnail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     System.out.println(v.getId());
+                    mSelectedImagesContainer.removeView(imageHolder);
+//                    imagesArray.clear();
+                    mMedia.remove(finalUri);
                 }
             });
 
