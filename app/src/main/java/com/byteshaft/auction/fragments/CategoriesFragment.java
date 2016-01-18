@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.byteshaft.auction.R;
+import com.byteshaft.auction.fragments.buyer.Buy;
 import com.byteshaft.auction.register_login.LoginActivity;
 import com.byteshaft.auction.register_login.RegisterActivity;
 import com.byteshaft.auction.utils.AppGlobals;
@@ -259,6 +261,7 @@ public class CategoriesFragment extends Fragment {
                     AppGlobals.sCategoriesFragmentForeGround) {
                 CategoriesFragment.sProgressDialog.dismiss();
             }
+            System.out.println(arrayList.size());
             if (arrayList.size() > 0) {
                 if (AppGlobals.sCategoriesFragmentForeGround) {
                     sAdapter = new CategoriesAdapter(arrayList);
@@ -412,9 +415,11 @@ public class CategoriesFragment extends Fragment {
             }
             if (s == HttpURLConnection.HTTP_OK) {
                 Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED, true);
-                System.out.println(selectedCategories);
                 Helpers.saveCategories(selectedCategories);
                 Toast.makeText(getActivity(), "success", Toast.LENGTH_SHORT).show();
+                FragmentTransaction tx = getFragmentManager().beginTransaction();
+                tx.replace(R.id.container, new Buy());
+                tx.commit();
             }
         }
     }

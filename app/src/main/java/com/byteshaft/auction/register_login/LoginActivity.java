@@ -261,12 +261,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             if (!profilePicUrl.trim().isEmpty()) {
                 new DownloadProfilePic().execute(profilePicUrl);
             }
+//            System.out.println(arrayList.get(0));
             if (arrayList.get(0).equals(HttpURLConnection.HTTP_OK)) {
                 Helpers.userLogin(true);
             } else if (arrayList.get(0).equals(HttpURLConnection.HTTP_FORBIDDEN)) {
                 sProgressDialog.dismiss();
-                Helpers.alertDialog(LoginActivity.this, "Authentication Error",
-                        "Username or password is incorrect");
+                Helpers.alertDialog(LoginActivity.this, "Login Error",
+                        AppGlobals.getLoginResponseMessage());
             } else if (arrayList.get(0).equals(AppGlobals.NO_INTERNET)) {
                 sProgressDialog.dismiss();
                 Helpers.alertDialog(LoginActivity.this, "No Internet", "Internet Not Available");

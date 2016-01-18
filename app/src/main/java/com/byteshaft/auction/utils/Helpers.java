@@ -12,6 +12,11 @@ import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Patterns;
+import android.webkit.URLUtil;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.json.JSONException;
 
@@ -211,12 +216,15 @@ public class Helpers {
             parsedString = convertInputStreamToString(is);
             return new String[]{String.valueOf(connection.getResponseCode()), parsedString};
         }else {
+            InputStream is = connection.getErrorStream();
+            parsedString = convertInputStreamToString(is);
+            JsonParser jsonParser = new JsonParser();
+            JsonObject jsonObject = jsonParser.parse(parsedString).getAsJsonObject();
+            AppGlobals.setLoginResponseMessage(jsonObject.get("detail").getAsString());
             return new String[]{String.valueOf(connection.getResponseCode()), parsedString};
         }
 
     }
-
-
 
     /**
      * convert the InputStream to String, Basically its a JsonObject than we can get user details
@@ -308,6 +316,9 @@ public class Helpers {
     public static Bitmap downloadImage(String link) {
         Bitmap myBitmap = null;
         try {
+            if (!URLUtil.isValidUrl(link) || !Patterns.WEB_URL.matcher(link).matches()) {
+                link = AppGlobals.BASE_URL  +link;
+            }
             URL url = new URL(link);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.connect();

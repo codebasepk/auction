@@ -22,8 +22,15 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content">
 
+                <android.support.v7.widget.CardView
+                    android:id="@+id/item_detail_card_view"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp">
+
                 <TextView
                     android:id="@+id/ad_description"
+                    android:layout_margin="5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
@@ -31,17 +38,26 @@
 
                 <TextView
                     android:id="@+id/ad_price"
+                    android:layout_margin="2dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/orange"
                     android:layout_gravity="right"
-                    android:layout_below="@+id/ad_description"/>
+                    android:layout_below="@+id/ad_description"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+
+                </android.support.v7.widget.CardView>
 
                 <GridView
                     android:id="@+id/grid_view"
-                    android:layout_width="fill_parent"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/ad_price"
-                    android:columnWidth="100dp"/>
+                    android:stretchMode="columnWidth"
+                    android:layout_below="@+id/item_detail_card_view"
+                    android:numColumns="auto_fit"
+                    android:columnWidth="130dp"/>
 
                 <View
                     android:id="@+id/view"
