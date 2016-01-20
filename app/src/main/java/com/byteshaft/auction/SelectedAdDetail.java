@@ -10,6 +10,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,8 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.ChatActivity;
@@ -42,13 +46,12 @@ import java.util.ArrayList;
  * Class to show the details if a product which will include item images, bids, rating of the seller
  * product description, price and option of chatting with the client / buyer
  */
-public class SelectedAdDetail extends AppCompatActivity {
+public class SelectedAdDetail extends AppCompatActivity implements View.OnClickListener {
 
     private ArrayList<Bitmap> bitmapArrayList;
     private GridView mGrid;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private BidsAdapter mBidsAdapter;
     private ArrayList<String> arrayList;
     private int adPrimaryKey;
     public int id;
@@ -60,6 +63,9 @@ public class SelectedAdDetail extends AppCompatActivity {
     public TextView descriptionTextView;
     public TextView adPrice;
     private ProgressDialog mProgressDialog;
+    public EditText placeBidEditText;
+    public Button placeBidButton;
+    public ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,10 +73,15 @@ public class SelectedAdDetail extends AppCompatActivity {
         setContentView(R.layout.item_detials);
         final ProductImageView productImageView = new ProductImageView();
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.detail, 0);
+        System.out.println(adPrimaryKey);
         String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
         descriptionTextView = (TextView) findViewById(R.id.ad_description);
         imagesUrls = new ArrayList<>();
+        placeBidButton = (Button) findViewById(R.id.place_bid);
+        placeBidEditText = (EditText) findViewById(R.id.bid_editText);
+        placeBidButton.setOnClickListener(this);
         adPrice = (TextView) findViewById(R.id.ad_price);
+        mProgressBar = (ProgressBar) findViewById(R.id.bid_loading_progress);
         setTitle(productName);
         mGrid = (GridView) findViewById(R.id.grid_view);
         mGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -98,16 +109,6 @@ public class SelectedAdDetail extends AppCompatActivity {
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         bitmapArrayList = new ArrayList<>();
         arrayList = new ArrayList<>();
-        arrayList.add("s9iper1");
-        arrayList.add("shg8rb");
-        arrayList.add("om26er");
-        arrayList.add("fi8er1");
-        arrayList.add("hussi");
-        arrayList.add("humza");
-        arrayList.add("talha");
-        arrayList.add("falak");
-        arrayList.add("jamal");
-        arrayList.add("that");
         new GetItemDetailsTask().execute();
 
 //        mBidsAdapter = new BidsAdapter(arrayList);
@@ -144,6 +145,24 @@ public class SelectedAdDetail extends AppCompatActivity {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.chat_for_user, menu);
         return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.place_bid:
+                if (placeBidEditText.getText().toString().trim().isEmpty()) {
+                    return;
+                }
+                if (!placeBidEditText.getText().toString().trim().isEmpty() &&
+                    TextUtils.isDigitsOnly(placeBidEditText.getText().toString())) {
+                    String bid = placeBidEditText.getText().toString();
+                    new PlaceBidTask().execute(bid);
+                }
+
+
+                break;
+        }
     }
 
     /**
@@ -221,6 +240,7 @@ public class SelectedAdDetail extends AppCompatActivity {
                         description = jsonObject.get("description").getAsString();
                         price = jsonObject.get("price").getAsString();
                         title = jsonObject.get("title").getAsString();
+                        currency = jsonObject.get("currency").getAsString();
 
                         for (int i = 1; i < 9; i++) {
                             String photoCounter = ("photo") + i;
@@ -229,8 +249,8 @@ public class SelectedAdDetail extends AppCompatActivity {
                                         jsonObject.get(photoCounter).getAsString()));
                             }
                         }
-                        JsonArray jsonArray = jsonObject.getAsJsonArray("comments");
-                        System.out.println(imagesUrls);
+                        JsonArray jsonArray = jsonObject.getAsJsonArray("bids");
+                        System.out.println("bids"+jsonArray);
 
                     }
                 } catch (IOException e) {
@@ -246,9 +266,9 @@ public class SelectedAdDetail extends AppCompatActivity {
             super.onPostExecute(bitmap);
             mProgressDialog.dismiss();
             descriptionTextView.setText("Description: \n \n" + description);
-            adPrice.setText(price);
+            adPrice.setText(price + currency);
             mGrid.setAdapter(new CustomAdapter(imagesUrls));
-
+            new GetBidsTask().execute();
         }
     }
 
@@ -332,6 +352,42 @@ public class SelectedAdDetail extends AppCompatActivity {
                 textView = (TextView) itemView.findViewById(R.id.bid_text_View);
                 bidderTextView = (TextView) itemView.findViewById(R.id.bidder_user_name);
             }
+        }
+    }
+
+    class PlaceBidTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+            String url = AppGlobals.POST_BID_URL + userName + "/ads/" + adPrimaryKey + "/bids/post";
+            try {
+                Helpers.authPostRequest(url, "bid", params[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+    class GetBidsTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            String[] data = new String[0];
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+                String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+                String url = AppGlobals.GET_SPECIFIC_BIDS + userName + "/ads/" + adPrimaryKey +"/bids/";
+                try {
+                    data = Helpers.simpleGetRequest(url, userName, password);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(data[0]);
+                System.out.println(data[1]);
+            }
+            return null;
         }
     }
 

@@ -2,6 +2,7 @@ package com.byteshaft.auction;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -10,8 +11,11 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,7 +43,7 @@ import java.util.HashMap;
 /**
  * Activity that represent the selected categories of user
  */
-public class SelectedCategoryList extends AppCompatActivity implements View.OnClickListener {
+public class SelectedCategoryList extends AppCompatActivity implements View.OnClickListener, SearchView.OnQueryTextListener {
 
     public static RecyclerView sRecyclerView;
     private CustomAdapter mAdapter;
@@ -74,7 +78,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         mShowMoreProgress.setVisibility(View.INVISIBLE);
         showMoreButton.setOnClickListener(this);
         categorySpecificUrl = AppGlobals.SELECTED_CATEGORY_DETAIL_URL + category.toLowerCase();
-        setTitle(category);
+//        setTitle(category);
         initializeArrayAndHashMap();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -136,6 +140,26 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.search_selected_item, menu);
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        android.widget.SearchView searchView =
+                (android.widget.SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+//        ImageView mCloseButton = (ImageView) searchView.findViewById(R.id.search_close_btn);
+//        mCloseButton.setVisibility(View.GONE);
+        int id = getResources().getIdentifier("android:id/search_close_btn", null, null);
+        ImageView imageView = (ImageView) searchView.findViewById(id);
+        imageView.setBackgroundResource(android.R.drawable.ic_menu_search);
+
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -181,7 +205,17 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         }
     }
 
-    // custom Member class to represent the categories selected by user and its images
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
+    }
+
+// custom Member class to represent the categories selected by user and its images
     static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
             RecyclerView.OnItemTouchListener {
 

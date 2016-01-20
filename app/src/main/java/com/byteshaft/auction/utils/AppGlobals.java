@@ -59,6 +59,8 @@ public class AppGlobals extends Application{
     public static final String SINGLE_AD_DETAILS_APPEND_END = "ads/";
     public static final String SINGLE_PRODUCT_NAME = "product_name";
     public static String loginResponseMessage;
+    public static final String POST_BID_URL = String.format("%s/api/users/",BASE_URL);
+    public static final String GET_SPECIFIC_BIDS = String.format("%s/api/users/", BASE_URL);
 
     @Override
     public void onCreate() {
