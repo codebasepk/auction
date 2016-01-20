@@ -74,7 +74,6 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.item_detials);
         final ProductImageView productImageView = new ProductImageView();
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.detail, 0);
-        System.out.println(adPrimaryKey);
         String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
         descriptionTextView = (TextView) findViewById(R.id.ad_description);
         imagesUrls = new ArrayList<>();
@@ -204,10 +203,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             } else {
                 imageView = (ImageView) convertView;
             }
-
+//            Log.i(AppGlobals.getLogTag(getClass()), images.get(position));
             Picasso.with(SelectedAdDetail.this)
                     .load(images.get(position))
-
                     .resize(640, 480)
                     .centerCrop()
                     .into(imageView);
@@ -252,9 +250,6 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                                         jsonObject.get(photoCounter).getAsString()));
                             }
                         }
-                        JsonArray jsonArray = jsonObject.getAsJsonArray("bids");
-                        System.out.println("bids" + jsonArray);
-
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -270,6 +265,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             mProgressDialog.dismiss();
             descriptionTextView.setText("Description: \n \n" + description);
             adPrice.setText(price + currency);
+            System.out.println(imagesUrls);
             mGrid.setAdapter(new CustomAdapter(imagesUrls));
             new GetBidsTask().execute();
         }
@@ -354,7 +350,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     JsonParser jsonParser = new JsonParser();
                     JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
                     JsonArray jsonArray = jsonObject.get("results").getAsJsonArray();
-                    for (int i = 0; i <= jsonArray.size(); i++) {
+                    for (int i = 0; i < jsonArray.size(); i++) {
                         JsonObject object = jsonArray.get(i).getAsJsonObject();
                         if (!arrayList.contains(object.get("id").getAsInt())) {
                             arrayList.add(object.get("id").getAsInt());

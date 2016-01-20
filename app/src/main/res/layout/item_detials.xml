@@ -150,6 +150,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_below="@+id/detail_card_view"
+                android:visibility="gone"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"/>
 
