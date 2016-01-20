@@ -108,13 +108,13 @@
                     android:id="@+id/post_bid_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentBottom="true"
                     android:layout_below="@+id/view_below_about_seller"
                     android:orientation="horizontal">
 
                     <EditText
                         android:id="@+id/bid_editText"
-                        android:layout_width="249dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ems="10"
                         android:inputType="number"

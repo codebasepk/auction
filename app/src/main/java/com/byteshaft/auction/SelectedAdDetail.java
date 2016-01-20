@@ -1,7 +1,6 @@
 package com.byteshaft.auction;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -11,12 +10,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -41,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Class to show the details if a product which will include item images, bids, rating of the seller
@@ -52,7 +50,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     private GridView mGrid;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ArrayList<String> arrayList;
+    private ArrayList<Integer> arrayList;
     private int adPrimaryKey;
     public int id;
     public String description;
@@ -66,6 +64,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public EditText placeBidEditText;
     public Button placeBidButton;
     public ProgressBar mProgressBar;
+    public static HashMap<Integer, String> userNameHashMap;
+    public static HashMap<Integer, String> bidPriceHashMap;
+    public BidsAdapter mBidsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +78,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
         descriptionTextView = (TextView) findViewById(R.id.ad_description);
         imagesUrls = new ArrayList<>();
+        userNameHashMap = new HashMap<>();
+        bidPriceHashMap = new HashMap<>();
         placeBidButton = (Button) findViewById(R.id.place_bid);
         placeBidEditText = (EditText) findViewById(R.id.bid_editText);
         placeBidButton.setOnClickListener(this);
@@ -155,7 +158,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     return;
                 }
                 if (!placeBidEditText.getText().toString().trim().isEmpty() &&
-                    TextUtils.isDigitsOnly(placeBidEditText.getText().toString())) {
+                        TextUtils.isDigitsOnly(placeBidEditText.getText().toString())) {
                     String bid = placeBidEditText.getText().toString();
                     new PlaceBidTask().execute(bid);
                 }
@@ -250,7 +253,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                             }
                         }
                         JsonArray jsonArray = jsonObject.getAsJsonArray("bids");
-                        System.out.println("bids"+jsonArray);
+                        System.out.println("bids" + jsonArray);
 
                     }
                 } catch (IOException e) {
@@ -275,32 +278,13 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     /**
      * Custom class that extends RecyclerView adapter
      */
-    static class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView> implements
-            RecyclerView.OnItemTouchListener {
-
-        private OnItemClickListener mListener;
-        private GestureDetector mGestureDetector;
+    static class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView> {
         private BidView bidView;
-        private ArrayList<String> items;
+        private ArrayList<Integer> items;
 
-        public interface OnItemClickListener {
-            void onItem(String item);
-        }
-
-        public BidsAdapter(ArrayList<String> data) {
+        public BidsAdapter(ArrayList<Integer> data) {
             super();
             this.items = data;
-        }
-
-        public BidsAdapter(ArrayList<String> categories, Context context, OnItemClickListener listener) {
-            this.items = categories;
-            mListener = listener;
-            mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    return true;
-                }
-            });
         }
 
         @Override
@@ -313,29 +297,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         @Override
         public void onBindViewHolder(BidView holder, int position) {
             holder.setIsRecyclable(false);
-//            bidView.textView.setText(String.valueOf(position));
-            bidView.bidderTextView.setText(items.get(position));
-        }
-
-
-        @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-//            View childView = rv.findChildViewUnder(e.getX(), e.getY());
-//            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-//                mListener.onItem(items.get(rv.getChildPosition(childView)));
-//                return true;
-//            }
-            return false;
-        }
-
-        @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-        }
-
-        @Override
-        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
+            bidView.invisibleBidPrimaryKey.setText(String.valueOf(items.get(position)));
+            bidView.textView.setText(bidPriceHashMap.get(items.get(position)));
+            bidView.bidderTextView.setText(userNameHashMap.get(items.get(position)));
         }
 
         @Override
@@ -346,11 +310,13 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         static class BidView extends RecyclerView.ViewHolder {
             public TextView textView;
             public TextView bidderTextView;
+            public TextView invisibleBidPrimaryKey;
 
             public BidView(View itemView) {
                 super(itemView);
                 textView = (TextView) itemView.findViewById(R.id.bid_text_View);
                 bidderTextView = (TextView) itemView.findViewById(R.id.bidder_user_name);
+                invisibleBidPrimaryKey = (TextView) itemView.findViewById(R.id.invisible_bid_primary_key);
             }
         }
     }
@@ -378,16 +344,37 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
                 String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
-                String url = AppGlobals.GET_SPECIFIC_BIDS + userName + "/ads/" + adPrimaryKey +"/bids/";
+                String url = AppGlobals.GET_SPECIFIC_BIDS + userName + "/ads/" + adPrimaryKey + "/bids/";
                 try {
                     data = Helpers.simpleGetRequest(url, userName, password);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                System.out.println(data[0]);
-                System.out.println(data[1]);
+                if (Integer.valueOf(data[0]) == HttpURLConnection.HTTP_OK) {
+                    JsonParser jsonParser = new JsonParser();
+                    JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
+                    JsonArray jsonArray = jsonObject.get("results").getAsJsonArray();
+                    for (int i = 0; i <= jsonArray.size(); i++) {
+                        JsonObject object = jsonArray.get(i).getAsJsonObject();
+                        if (!arrayList.contains(object.get("id").getAsInt())) {
+                            arrayList.add(object.get("id").getAsInt());
+                            userNameHashMap.put(object.get("id").getAsInt(),
+                                    object.get("bidder_name").getAsString());
+                            bidPriceHashMap.put(object.get("id").getAsInt(),
+                                    object.get("bid").getAsString());
+                        }
+                    }
+                }
             }
             return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressBar.setVisibility(View.GONE);
+            mBidsAdapter = new BidsAdapter(arrayList);
+            mRecyclerView.setAdapter(mBidsAdapter);
         }
     }
 
