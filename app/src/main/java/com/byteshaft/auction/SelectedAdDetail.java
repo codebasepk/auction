@@ -1,7 +1,6 @@
 package com.byteshaft.auction;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -10,18 +9,20 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.GestureDetector;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.ChatActivity;
@@ -37,19 +38,19 @@ import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Class to show the details if a product which will include item images, bids, rating of the seller
  * product description, price and option of chatting with the client / buyer
  */
-public class SelectedAdDetail extends AppCompatActivity {
+public class SelectedAdDetail extends AppCompatActivity implements View.OnClickListener {
 
     private ArrayList<Bitmap> bitmapArrayList;
     private GridView mGrid;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private BidsAdapter mBidsAdapter;
-    private ArrayList<String> arrayList;
+    private ArrayList<Integer> arrayList;
     private int adPrimaryKey;
     public int id;
     public String description;
@@ -60,6 +61,12 @@ public class SelectedAdDetail extends AppCompatActivity {
     public TextView descriptionTextView;
     public TextView adPrice;
     private ProgressDialog mProgressDialog;
+    public EditText placeBidEditText;
+    public Button placeBidButton;
+    public ProgressBar mProgressBar;
+    public static HashMap<Integer, String> userNameHashMap;
+    public static HashMap<Integer, String> bidPriceHashMap;
+    public BidsAdapter mBidsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,10 +74,17 @@ public class SelectedAdDetail extends AppCompatActivity {
         setContentView(R.layout.item_detials);
         final ProductImageView productImageView = new ProductImageView();
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.detail, 0);
+        System.out.println(adPrimaryKey);
         String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
         descriptionTextView = (TextView) findViewById(R.id.ad_description);
         imagesUrls = new ArrayList<>();
+        userNameHashMap = new HashMap<>();
+        bidPriceHashMap = new HashMap<>();
+        placeBidButton = (Button) findViewById(R.id.place_bid);
+        placeBidEditText = (EditText) findViewById(R.id.bid_editText);
+        placeBidButton.setOnClickListener(this);
         adPrice = (TextView) findViewById(R.id.ad_price);
+        mProgressBar = (ProgressBar) findViewById(R.id.bid_loading_progress);
         setTitle(productName);
         mGrid = (GridView) findViewById(R.id.grid_view);
         mGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -98,16 +112,6 @@ public class SelectedAdDetail extends AppCompatActivity {
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         bitmapArrayList = new ArrayList<>();
         arrayList = new ArrayList<>();
-        arrayList.add("s9iper1");
-        arrayList.add("shg8rb");
-        arrayList.add("om26er");
-        arrayList.add("fi8er1");
-        arrayList.add("hussi");
-        arrayList.add("humza");
-        arrayList.add("talha");
-        arrayList.add("falak");
-        arrayList.add("jamal");
-        arrayList.add("that");
         new GetItemDetailsTask().execute();
 
 //        mBidsAdapter = new BidsAdapter(arrayList);
@@ -144,6 +148,24 @@ public class SelectedAdDetail extends AppCompatActivity {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.chat_for_user, menu);
         return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.place_bid:
+                if (placeBidEditText.getText().toString().trim().isEmpty()) {
+                    return;
+                }
+                if (!placeBidEditText.getText().toString().trim().isEmpty() &&
+                        TextUtils.isDigitsOnly(placeBidEditText.getText().toString())) {
+                    String bid = placeBidEditText.getText().toString();
+                    new PlaceBidTask().execute(bid);
+                }
+
+
+                break;
+        }
     }
 
     /**
@@ -221,6 +243,7 @@ public class SelectedAdDetail extends AppCompatActivity {
                         description = jsonObject.get("description").getAsString();
                         price = jsonObject.get("price").getAsString();
                         title = jsonObject.get("title").getAsString();
+                        currency = jsonObject.get("currency").getAsString();
 
                         for (int i = 1; i < 9; i++) {
                             String photoCounter = ("photo") + i;
@@ -229,8 +252,8 @@ public class SelectedAdDetail extends AppCompatActivity {
                                         jsonObject.get(photoCounter).getAsString()));
                             }
                         }
-                        JsonArray jsonArray = jsonObject.getAsJsonArray("comments");
-                        System.out.println(imagesUrls);
+                        JsonArray jsonArray = jsonObject.getAsJsonArray("bids");
+                        System.out.println("bids" + jsonArray);
 
                     }
                 } catch (IOException e) {
@@ -246,41 +269,22 @@ public class SelectedAdDetail extends AppCompatActivity {
             super.onPostExecute(bitmap);
             mProgressDialog.dismiss();
             descriptionTextView.setText("Description: \n \n" + description);
-            adPrice.setText(price);
+            adPrice.setText(price + currency);
             mGrid.setAdapter(new CustomAdapter(imagesUrls));
-
+            new GetBidsTask().execute();
         }
     }
 
     /**
      * Custom class that extends RecyclerView adapter
      */
-    static class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView> implements
-            RecyclerView.OnItemTouchListener {
-
-        private OnItemClickListener mListener;
-        private GestureDetector mGestureDetector;
+    static class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView> {
         private BidView bidView;
-        private ArrayList<String> items;
+        private ArrayList<Integer> items;
 
-        public interface OnItemClickListener {
-            void onItem(String item);
-        }
-
-        public BidsAdapter(ArrayList<String> data) {
+        public BidsAdapter(ArrayList<Integer> data) {
             super();
             this.items = data;
-        }
-
-        public BidsAdapter(ArrayList<String> categories, Context context, OnItemClickListener listener) {
-            this.items = categories;
-            mListener = listener;
-            mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    return true;
-                }
-            });
         }
 
         @Override
@@ -293,29 +297,9 @@ public class SelectedAdDetail extends AppCompatActivity {
         @Override
         public void onBindViewHolder(BidView holder, int position) {
             holder.setIsRecyclable(false);
-//            bidView.textView.setText(String.valueOf(position));
-            bidView.bidderTextView.setText(items.get(position));
-        }
-
-
-        @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-//            View childView = rv.findChildViewUnder(e.getX(), e.getY());
-//            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-//                mListener.onItem(items.get(rv.getChildPosition(childView)));
-//                return true;
-//            }
-            return false;
-        }
-
-        @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-        }
-
-        @Override
-        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
+            bidView.invisibleBidPrimaryKey.setText(String.valueOf(items.get(position)));
+            bidView.textView.setText(bidPriceHashMap.get(items.get(position)));
+            bidView.bidderTextView.setText(userNameHashMap.get(items.get(position)));
         }
 
         @Override
@@ -326,12 +310,71 @@ public class SelectedAdDetail extends AppCompatActivity {
         static class BidView extends RecyclerView.ViewHolder {
             public TextView textView;
             public TextView bidderTextView;
+            public TextView invisibleBidPrimaryKey;
 
             public BidView(View itemView) {
                 super(itemView);
                 textView = (TextView) itemView.findViewById(R.id.bid_text_View);
                 bidderTextView = (TextView) itemView.findViewById(R.id.bidder_user_name);
+                invisibleBidPrimaryKey = (TextView) itemView.findViewById(R.id.invisible_bid_primary_key);
             }
+        }
+    }
+
+    class PlaceBidTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+            String url = AppGlobals.POST_BID_URL + userName + "/ads/" + adPrimaryKey + "/bids/post";
+            try {
+                Helpers.authPostRequest(url, "bid", params[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+    class GetBidsTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            String[] data = new String[0];
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+                String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+                String url = AppGlobals.GET_SPECIFIC_BIDS + userName + "/ads/" + adPrimaryKey + "/bids/";
+                try {
+                    data = Helpers.simpleGetRequest(url, userName, password);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (Integer.valueOf(data[0]) == HttpURLConnection.HTTP_OK) {
+                    JsonParser jsonParser = new JsonParser();
+                    JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
+                    JsonArray jsonArray = jsonObject.get("results").getAsJsonArray();
+                    for (int i = 0; i <= jsonArray.size(); i++) {
+                        JsonObject object = jsonArray.get(i).getAsJsonObject();
+                        if (!arrayList.contains(object.get("id").getAsInt())) {
+                            arrayList.add(object.get("id").getAsInt());
+                            userNameHashMap.put(object.get("id").getAsInt(),
+                                    object.get("bidder_name").getAsString());
+                            bidPriceHashMap.put(object.get("id").getAsInt(),
+                                    object.get("bid").getAsString());
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressBar.setVisibility(View.GONE);
+            mBidsAdapter = new BidsAdapter(arrayList);
+            mRecyclerView.setAdapter(mBidsAdapter);
         }
     }
 
