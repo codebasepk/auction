@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import com.byteshaft.auction.R;
 
-public class UserSpeificBidsFragment extends Fragment {
+public class UserSpecificBidsFragment extends Fragment {
 
     private View mBaseView;
 

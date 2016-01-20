@@ -1,5 +1,6 @@
 package com.byteshaft.auction.utils;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -58,7 +59,11 @@ public class AppGlobals extends Application{
     public static final String SINGLE_AD_DETAILS = String.format("%s/api/users/", BASE_URL);
     public static final String SINGLE_AD_DETAILS_APPEND_END = "ads/";
     public static final String SINGLE_PRODUCT_NAME = "product_name";
+    public static final String ACTION_FOR_SELECTED_CATEGORY = "com.pits.execute.getSelectedCatagoryTask";
+    public static final String ACTION_FOR_MY_ADS_DETAIL ="com.pits.execute.myAdsDetailsTask";
+    public static final String ACTION_FOR_ALLCATEGORY = "com.pits.execute.getAllCategoryTask";
     public static String loginResponseMessage;
+    public static Activity mCurrentActivity = null;
 
     @Override
     public void onCreate() {
@@ -66,6 +71,14 @@ public class AppGlobals extends Application{
         sContext = getApplicationContext();
         root = Environment.getExternalStorageDirectory().toString()
                 +"/Android/data/" + getPackageName();
+    }
+
+
+    public static Activity getCurrentActivity(){
+        return mCurrentActivity;
+    }
+    public static void setCurrentActivity(Activity activity){
+        mCurrentActivity = activity;
     }
 
     public static void setLoginResponseMessage(String responseMessage) {

@@ -52,7 +52,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     String[] loginData;
     public static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
     public static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE2 = 1;
-
     public static LoginActivity getLoginActivityInstance() {
         return sInstance;
     }
