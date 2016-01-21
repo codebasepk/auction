@@ -161,7 +161,7 @@ public class Helpers {
     public static void userExist(String username)
             throws IOException, JSONException {
         HttpURLConnection connection =
-                openConnectionForUrl(AppGlobals.USER_EXIST_URL + username +"/"+ "exists", "GET");
+                openConnectionForUrl(AppGlobals.USER_EXIST_URL + username + "/" + "exists", "GET");
         AppGlobals.setUserExistResponse(connection.getResponseCode());
     }
 
@@ -208,7 +208,7 @@ public class Helpers {
      */
     public static String[] simpleGetRequest(String link, String userName, String password)
             throws IOException {
-        String parsedString = "";
+        String parsedString;
         URL url = new URL(link);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("Content-Type", "application/json");
@@ -400,5 +400,34 @@ public class Helpers {
         File file = new File(AppGlobals.root + AppGlobals.CATEGORIES_FOLDER);
         File[] files = file.listFiles();
         return files.length;
+    }
+    public static void authPostRequest(String link, String key, String value) throws IOException {
+        URL url;
+        url = new URL(link);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestMethod("POST");
+        String authString = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)
+                + ":" + Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+        String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
+        connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
+        String jsonFormattedData = getJsonObjectString(key, value);
+        sendRequestData(connection, jsonFormattedData);
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            Log.i("Log", "connection:" + connection.getResponseCode());
+        } else if (connection.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
+            Log.i("Log", "created" + connection.getResponseCode());
+        }
+    }
+
+    private static String getJsonObjectString(String key, String pushKey) {
+        return String.format("{\"%s\": \"%s\"}", key, pushKey);
+    }
+
+    private static void sendRequestData(HttpURLConnection connection, String body) throws IOException {
+        byte[] outputInBytes = body.getBytes("UTF-8");
+        OutputStream os = connection.getOutputStream();
+        os.write(outputInBytes);
+        os.close();
     }
 }

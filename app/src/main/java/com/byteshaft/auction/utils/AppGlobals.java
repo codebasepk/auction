@@ -64,6 +64,8 @@ public class AppGlobals extends Application{
     public static final String ACTION_FOR_ALLCATEGORY = "com.pits.execute.getAllCategoryTask";
     public static String loginResponseMessage;
     public static Activity mCurrentActivity = null;
+    public static final String POST_BID_URL = String.format("%s/api/users/",BASE_URL);
+    public static final String GET_SPECIFIC_BIDS = String.format("%s/api/users/", BASE_URL);
 
     @Override
     public void onCreate() {
