@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,12 +15,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -47,9 +44,7 @@ import java.util.HashMap;
 public class SelectedAdDetail extends AppCompatActivity implements View.OnClickListener {
 
     private ArrayList<Bitmap> bitmapArrayList;
-    private GridView mGrid;
     private RecyclerView mRecyclerView;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
     private ArrayList<Integer> arrayList;
     private int adPrimaryKey;
     public int id;
@@ -67,12 +62,13 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public static HashMap<Integer, String> userNameHashMap;
     public static HashMap<Integer, String> bidPriceHashMap;
     public BidsAdapter mBidsAdapter;
+    private ProductImageView productImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_detials);
-        final ProductImageView productImageView = new ProductImageView();
+        productImageView = new ProductImageView();
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.detail, 0);
         String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
         descriptionTextView = (TextView) findViewById(R.id.ad_description);
@@ -85,42 +81,15 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         adPrice = (TextView) findViewById(R.id.ad_price);
         mProgressBar = (ProgressBar) findViewById(R.id.bid_loading_progress);
         setTitle(productName);
-        mGrid = (GridView) findViewById(R.id.grid_view);
-        mGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), productImageView.getClass());
-                intent.putExtra("url", imagesUrls.get(position));
-                startActivity(intent);
-            }
-        });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mRecyclerView = (RecyclerView) findViewById(R.id.bids_recycler_view);
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout_for_item_detail);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.orange, R.color.green,
-                R.color.colorPrimary, R.color.gray);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-        });
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         bitmapArrayList = new ArrayList<>();
         arrayList = new ArrayList<>();
         new GetItemDetailsTask().execute();
-
-//        mBidsAdapter = new BidsAdapter(arrayList);
-//        mRecyclerView.setAdapter(mBidsAdapter);
-//        mRecyclerView.addOnItemTouchListener(new BidsAdapter(arrayList, getApplicationContext()
-//                , new BidsAdapter.OnItemClickListener() {
-//            @Override
-//            public void onItem(String item) {
-//            }
-//        }));
     }
 
     @Override
@@ -161,55 +130,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     String bid = placeBidEditText.getText().toString();
                     new PlaceBidTask().execute(bid);
                 }
-
-
                 break;
-        }
-    }
-
-    /**
-     * Custom Member class for to show images in grid view
-     */
-    class CustomAdapter extends BaseAdapter {
-
-        private ArrayList<String> images;
-
-
-        public CustomAdapter(ArrayList<String> urlsList) {
-            this.images = urlsList;
-        }
-
-        public int getCount() {
-            return images.size();
-        }
-
-        public Object getItem(int position) {
-            return null;
-        }
-
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        // create a new ImageView for each item referenced by the Adapter
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView imageView;
-            if (convertView == null) {
-                // if it's not recycled, initialize some attributes
-                imageView = new ImageView(getApplicationContext());
-                imageView.setLayoutParams(new GridView.LayoutParams(200, 200));
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                imageView.setPadding(2, 4, 2, 4);
-            } else {
-                imageView = (ImageView) convertView;
-            }
-//            Log.i(AppGlobals.getLogTag(getClass()), images.get(position));
-            Picasso.with(SelectedAdDetail.this)
-                    .load(images.get(position))
-                    .resize(640, 480)
-                    .centerCrop()
-                    .into(imageView);
-            return imageView;
         }
     }
 
@@ -265,8 +186,29 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             mProgressDialog.dismiss();
             descriptionTextView.setText("Description: \n \n" + description);
             adPrice.setText(price + currency);
-            System.out.println(imagesUrls);
-            mGrid.setAdapter(new CustomAdapter(imagesUrls));
+            LinearLayout layout = (LinearLayout) findViewById(R.id.linear);
+            int value = 0;
+            for (String url : imagesUrls) {
+                ImageView imageView = new ImageView(SelectedAdDetail.this);
+                imageView.setPadding(2, 2, 2, 2);
+                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                value++;
+                imageView.setTag(value);
+                Picasso.with(SelectedAdDetail.this)
+                        .load(url)
+                        .resize(200, 250)
+                        .into(imageView);
+                layout.addView(imageView);
+                imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        System.out.println(v.getTag());
+                        Intent intent = new Intent(getApplicationContext(), productImageView.getClass());
+                        intent.putExtra("url", imagesUrls.get((Integer) v.getTag() - 1));
+                        startActivity(intent);
+                    }
+                });
+            }
             new GetBidsTask().execute();
         }
     }
