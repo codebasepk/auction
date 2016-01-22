@@ -126,7 +126,7 @@ public class AdsDetailFragment extends Fragment {
         }
 
         @Override
-        public int getItemCount() {
+        public int getItemCount()    {
             return items.size();
         }
     }
@@ -188,7 +188,7 @@ public class AdsDetailFragment extends Fragment {
                         nextUrl = jsonObject.get("next").getAsString();
                     }
                     JsonArray jsonArray = jsonObject.getAsJsonArray("results");
-                    System.out.println(jsonArray);
+
                     for (int i = 0; i < jsonArray.size(); i++) {
                         JsonObject object = jsonArray.get(i).getAsJsonObject();
                         if (!idsArray.contains(object.get("id").getAsInt())) {

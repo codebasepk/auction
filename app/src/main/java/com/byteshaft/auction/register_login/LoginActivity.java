@@ -266,10 +266,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else if (arrayList.get(0).equals(HttpURLConnection.HTTP_FORBIDDEN)) {
                 sProgressDialog.dismiss();
                 Helpers.alertDialog(LoginActivity.this, "Login Error",
-                        AppGlobals.getLoginResponseMessage());
+                        AppGlobals.getLoginResponseMessage(), "");
             } else if (arrayList.get(0).equals(AppGlobals.NO_INTERNET)) {
                 sProgressDialog.dismiss();
-                Helpers.alertDialog(LoginActivity.this, "No Internet", "Internet Not Available");
+                Helpers.alertDialog(LoginActivity.this, "No Internet", "Internet Not Available", "");
             }
         }
     }
