@@ -1,5 +1,6 @@
 package com.byteshaft.auction.utils;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -61,6 +62,9 @@ public class AppGlobals extends Application{
     public static String loginResponseMessage;
     public static final String POST_BID_URL = String.format("%s/api/users/",BASE_URL);
     public static final String GET_SPECIFIC_BIDS = String.format("%s/api/users/", BASE_URL);
+    public static int postBidResponse = 0;
+    public static final String GET_USER_SPECIFIC_BIDS = String.format("%s/api/users/", BASE_URL);
+    public static Activity sCurrentActivity;
 
     @Override
     public void onCreate() {
@@ -68,6 +72,21 @@ public class AppGlobals extends Application{
         sContext = getApplicationContext();
         root = Environment.getExternalStorageDirectory().toString()
                 +"/Android/data/" + getPackageName();
+    }
+
+    public static void setPostBidResponse(int value) {
+        postBidResponse = value;
+    }
+
+    public static int getPostBidResponse() {
+        return postBidResponse;
+    }
+
+    public static Activity getCurrentActivity(){
+        return sCurrentActivity;
+    }
+    public static void setCurrentActivity(Activity activity){
+        sCurrentActivity = activity;
     }
 
     public static void setLoginResponseMessage(String responseMessage) {

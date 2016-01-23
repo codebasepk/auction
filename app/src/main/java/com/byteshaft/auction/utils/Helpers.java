@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -259,6 +260,8 @@ public class Helpers {
      * @param msg
      */
     public static void alertDialog(final Activity activity, String title, String msg) {
+        final Intent intent = new Intent();
+        final String action = "";
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
         alertDialogBuilder.setTitle(title);
         alertDialogBuilder
@@ -403,7 +406,9 @@ public class Helpers {
             Log.i("Log", "connection:" + connection.getResponseCode());
         } else if (connection.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
             Log.i("Log", "created" + connection.getResponseCode());
+            AppGlobals.setPostBidResponse(connection.getResponseCode());
         }
+        AppGlobals.setPostBidResponse(connection.getResponseCode());
     }
 
     private static String getJsonObjectString(String key, String pushKey) {

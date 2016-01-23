@@ -182,7 +182,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     @Override
     protected void onResume() {
         super.onResume();
-        initializeArrayAndHashMap();
     }
 
     @Override
