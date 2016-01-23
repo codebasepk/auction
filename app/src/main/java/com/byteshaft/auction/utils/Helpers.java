@@ -2,11 +2,8 @@ package com.byteshaft.auction.utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,7 +15,6 @@ import android.util.Log;
 import android.util.Patterns;
 import android.webkit.URLUtil;
 
-import com.byteshaft.auction.SelectedCategoryList;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -262,30 +258,20 @@ public class Helpers {
      * @param title
      * @param msg
      */
-    public static void alertDialog(final Activity activity, String title, String msg, final String action) {
-        final Intent intent = new Intent();
+    public static void alertDialog(final Activity activity, String title, String msg) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
         alertDialogBuilder.setTitle(title);
         alertDialogBuilder
                 .setMessage(msg)
                 .setCancelable(false)
-                .setPositiveButton("ReTry", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                            intent.setAction(action);
-                            AppGlobals.getContext().sendBroadcast(intent);
-                    }
-                })
-                .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
-
 
     /**
      * Saves the Set of categories selected by user

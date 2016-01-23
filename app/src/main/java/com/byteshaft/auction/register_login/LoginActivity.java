@@ -52,6 +52,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     String[] loginData;
     public static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
     public static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE2 = 1;
+
     public static LoginActivity getLoginActivityInstance() {
         return sInstance;
     }
@@ -266,10 +267,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else if (arrayList.get(0).equals(HttpURLConnection.HTTP_FORBIDDEN)) {
                 sProgressDialog.dismiss();
                 Helpers.alertDialog(LoginActivity.this, "Login Error",
-                        AppGlobals.getLoginResponseMessage(), "");
+                        AppGlobals.getLoginResponseMessage());
             } else if (arrayList.get(0).equals(AppGlobals.NO_INTERNET)) {
                 sProgressDialog.dismiss();
-                Helpers.alertDialog(LoginActivity.this, "No Internet", "Internet Not Available", "");
+                Helpers.alertDialog(LoginActivity.this, "No Internet", "Internet Not Available");
             }
         }
     }

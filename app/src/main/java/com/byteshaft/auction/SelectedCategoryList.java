@@ -2,11 +2,9 @@ package com.byteshaft.auction;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -28,7 +26,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.byteshaft.auction.receivers.MessageForDialog;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.google.gson.JsonArray;
@@ -69,7 +66,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     private ProgressBar mShowMoreProgress;
     private String categorySpecificUrl;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,8 +97,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                 new GetSpecificDataTask().execute(categorySpecificUrl);
             }
         });
-
-
         sRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
@@ -402,8 +396,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
             return idsArray;
         }
 
-
-
         @Override
         protected void onPostExecute(ArrayList<Integer> idsList) {
             super.onPostExecute(idsList);
@@ -413,8 +405,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                 mProgressDialog.dismiss();
             }
             if (noInternet) {
-                Helpers.alertDialog(SelectedCategoryList.this, "No internet", "Internet not available",
-                        AppGlobals.ACTION_FOR_SELECTED_CATEGORY);
+                Helpers.alertDialog(SelectedCategoryList.this, "No internet", "Internet not available");
                 return;
             }
             System.out.println("countvalue:" +countValue);

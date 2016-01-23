@@ -343,13 +343,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             } else if (AppGlobals.getResponseCode() == 0) {
                 sRegisterProgressDialog.dismiss();
                 Helpers.alertDialog(RegisterActivity.this, "Request Failed", "There was an issue, " +
-                        "Please try again", "");
+                        "Please try again");
             } else if (Integer.valueOf(result[0]).equals(AppGlobals.NO_INTERNET)) {
                 sRegisterProgressDialog.dismiss();
-                Helpers.alertDialog(RegisterActivity.this, "No Internet", "Internet Not Available", "");
+                Helpers.alertDialog(RegisterActivity.this, "No Internet", "Internet Not Available");
             } else if (AppGlobals.getResponseCode() == 500) {
                 sRegisterProgressDialog.dismiss();
-                Helpers.alertDialog(RegisterActivity.this, "500", "Internal server error, try after few moments", "");
+                Helpers.alertDialog(RegisterActivity.this, "500", "Internal server error, try after few moments");
             }
         }
     }
@@ -381,7 +381,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             } else if (integer == 200) {
                 mUserNameEditText.setError("Username already exist");
             } else if (integer == AppGlobals.NO_INTERNET) {
-                Helpers.alertDialog(RegisterActivity.this, "No Internet", "Internet Not Available", "");
+                Helpers.alertDialog(RegisterActivity.this, "No Internet", "Internet Not Available");
             }
         }
     }
