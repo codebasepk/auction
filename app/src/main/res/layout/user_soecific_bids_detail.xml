@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/bids_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_margin="5dp">
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/bids_invisible_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"/>
+
+                <ProgressBar
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="10dp"
+                    android:id="@+id/bids_image_progressBar"
+                    android:layout_gravity="left"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    style="?android:attr/progressBarStyle"/>
+
+                <com.github.siyamed.shapeimageview.mask.PorterShapeImageView
+                    android:id="@+id/bids_image"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    app:siShape="@drawable/image_background"
+                    android:layout_gravity="left"
+                    app:siSquare="true"
+                    android:layout_margin="2dp"/>
+
+                <TextView
+                    android:id="@+id/total_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="12dp"
+                    android:layout_alignLeft="@id/bids_image"
+                    android:layout_alignStart="@+id/bids_image"
+                    android:layout_below="@id/bids_image"
+                    android:layout_gravity="center"
+                    android:layout_margin="5dp"
+                    />
+                <TextView
+                    android:id="@+id/user_bid_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="12dp"
+                    android:layout_alignLeft="@id/bids_image"
+                    android:layout_alignStart="@+id/bids_image"
+                    android:layout_below="@id/total_price"
+                    android:layout_gravity="center"
+                    android:layout_margin="10dp"
+                    />
+
+                <TextView
+                    android:id="@+id/bids_title"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp" />
+
+                <TextView
+                    android:id="@+id/bids_description"
+                    android:textStyle="italic"
+                    android:maxLength="150"
+                    android:maxLines="3"
+                    android:maxWidth="200dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_toEndOf="@+id/bids_image"
+                    android:layout_below="@+id/bids_title"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_above="@+id/total_price"
+                    android:layout_centerHorizontal="true" />
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+    </ScrollView>
+</RelativeLayout>

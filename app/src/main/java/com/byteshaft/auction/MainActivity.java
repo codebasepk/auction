@@ -1,6 +1,5 @@
 package com.byteshaft.auction;
 
-import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,12 +24,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.byteshaft.auction.fragments.AdsDetailFragment;
 import com.byteshaft.auction.fragments.CategoriesFragment;
 import com.byteshaft.auction.fragments.UserSettingFragment;
 import com.byteshaft.auction.fragments.buyer.Buy;
-import com.byteshaft.auction.fragments.AdsDetailFragment;
 import com.byteshaft.auction.fragments.seller.Sell;
-import com.byteshaft.auction.fragments.seller.UserSpeificBidsFragment;
+import com.byteshaft.auction.fragments.seller.UserSpecificBidsFragment;
 import com.byteshaft.auction.gcm.QuickstartPreferences;
 import com.byteshaft.auction.gcm.RegistrationIntentService;
 import com.byteshaft.auction.register_login.LoginActivity;
@@ -112,18 +111,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         header = navigationView.getHeaderView(0);
-        TextView userName = (TextView) header.findViewById(R.id.nav_user_name);
-        TextView userEmail = (TextView) header.findViewById(R.id.nav_user_email);
-        if (!Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME).equals("")) {
-            userName.setText(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME));
-        } else {
-            userName.setText("username");
-        }
-        if (!Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_EMAIL).equals("")) {
-            userEmail.setText(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_EMAIL));
-        } else {
-            userEmail.setText("abc@xyz.com");
-        }
     }
 
     @Override
@@ -136,6 +123,18 @@ public class MainActivity extends AppCompatActivity
             loadFragment(new CategoriesFragment());
         } else if (Helpers.isUserLoggedIn() && Helpers.getLastFragment().equals("")) {
             loadFragment(new Buy());
+        }
+        TextView userName = (TextView) header.findViewById(R.id.nav_user_name);
+        TextView userEmail = (TextView) header.findViewById(R.id.nav_user_email);
+        if (!Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME).equals("")) {
+            userName.setText(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME));
+        } else {
+            userName.setText("username");
+        }
+        if (!Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_EMAIL).equals("")) {
+            userEmail.setText(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_EMAIL));
+        } else {
+            userEmail.setText("abc@xyz.com");
         }
 
         CircularImageView circularImageView = (CircularImageView) header.findViewById(R.id.imageView);
@@ -228,7 +227,7 @@ public class MainActivity extends AppCompatActivity
                 fragmentClass = AdsDetailFragment.class;
                 break;
             case R.id.user_bids_detail:
-                fragmentClass = UserSpeificBidsFragment.class;
+                fragmentClass = UserSpecificBidsFragment.class;
                 break;
             case R.id.nav_user:
                 fragmentClass = UserSettingFragment.class;
