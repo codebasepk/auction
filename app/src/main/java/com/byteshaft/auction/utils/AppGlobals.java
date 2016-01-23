@@ -17,12 +17,18 @@ public class AppGlobals extends Application{
     private static Context sContext;
     public static final String user_login_key = "user_login";
     public static final String lastFragment = "last_fragment";
-    public static final String SELECTED_CATEGORIES = "selected_category";
+
+    public static final String CATEGORY_INTENT_KEY = "category_intent_key";
+    public static final String ALL_CATEGORIES = "all_categories";
+    public static final String KEY_SELECTED_CATEGORY_BOOLEAN_STATUS = "selected_category_boolean_status";
+    public static final String KEY_CATEGORY_BOOLEAN_STATUS = "category_boolean_status";
+    public static final String SELECTED_CATEGORIES = "selected_categories";
+
     public static final String detail = "detail";
     public static final String KEY_USERNAME = "username";
     public static final String KEY_PASSWORD = "password";
     public static final String KEY_EMAIL = "email";
-    public static final String KEY_CATEGORIES_SELECTED = "categories_selected";
+
     public static final String KEY_PHONE_NUMBER = "phone_number";
     public static final String KEY_ADDRESS = "address";
     public static final String KEY_CITY = "city";
@@ -41,16 +47,14 @@ public class AppGlobals extends Application{
     public static String root;
     public static String profilePicName = "profile_pic.png";
     public static final String POST_AD_URL = String.format("%s/api/users/", BASE_URL);
-    public static final String ALL_CATEGORIES = String.format("%s/api/ads/categories", BASE_URL);
+    public static final String ALL_CATEGORIES_URL = String.format("%s/api/ads/categories", BASE_URL);
     public static final String PUSH_NOTIFICATION_KEY = String.format("%s/api/users/", BASE_URL);
     public static final String SELECTED_CATEGORY_DETAIL_URL = String.format("%s/api/ads/?category=",BASE_URL);
     public static final String PROFILE_PIC_FOLDER = "/profilePic";
     public static final String CATEGORIES_FOLDER = "/categories_folder";
-    public static final String ALL_CATEGORIES_STATUS = "all_categories_status";
+//    public static final String ALL_CATEGORIES_STATUS = "all_categories_status";
     public static final String CATEGORIES_IMAGES_SAVED = "category_images_saved";
     public static final String PROFILE_PIC_IMAGE_URL = "profile_pic_image";
-    public static final String ALL_CATEGORY = "all_categories";
-//    public static final String ALL_CATEGORY_STATUS = "category_status";
     public static boolean alertDialogShownOneTimeForCategory = false;
     public static boolean sCategoriesFragmentForeGround = true;
     public static boolean sRegisterProcess = false;

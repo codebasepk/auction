@@ -69,7 +69,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        category = getIntent().getStringExtra(AppGlobals.SELECTED_CATEGORIES);
+        category = getIntent().getStringExtra(AppGlobals.CATEGORY_INTENT_KEY);
         setContentView(R.layout.specific_category);
         showMoreLinearLayout = (LinearLayout) findViewById(R.id.show_more_layout);
         showMoreLinearLayout.setVisibility(View.GONE);

@@ -77,7 +77,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         mBaseView = inflater.inflate(R.layout.seller_fragment, container, false);
         Helpers.saveLastFragmentOpened(getClass().getSimpleName());
         list = new ArrayList<>();
-        categoryStringSet = Helpers.getSavedStringSet(AppGlobals.ALL_CATEGORY);
+        categoryStringSet = Helpers.getSavedStringSet(AppGlobals.ALL_CATEGORIES);
         for (String item : categoryStringSet) {
             if (!item.isEmpty()) {
                 list.add(item);

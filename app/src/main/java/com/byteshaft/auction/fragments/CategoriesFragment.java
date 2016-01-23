@@ -64,7 +64,7 @@ public class CategoriesFragment extends Fragment {
         mBaseView = inflater.inflate(R.layout.categories_fragment, container, false);
         AppGlobals.sCategoriesFragmentForeGround = true;
         selectedCategories = new HashSet<>();
-        if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED)
+        if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORY_BOOLEAN_STATUS)
                 && !AppGlobals.alertDialogShownOneTimeForCategory) {
             Helpers.alertDialog(getActivity(), "Category selection", "select categories to view products of your interest");
             AppGlobals.alertDialogShownOneTimeForCategory = true;
@@ -77,17 +77,17 @@ public class CategoriesFragment extends Fragment {
         sRecyclerView.canScrollVertically(1);
         sRecyclerView.setHasFixedSize(true);
         Log.i("ALL_CATEGORIES_STATUS", String.valueOf(Helpers.getBooleanValueFromSharedPreference(
-                AppGlobals.ALL_CATEGORIES_STATUS)));
+                AppGlobals.KEY_CATEGORY_BOOLEAN_STATUS)));
         Log.i("CATEGORIES_IMAGES_SAVED", String.valueOf(Helpers.getBooleanValueFromSharedPreference(
                 AppGlobals.CATEGORIES_IMAGES_SAVED)));
-        if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.ALL_CATEGORIES_STATUS)
+        if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORY_BOOLEAN_STATUS)
                 || !Helpers.getBooleanValueFromSharedPreference(AppGlobals.CATEGORIES_IMAGES_SAVED)) {
             sInternetTaskInProgress = true;
             (new GetCategoriesTask(getActivity())).execute();
         } else {
             sLinksHaspMap = new HashMap<>();
             sCategoriesList = new ArrayList<>();
-            allCategories = Helpers.getSavedStringSet(AppGlobals.ALL_CATEGORY);
+            allCategories = Helpers.getSavedStringSet(AppGlobals.ALL_CATEGORIES);
             for (String item : allCategories) {
                 if (!item.isEmpty()) {
                     sCategoriesList.add(item);
@@ -223,7 +223,7 @@ public class CategoriesFragment extends Fragment {
                 URL url;
                 String parsedString;
                 try {
-                    url = new URL(AppGlobals.ALL_CATEGORIES);
+                    url = new URL(AppGlobals.ALL_CATEGORIES_URL);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestProperty("Content-Type", "application/json");
                     if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -244,7 +244,7 @@ public class CategoriesFragment extends Fragment {
                                 stringSet.add(category);
                             }
                         }
-                        Helpers.saveStringSet(AppGlobals.ALL_CATEGORY, stringSet);
+                        Helpers.saveStringSet(AppGlobals.ALL_CATEGORIES, stringSet);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -272,7 +272,7 @@ public class CategoriesFragment extends Fragment {
                     Log.i("IMAGE TASK", "running");
                     new GetImagesTask().execute(data);
                 }
-                Helpers.saveBooleanToSharedPreference(AppGlobals.ALL_CATEGORIES_STATUS, true);
+                Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_CATEGORY_BOOLEAN_STATUS, true);
                 Log.i(AppGlobals.getLogTag(getClass()), "categories saved");
             }
         }
@@ -414,7 +414,8 @@ public class CategoriesFragment extends Fragment {
                 return;
             }
             if (s == HttpURLConnection.HTTP_OK) {
-                Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED, true);
+                Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_SELECTED_CATEGORY_BOOLEAN_STATUS, true);
+                System.out.println(selectedCategories);
                 Helpers.saveCategories(selectedCategories);
                 Toast.makeText(getActivity(), "success", Toast.LENGTH_SHORT).show();
                 FragmentTransaction tx = getFragmentManager().beginTransaction();
