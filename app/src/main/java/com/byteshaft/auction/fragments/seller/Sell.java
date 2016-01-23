@@ -71,7 +71,6 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
     private ViewGroup mSelectedImagesContainer;
     private HashSet<Uri> mMedia = new HashSet<>();
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_CAMERA = 0;
-    public  Intent intent = new Intent();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -340,13 +339,13 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
             if (s.equals(201)) {
                 imagesArray.clear();
                 showMedia();
-                Helpers.alertDialog(getActivity(), "Success!", "Your Product is posted", "");
+                Helpers.alertDialog(getActivity(), "Success!", "Your Product is posted");
                 itemTitle.setText("");
                 itemDescription.setText("");
                 mItemAmount.setText("");
             } else if (s.equals(AppGlobals.NO_INTERNET)) {
                 Helpers.alertDialog(getActivity(), "No Internet", "please check your internet" +
-                        " and try again", "");
+                        " and try again");
             }
         }
     }

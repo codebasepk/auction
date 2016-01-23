@@ -43,17 +43,7 @@
                 <category android:name="gcm.play.android.samples.com.gcmquickstart" />
             </intent-filter>
         </receiver>
-        <receiver
-            android:name=".receivers.MessageForDialog"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.pits.execute.getSelectedCatagoryTask"/>
-                    <action android:name="com.pits.execute.myAdsDetailsTask"/>
-                <action android:name="com.pits.execute.getAllCategoryTask"
-                   />
-            </intent-filter>
-        </receiver>
+
         <!-- [START gcm_listener] -->
         <service
             android:name="com.byteshaft.auction.gcm.MyGcmListenerService"
@@ -72,8 +62,6 @@
             </intent-filter>
         </service>
         <!-- [END instanceId_listener] -->
-
-
         <service
             android:name="com.byteshaft.auction.gcm.RegistrationIntentService"
             android:exported="false">
