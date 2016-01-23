@@ -318,7 +318,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
                 Helpers.saveCategories(categoriesSet);
                 if (categoriesAvailable) {
-                    Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED, true);
+                    Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_SELECTED_CATEGORY_BOOLEAN_STATUS, true);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

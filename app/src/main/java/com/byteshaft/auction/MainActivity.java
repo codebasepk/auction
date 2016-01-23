@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity
         }
         instance = this;
         if (Helpers.isUserLoggedIn()) {
-            if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED)) {
+            if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORY_BOOLEAN_STATUS)) {
                 loadFragment(new CategoriesFragment());
             }
             if (!Helpers.getLastFragment().equals("")) {
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
         if (Helpers.isUserLoggedIn() && !Helpers.getBooleanValueFromSharedPreference(
-                AppGlobals.KEY_CATEGORIES_SELECTED)) {
+                AppGlobals.KEY_CATEGORY_BOOLEAN_STATUS)) {
             loadFragment(new CategoriesFragment());
         } else if (Helpers.isUserLoggedIn() && Helpers.getLastFragment().equals("")) {
             loadFragment(new Buy());

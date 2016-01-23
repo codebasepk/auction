@@ -38,6 +38,8 @@ public class Buy extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.buyer_category_fragment, container, false);
         categories = Helpers.getCategories();
+        System.out.println("Buyer");
+        System.out.println(categories);
         mBaseView.setTag(TAG);
         Helpers.saveLastFragmentOpened(getClass().getSimpleName());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -46,7 +48,6 @@ public class Buy extends Fragment {
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
         arrayList = new ArrayList<>();
-        System.out.println(categories);
         for (String category: categories) {
             if (!category.isEmpty()) {
                 arrayList.add(category);
@@ -76,7 +77,7 @@ public class Buy extends Fragment {
             public void onItem(String item) {
                 Intent intent = new Intent(getActivity().getApplicationContext(),
                         SelectedCategoryList.class);
-                intent.putExtra(AppGlobals.SELECTED_CATEGORIES, item);
+                intent.putExtra(AppGlobals.CATEGORY_INTENT_KEY, item);
                 startActivity(intent);
             }
         }));

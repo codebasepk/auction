@@ -282,7 +282,7 @@ public class Helpers {
      */
     public static void saveCategories(Set<String> stringSet) {
         SharedPreferences sharedPreferences = getPreferenceManager();
-        sharedPreferences.edit().putStringSet(AppGlobals.SELECTED_CATEGORIES, stringSet).apply();
+        sharedPreferences.edit().putStringSet(AppGlobals.SELECTED_CATEGORIES, stringSet).commit();
     }
 
     // Returns the set of categories selected by user
