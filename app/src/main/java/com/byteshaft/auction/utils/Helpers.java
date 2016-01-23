@@ -403,7 +403,9 @@ public class Helpers {
             Log.i("Log", "connection:" + connection.getResponseCode());
         } else if (connection.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
             Log.i("Log", "created" + connection.getResponseCode());
+            AppGlobals.setPostBidResponse(connection.getResponseCode());
         }
+        AppGlobals.setPostBidResponse(connection.getResponseCode());
     }
 
     private static String getJsonObjectString(String key, String pushKey) {

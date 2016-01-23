@@ -125,6 +125,12 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 if (placeBidEditText.getText().toString().trim().isEmpty()) {
                     return;
                 }
+                int productPrice = Integer.valueOf(price.replaceAll(".00", ""));
+                int biddingAmount = Integer.valueOf(placeBidEditText.getText().toString());
+                if (biddingAmount < productPrice) {
+                    Helpers.alertDialog(SelectedAdDetail.this, "", "price is lower than product amount");
+                    return;
+                }
                 if (!placeBidEditText.getText().toString().trim().isEmpty() &&
                         TextUtils.isDigitsOnly(placeBidEditText.getText().toString())) {
                     String bid = placeBidEditText.getText().toString();
@@ -196,7 +202,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 imageView.setTag(value);
                 Picasso.with(SelectedAdDetail.this)
                         .load(url)
-                        .resize(200, 250)
+                        .resize(150, 150)
                         .into(imageView);
                 layout.addView(imageView);
                 imageView.setOnClickListener(new View.OnClickListener() {
@@ -259,25 +265,48 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    class PlaceBidTask extends AsyncTask<String, String, String> {
+    class PlaceBidTask extends AsyncTask<String, String, Integer> {
 
         @Override
-        protected String doInBackground(String... params) {
-            String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
-            String url = AppGlobals.POST_BID_URL + userName + "/ads/" + adPrimaryKey + "/bids/post";
-            try {
-                Helpers.authPostRequest(url, "bid", params[0]);
-            } catch (IOException e) {
-                e.printStackTrace();
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Integer doInBackground(String... params) {
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+                String url = AppGlobals.POST_BID_URL + userName + "/ads/" + adPrimaryKey + "/bids/post";
+                try {
+                    Helpers.authPostRequest(url, "bid", params[0]);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-            return null;
+            return AppGlobals.getPostBidResponse();
+        }
+
+        @Override
+        protected void onPostExecute(Integer s) {
+            super.onPostExecute(s);
+            mProgressBar.setVisibility(View.GONE);
+            placeBidEditText.setText("");
+            if (s == HttpURLConnection.HTTP_CREATED) {
+                mRecyclerView.removeAllViews();
+                new GetBidsTask().execute();
+            } else if (s == HttpURLConnection.HTTP_CONFLICT) {
+                Helpers.alertDialog(SelectedAdDetail.this, "Conflict", "your bid is already placed!");
+            } else {
+                Helpers.alertDialog(SelectedAdDetail.this, "Error", "There was an unexpected error");
+            }
         }
     }
 
-    class GetBidsTask extends AsyncTask<String, String, String> {
+    class GetBidsTask extends AsyncTask<String, String, ArrayList<Integer>> {
 
         @Override
-        protected String doInBackground(String... params) {
+        protected ArrayList<Integer> doInBackground(String... params) {
             String[] data = new String[0];
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
@@ -304,14 +333,14 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     }
                 }
             }
-            return null;
+            return arrayList;
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+        protected void onPostExecute(ArrayList<Integer> integers) {
+            super.onPostExecute(integers);
             mProgressBar.setVisibility(View.GONE);
-            mBidsAdapter = new BidsAdapter(arrayList);
+            mBidsAdapter = new BidsAdapter(integers);
             mRecyclerView.setAdapter(mBidsAdapter);
         }
     }

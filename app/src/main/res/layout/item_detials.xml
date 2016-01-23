@@ -2,6 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <android.support.v7.widget.CardView
             android:id="@+id/detail_card_view"
@@ -67,24 +71,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/view"
-                    android:layout_margin="5dp"
-                    android:layout_marginTop="2dp"
-                    android:text="About the seller"
+                    android:layout_marginTop="1dp"
+                    android:text="seller info"
                     android:textColor="@color/orange"
-                    android:textSize="20sp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/seller_user_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/about_seller"
-                    android:layout_margin="5dp"
                     android:text="username: bilal" />
 
                 <RatingBar
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
                     android:layout_below="@+id/seller_user_name"
                     style="?android:attr/ratingBarStyleSmall"
                     android:isIndicator="true"
@@ -95,7 +96,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="1dip"
                     android:layout_below="@+id/ratingBar"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="2dp"
                     android:background="#000000" />
                 <LinearLayout
                     android:id="@+id/post_bid_layout"
@@ -109,22 +110,23 @@
                         android:id="@+id/bid_editText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:ems="10"
+                        android:ems="5"
                         android:inputType="number"
                         android:hint="place bid"
-                        android:textColor="@color/orange"
                         android:textStyle="italic"/>
 
                     <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="OK"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/send"
+                        android:layout_marginTop="1dp"
                         android:id="@+id/place_bid"
-                        android:layout_gravity="right"/>
+                        />
 
                 </LinearLayout>
             </RelativeLayout>
         </android.support.v7.widget.CardView>
+    </ScrollView>
 
             <ProgressBar
                 android:layout_width="50dp"
@@ -132,26 +134,16 @@
                 android:layout_margin="10dp"
                 android:id="@+id/bid_loading_progress"
                 android:layout_gravity="center"
-                android:layout_below="@+id/detail_card_view"
+                android:layout_below="@+id/scrollView"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
                 style="?android:attr/progressBarStyle"/>
 
-            <ImageView
-                android:id="@+id/no_internet_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_below="@+id/detail_card_view"
-                android:visibility="gone"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true"/>
-
             <android.support.v7.widget.RecyclerView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/bid_loading_progress"
                 android:id="@+id/bids_recycler_view"
-                android:layout_alignParentBottom="true"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true" />
+                android:foregroundGravity="bottom"
+                android:layout_alignParentBottom="true" />
 </RelativeLayout>

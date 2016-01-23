@@ -61,6 +61,7 @@ public class AppGlobals extends Application{
     public static String loginResponseMessage;
     public static final String POST_BID_URL = String.format("%s/api/users/",BASE_URL);
     public static final String GET_SPECIFIC_BIDS = String.format("%s/api/users/", BASE_URL);
+    public static int postBidResponse = 0;
 
     @Override
     public void onCreate() {
@@ -68,6 +69,14 @@ public class AppGlobals extends Application{
         sContext = getApplicationContext();
         root = Environment.getExternalStorageDirectory().toString()
                 +"/Android/data/" + getPackageName();
+    }
+
+    public static void setPostBidResponse(int value) {
+        postBidResponse = value;
+    }
+
+    public static int getPostBidResponse() {
+        return postBidResponse;
     }
 
     public static void setLoginResponseMessage(String responseMessage) {
