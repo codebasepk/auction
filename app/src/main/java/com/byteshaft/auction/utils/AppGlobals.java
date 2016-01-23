@@ -59,15 +59,12 @@ public class AppGlobals extends Application{
     public static final String SINGLE_AD_DETAILS = String.format("%s/api/users/", BASE_URL);
     public static final String SINGLE_AD_DETAILS_APPEND_END = "ads/";
     public static final String SINGLE_PRODUCT_NAME = "product_name";
-    public static final String ACTION_FOR_SELECTED_CATEGORY = "com.pits.execute.getSelectedCatagoryTask";
-    public static final String ACTION_FOR_MY_ADS_DETAIL ="com.pits.execute.myAdsDetailsTask";
-    public static final String ACTION_FOR_ALLCATEGORY = "com.pits.execute.getAllCategoryTask";
     public static String loginResponseMessage;
-    public static Activity mCurrentActivity = null;
     public static final String POST_BID_URL = String.format("%s/api/users/",BASE_URL);
     public static final String GET_SPECIFIC_BIDS = String.format("%s/api/users/", BASE_URL);
     public static int postBidResponse = 0;
     public static final String GET_USER_SPECIFIC_BIDS = String.format("%s/api/users/", BASE_URL);
+    public static Activity sCurrentActivity;
 
     @Override
     public void onCreate() {
@@ -86,10 +83,10 @@ public class AppGlobals extends Application{
     }
 
     public static Activity getCurrentActivity(){
-        return mCurrentActivity;
+        return sCurrentActivity;
     }
     public static void setCurrentActivity(Activity activity){
-        mCurrentActivity = activity;
+        sCurrentActivity = activity;
     }
 
     public static void setLoginResponseMessage(String responseMessage) {

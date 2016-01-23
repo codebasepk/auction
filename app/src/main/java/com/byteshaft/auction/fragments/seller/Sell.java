@@ -71,7 +71,6 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
     private ViewGroup mSelectedImagesContainer;
     private HashSet<Uri> mMedia = new HashSet<>();
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_CAMERA = 0;
-    public  Intent intent = new Intent();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

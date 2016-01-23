@@ -66,7 +66,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     private ProgressBar mShowMoreProgress;
     private String categorySpecificUrl;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,8 +97,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                 new GetSpecificDataTask().execute(categorySpecificUrl);
             }
         });
-
-
         sRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
@@ -397,8 +394,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
             }
             return idsArray;
         }
-
-
 
         @Override
         protected void onPostExecute(ArrayList<Integer> idsList) {

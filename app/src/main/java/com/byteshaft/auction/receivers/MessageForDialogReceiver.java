@@ -11,11 +11,11 @@ public class MessageForDialogReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         switch (intent.getAction()) {
-            case AppGlobals.ACTION_FOR_MY_ADS_DETAIL:
-                new AdsDetailFragment.GetAllAdsDetailTask((AppGlobals.getCurrentActivity())).execute();
-                break;
-            case AppGlobals.ACTION_FOR_SELECTED_CATEGORY:
-                break;
+//            case AppGlobals.ACTION_FOR_MY_ADS_DETAIL:
+//                new AdsDetailFragment.GetAllAdsDetailTask((AppGlobals.getCurrentActivity())).execute();
+//                break;
+//            case AppGlobals.ACTION_FOR_SELECTED_CATEGORY:
+//                break;
         }
 
     }

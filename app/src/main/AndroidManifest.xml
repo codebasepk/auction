@@ -54,6 +54,9 @@
                    />
             </intent-filter>
         </receiver>
+=======
+
+>>>>>>> upstream/master
         <!-- [START gcm_listener] -->
         <service
             android:name="com.byteshaft.auction.gcm.MyGcmListenerService"
@@ -72,8 +75,6 @@
             </intent-filter>
         </service>
         <!-- [END instanceId_listener] -->
-
-
         <service
             android:name="com.byteshaft.auction.gcm.RegistrationIntentService"
             android:exported="false">

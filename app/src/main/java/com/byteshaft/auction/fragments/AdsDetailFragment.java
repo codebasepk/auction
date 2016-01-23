@@ -33,7 +33,7 @@ public class AdsDetailFragment extends Fragment {
 
     private View mBaseView;
     public static RecyclerView mRecyclerView;
-    private static CustomAdapter customAdapter;
+    private CustomAdapter customAdapter;
     private String catagories;
     public static String nextUrl;
     private static HashMap<Integer, String> descriptionHashMap;
@@ -44,7 +44,7 @@ public class AdsDetailFragment extends Fragment {
     private static HashMap<Integer, String> titleHashMap;
     public ArrayList<Integer> arrayList;
     public static CustomView customView;
-    private static ProgressDialog mProgressDialog;
+    private ProgressDialog mProgressDialog;
 
 
     @Nullable
@@ -64,8 +64,7 @@ public class AdsDetailFragment extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
-        new GetAllAdsDetailTask(getActivity()).execute();
-        AppGlobals.setCurrentActivity(getActivity());
+        new GetAllAdsDetailTask().execute();
         return mBaseView;
     }
 
@@ -119,12 +118,13 @@ public class AdsDetailFragment extends Fragment {
                                         itemView.findViewById(R.id.specific_image_progressBar)
                                         .setVisibility(View.GONE);
                             }
+
                         }
                     });
         }
 
         @Override
-        public int getItemCount()    {
+        public int getItemCount() {
             return items.size();
         }
     }
@@ -151,21 +151,14 @@ public class AdsDetailFragment extends Fragment {
     /**
      * task to get per user ads.
      */
-    public static class GetAllAdsDetailTask extends AsyncTask<String, String, ArrayList<Integer>> {
-
-        private Activity mActivity;
-
-        public GetAllAdsDetailTask(Activity activity) {
-           mActivity = activity;
-
-        }
+    class GetAllAdsDetailTask extends AsyncTask<String, String, ArrayList<Integer>> {
 
         private boolean internetAvailable = false;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(mActivity);
+            mProgressDialog = new ProgressDialog(getActivity());
             mProgressDialog.setMessage("fetching your ads...");
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.setCancelable(false);
@@ -186,7 +179,7 @@ public class AdsDetailFragment extends Fragment {
                         nextUrl = jsonObject.get("next").getAsString();
                     }
                     JsonArray jsonArray = jsonObject.getAsJsonArray("results");
-
+                    System.out.println(jsonArray);
                     for (int i = 0; i < jsonArray.size(); i++) {
                         JsonObject object = jsonArray.get(i).getAsJsonObject();
                         if (!idsArray.contains(object.get("id").getAsInt())) {
@@ -219,10 +212,10 @@ public class AdsDetailFragment extends Fragment {
             super.onPostExecute(integers);
             mProgressDialog.dismiss();
             if (internetAvailable) {
-                Helpers.alertDialog(mActivity, "No internet", "Internet Not available");
+                Helpers.alertDialog(getActivity(), "No internet", "Internet Not available");
                 return;
             }
-            customAdapter = new CustomAdapter(idsArray,mActivity);
+            customAdapter = new CustomAdapter(idsArray, getActivity());
             mRecyclerView.setAdapter(customAdapter);
         }
     }
