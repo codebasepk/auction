@@ -3,6 +3,7 @@ package com.byteshaft.auction.fragments;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -66,7 +67,7 @@ public class CategoriesFragment extends Fragment {
         selectedCategories = new HashSet<>();
         if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORIES_SELECTED)
                 && !AppGlobals.alertDialogShownOneTimeForCategory) {
-            Helpers.alertDialog(getActivity(), "Category selection", "select categories to view products of your interest");
+            Helpers.alertDialog(getActivity(), "Category selection", "select categories to view products of your interest", "");
             AppGlobals.alertDialogShownOneTimeForCategory = true;
         }
         mBaseView.setTag("RecyclerViewFragment");
@@ -410,7 +411,7 @@ public class CategoriesFragment extends Fragment {
             }
             Log.i(AppGlobals.getLogTag(getClass()), String.valueOf(s));
             if (s == AppGlobals.NO_INTERNET) {
-                Helpers.alertDialog(getActivity(), "No internet", "Internet not available");
+                Helpers.alertDialog(getActivity(), "No internet", "Internet not available", "");
                 return;
             }
             if (s == HttpURLConnection.HTTP_OK) {

@@ -1,6 +1,5 @@
 package com.byteshaft.auction;
 
-import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -30,7 +29,7 @@ import com.byteshaft.auction.fragments.UserSettingFragment;
 import com.byteshaft.auction.fragments.buyer.Buy;
 import com.byteshaft.auction.fragments.AdsDetailFragment;
 import com.byteshaft.auction.fragments.seller.Sell;
-import com.byteshaft.auction.fragments.seller.UserSpeificBidsFragment;
+import com.byteshaft.auction.fragments.seller.UserSpecificBidsFragment;
 import com.byteshaft.auction.gcm.QuickstartPreferences;
 import com.byteshaft.auction.gcm.RegistrationIntentService;
 import com.byteshaft.auction.register_login.LoginActivity;
@@ -228,7 +227,7 @@ public class MainActivity extends AppCompatActivity
                 fragmentClass = AdsDetailFragment.class;
                 break;
             case R.id.user_bids_detail:
-                fragmentClass = UserSpeificBidsFragment.class;
+                fragmentClass = UserSpecificBidsFragment.class;
                 break;
             case R.id.nav_user:
                 fragmentClass = UserSettingFragment.class;
