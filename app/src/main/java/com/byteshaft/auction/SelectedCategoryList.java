@@ -152,9 +152,15 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                 searchManager.getSearchableInfo(getComponentName()));
 //        ImageView mCloseButton = (ImageView) searchView.findViewById(R.id.search_close_btn);
 //        mCloseButton.setVisibility(View.GONE);
-        int id = getResources().getIdentifier("android:id/search_close_btn", null, null);
-        ImageView imageView = (ImageView) searchView.findViewById(id);
-        imageView.setBackgroundResource(android.R.drawable.ic_menu_search);
+//        int id = getResources().getIdentifier("android:id/search_close_btn", null, null);
+//        ImageView imageView = (ImageView) searchView.findViewById(id);
+//        imageView.setBackgroundResource(android.R.drawable.ic_menu_search);
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("CLICK");
+            }
+        });
 
         return true;
     }

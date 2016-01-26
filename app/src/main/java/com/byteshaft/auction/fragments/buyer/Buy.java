@@ -38,6 +38,9 @@ public class Buy extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.buyer_category_fragment, container, false);
         categories = Helpers.getCategories();
+        if (categories.contains("nothing")) {
+            categories.remove("nothing");
+        }
         System.out.println("Buyer");
         System.out.println(categories);
         mBaseView.setTag(TAG);

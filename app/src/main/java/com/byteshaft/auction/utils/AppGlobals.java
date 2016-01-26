@@ -52,7 +52,6 @@ public class AppGlobals extends Application{
     public static final String SELECTED_CATEGORY_DETAIL_URL = String.format("%s/api/ads/?category=",BASE_URL);
     public static final String PROFILE_PIC_FOLDER = "/profilePic";
     public static final String CATEGORIES_FOLDER = "/categories_folder";
-//    public static final String ALL_CATEGORIES_STATUS = "all_categories_status";
     public static final String CATEGORIES_IMAGES_SAVED = "category_images_saved";
     public static final String PROFILE_PIC_IMAGE_URL = "profile_pic_image";
     public static boolean alertDialogShownOneTimeForCategory = false;
