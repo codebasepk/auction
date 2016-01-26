@@ -5,10 +5,6 @@
         android:title="Search"
         android:icon="@android:drawable/ic_menu_search"
         app:showAsAction="always"
+        app:closeIcon="@android:drawable/ic_menu_search"
         app:actionViewClass="android.widget.SearchView" />
-    <item
-        android:id="@+id/fire_search"
-        android:title="search"
-        android:icon="@android:drawable/ic_search_category_default"
-        app:showAsAction="always"/>
 </menu>

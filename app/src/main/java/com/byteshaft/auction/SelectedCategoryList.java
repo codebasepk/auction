@@ -143,25 +143,45 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.search_selected_item, menu);
+        ImageView mSearchCloseButton = null;
         // Associate searchable configuration with the SearchView
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        android.widget.SearchView searchView =
+        final android.widget.SearchView searchView =
                 (android.widget.SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
-//        ImageView mCloseButton = (ImageView) searchView.findViewById(R.id.search_close_btn);
-//        mCloseButton.setVisibility(View.GONE);
-//        int id = getResources().getIdentifier("android:id/search_close_btn", null, null);
-//        ImageView imageView = (ImageView) searchView.findViewById(id);
-//        imageView.setBackgroundResource(android.R.drawable.ic_menu_search);
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
+        searchView.setSubmitButtonEnabled(false);
+        LinearLayout linearLayoutOfSearchView = (LinearLayout) searchView.getChildAt(0);
+        final Button button = new Button(getApplicationContext());
+        button.setBackgroundResource(R.drawable.go_button);
+        button.setLayoutParams(new LinearLayout.LayoutParams(50, 50));
+        button.setVisibility(View.GONE);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("CLICK");
+                System.out.println(searchView.getQuery());
+                String url = AppGlobals.SEARCH_URL;
+                new GetSpecificDataTask().execute(url);
             }
         });
+        linearLayoutOfSearchView.addView(button);
+        searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (!newText.isEmpty()) {
+                    button.setVisibility(View.VISIBLE);
+                } else {
+                    button.setVisibility(View.GONE);
+                }
+                return true;
+            }
+        });
         return true;
     }
 
