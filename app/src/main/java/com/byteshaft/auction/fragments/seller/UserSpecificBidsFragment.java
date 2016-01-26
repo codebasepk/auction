@@ -71,7 +71,7 @@ public class UserSpecificBidsFragment extends Fragment {
         return mBaseView;
     }
 
-    static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
+    static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private ArrayList<Integer> items;
         public Activity mActivity;
@@ -97,7 +97,7 @@ public class UserSpecificBidsFragment extends Fragment {
             customView.descriptionTextView.setText(descriptionHashMap.get(items.get(position)));
             customView.priceTextView.setText(priceHashMap.get(items.get(position)) + " " +
                     currencyHashMap.get(items.get(position)));
-            customView.userBidsPrice.setText(bidPriceHashMap.get(items.get(position)) + " "+
+            customView.userBidsPrice.setText(bidPriceHashMap.get(items.get(position)) + " " +
                     currencyHashMap.get(items.get(position)));
             Picasso.with(mActivity)
                     .load(imagesUrlHashMap.get(items.get(position)))
@@ -130,7 +130,7 @@ public class UserSpecificBidsFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-           return items.size();
+            return items.size();
         }
     }
 
@@ -171,7 +171,7 @@ public class UserSpecificBidsFragment extends Fragment {
                 String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
                 String userBidsUrl = AppGlobals.GET_USER_SPECIFIC_BIDS + username + "/bids";
                 try {
-                    userdata = Helpers.simpleGetRequest(userBidsUrl,username, password);
+                    userdata = Helpers.simpleGetRequest(userBidsUrl, username, password);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -204,8 +204,6 @@ public class UserSpecificBidsFragment extends Fragment {
                             }
                         }
                     }
-
-
                 }
             }
 
