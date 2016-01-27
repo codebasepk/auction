@@ -124,16 +124,13 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         switch (v.getId()) {
             case R.id.place_bid:
                 if (placeBidEditText.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(SelectedAdDetail.this, "please enter some amount", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 int productPrice = Integer.valueOf(price.replaceAll(".00", ""));
                 int biddingAmount = Integer.valueOf(placeBidEditText.getText().toString());
                 if (biddingAmount < productPrice) {
                     Helpers.alertDialog(SelectedAdDetail.this, "", "price is lower than product amount");
-                    return;
-                }
-                if (placeBidEditText.getText().toString().trim().isEmpty()) {
-                    Toast.makeText(SelectedAdDetail.this, "please enter some amount", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
