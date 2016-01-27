@@ -228,7 +228,7 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-//                profilePic = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
+                profilePic = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
                 profilePicImageView.setImageBitmap(thumbnail);
                 profilePictureChanged = true;
             } else if (requestCode == SELECT_FILE) {
@@ -271,7 +271,7 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
                     }
                     String[] valueToUpdate = {mUserEmail.getText().toString(),
                             mAddress.getText().toString(), mCity.getText().toString(),
-                            mPhoneNumber.getText().toString(), password};
+                            mPhoneNumber.getText().toString(), password, imageUrl};
                     new UpdateUserDetailsTask().execute(valueToUpdate);
                 }
                 break;
@@ -358,12 +358,12 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
                     http.addFormField("city", params[2]);
                     http.addFormField("phone_number", params[3]);
                     http.addFormField("password", params[4]);
-                    if (profilePictureChanged) {
-                        http.addFilePart("photo", new File(""));
+                    if (profilePictureChanged && !params[5].trim().isEmpty()) {
+                        http.addFilePart("photo", new File(params[5]));
                     }
                     final byte[] bytes = http.finishFilesUpload();
                     try {
-                        OutputStream os = new FileOutputStream("");
+                        OutputStream os = new FileOutputStream(params[5]);
                         os.write(bytes);
                     } catch (IOException e) {
 

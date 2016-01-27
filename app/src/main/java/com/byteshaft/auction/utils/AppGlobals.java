@@ -146,6 +146,7 @@ public class AppGlobals extends Application{
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("saved in internal memory");
     }
 
     // get profile pic as bitmap when needed
