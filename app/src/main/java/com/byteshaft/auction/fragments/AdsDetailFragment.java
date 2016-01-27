@@ -34,7 +34,6 @@ public class AdsDetailFragment extends Fragment {
     private View mBaseView;
     public static RecyclerView mRecyclerView;
     private CustomAdapter customAdapter;
-    private String catagories;
     public static String nextUrl;
     private static HashMap<Integer, String> descriptionHashMap;
     private static ArrayList<Integer> idsArray;

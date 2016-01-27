@@ -47,7 +47,6 @@ import java.util.Set;
 
 public class CategoriesFragment extends Fragment {
 
-    private static final String TAG = "RecyclerViewFragment";
     private static CategoriesAdapter sAdapter;
     private static ArrayList<String> sCategoriesList;
     private static boolean sInternetTaskInProgress = false;
