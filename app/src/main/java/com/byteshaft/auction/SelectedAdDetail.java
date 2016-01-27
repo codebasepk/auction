@@ -23,8 +23,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.byteshaft.auction.fragments.ChatActivity;
-import com.byteshaft.auction.fragments.ProductImageView;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.google.gson.JsonArray;

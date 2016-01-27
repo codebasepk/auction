@@ -31,8 +31,8 @@
         <activity android:name=".SelectedCategoryList">
             </activity>
         <activity android:name=".SelectedAdDetail"/>
-        <activity android:name=".fragments.ProductImageView" />
-        <activity android:name=".fragments.ChatActivity"/>
+        <activity android:name=".ProductImageView" />
+        <activity android:name=".ChatActivity"/>
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"

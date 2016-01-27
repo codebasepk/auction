@@ -1,4 +1,4 @@
-package com.byteshaft.auction.fragments;
+package com.byteshaft.auction;
 
 
 import android.app.Activity;
@@ -15,8 +15,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.byteshaft.auction.R;
 
 
 public class ChatActivity extends Activity implements View.OnClickListener {
