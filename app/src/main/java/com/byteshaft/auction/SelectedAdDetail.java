@@ -1,6 +1,8 @@
 package com.byteshaft.auction;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -103,9 +105,12 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             case android.R.id.home:
                 onBackPressed();
                 return true;
-            case R.id.chat_button:
-                Intent intent = new Intent(this, ChatActivity.class);
-                startActivity(intent);
+//            case R.id.chat_button:
+//                Intent intent = new Intent(this, ChatActivity.class);
+//                startActivity(intent);
+            case R.id.user_info_button:
+                userInfoDialog();
+                break;
         }
         return false;
     }
@@ -349,5 +354,21 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         }
     }
 
+
+    public void userInfoDialog() {
+
+        LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
+        View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(SelectedAdDetail.this);
+        alertDialog.setView(promptView);
+        alertDialog.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alertDialog.create();
+        alertDialog.show();
+    }
 }
 

@@ -66,44 +66,44 @@
                     android:layout_below="@+id/horizontal_scroll"
                     android:background="#000000" />
 
-                <TextView
-                    android:id="@+id/about_seller"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/view"
-                    android:layout_marginTop="1dp"
-                    android:text="seller info"
-                    android:textColor="@color/orange"
-                    android:textSize="14sp" />
+                <!--<TextView-->
+                    <!--android:id="@+id/about_seller"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_below="@+id/view"-->
+                    <!--android:layout_marginTop="1dp"-->
+                    <!--android:text="seller info"-->
+                    <!--android:textColor="@color/orange"-->
+                    <!--android:textSize="14sp" />-->
 
-                <TextView
-                    android:id="@+id/seller_user_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/about_seller"
-                    android:text="username: bilal" />
+                <!--<TextView-->
+                    <!--android:id="@+id/seller_user_name"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_below="@+id/about_seller"-->
+                    <!--android:text="username: bilal" />-->
 
-                <RatingBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/seller_user_name"
-                    style="?android:attr/ratingBarStyleSmall"
-                    android:isIndicator="true"
-                    android:id="@+id/ratingBar" />
+                <!--<RatingBar-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_below="@+id/seller_user_name"-->
+                    <!--style="?android:attr/ratingBarStyleSmall"-->
+                    <!--android:isIndicator="true"-->
+                    <!--android:id="@+id/ratingBar" />-->
 
-                <View
-                    android:id="@+id/view_below_about_seller"
-                    android:layout_width="fill_parent"
-                    android:layout_height="1dip"
-                    android:layout_below="@+id/ratingBar"
-                    android:layout_marginTop="2dp"
-                    android:background="#000000" />
+                <!--<View-->
+                    <!--android:id="@+id/view_below_about_seller"-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="1dip"-->
+                    <!--android:layout_below="@+id/ratingBar"-->
+                    <!--android:layout_marginTop="2dp"-->
+                    <!--android:background="#000000" />-->
                 <LinearLayout
                     android:id="@+id/post_bid_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
-                    android:layout_below="@+id/view_below_about_seller"
+                    android:layout_below="@+id/view"
                     android:orientation="horizontal">
 
                     <EditText

@@ -33,6 +33,7 @@ public class ProductImageView extends AppCompatActivity {
         Picasso.with(ProductImageView.this)
                 .load(imagePosition)
                 .resize(720, 1280)
+                .centerCrop()
                 .into(imageView);
     }
 }
