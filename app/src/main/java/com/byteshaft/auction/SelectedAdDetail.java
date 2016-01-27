@@ -105,9 +105,12 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             case android.R.id.home:
                 onBackPressed();
                 return true;
-            case R.id.chat_button:
-                Intent intent = new Intent(this, ChatActivity.class);
-                startActivity(intent);
+//            case R.id.chat_button:
+//                Intent intent = new Intent(this, ChatActivity.class);
+//                startActivity(intent);
+            case R.id.user_info_button:
+
+                break;
         }
         return false;
     }

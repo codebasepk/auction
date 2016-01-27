@@ -14,8 +14,11 @@ import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.webkit.URLUtil;
 
+import com.byteshaft.auction.R;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -420,5 +423,12 @@ public class Helpers {
         OutputStream os = connection.getOutputStream();
         os.write(outputInBytes);
         os.close();
+    }
+
+    public void userInfoDialog() {
+
+        LayoutInflater layoutInflater = LayoutInflater.from(AppGlobals.getContext());
+        View promptview = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
+
     }
 }

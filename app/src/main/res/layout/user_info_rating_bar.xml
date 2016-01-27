@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/about_seller"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view"
+        android:layout_marginTop="1dp"
+        android:text="seller info"
+        android:textColor="@color/orange"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/seller_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/about_seller"
+        android:text="username: bilal" />
+
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/seller_user_name"
+        style="?android:attr/ratingBarStyleSmall"
+        android:isIndicator="true"
+        android:id="@+id/ratingBar" />
+
+    <View
+        android:id="@+id/view_below_about_seller"
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/ratingBar"
+        android:layout_marginTop="2dp"
+        android:background="#000000" />
+
+</RelativeLayout>
