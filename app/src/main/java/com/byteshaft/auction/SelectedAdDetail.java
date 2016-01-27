@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.byteshaft.auction.fragments.ChatActivity;
 import com.byteshaft.auction.fragments.seller.ProductImageView;
@@ -131,6 +132,11 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     Helpers.alertDialog(SelectedAdDetail.this, "", "price is lower than product amount");
                     return;
                 }
+                if (placeBidEditText.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(SelectedAdDetail.this, "please enter some amount", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if (!placeBidEditText.getText().toString().trim().isEmpty() &&
                         TextUtils.isDigitsOnly(placeBidEditText.getText().toString())) {
                     String bid = placeBidEditText.getText().toString();
