@@ -14,8 +14,12 @@ import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.webkit.URLUtil;
 
+import com.byteshaft.auction.R;
+import com.byteshaft.auction.SelectedAdDetail;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
