@@ -1,5 +1,6 @@
 package com.byteshaft.auction.fragments;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -109,5 +110,14 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.edit_user_profile, menu);
+    }
+
+    class UpdateUserDetailsTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            
+            return null;
+        }
     }
 }
