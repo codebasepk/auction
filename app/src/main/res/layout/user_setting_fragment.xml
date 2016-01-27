@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:fitsSystemWindows="true">
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="10dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:paddingTop="14dp">
+        android:orientation="vertical">
+
+        <com.github.siyamed.shapeimageview.CircularImageView
+            android:id="@+id/profilePic"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_gravity="right"
+            app:siBorderWidth="1dp"
+            app:siBorderColor="#FFFFFF"
+            />
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -129,4 +139,5 @@
             android:text="Done" />
 
     </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</RelativeLayout>

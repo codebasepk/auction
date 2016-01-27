@@ -1,4 +1,4 @@
-package com.byteshaft.auction.fragments.seller;
+package com.byteshaft.auction.fragments;
 
 import android.Manifest;
 import android.app.Activity;
@@ -325,7 +325,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return AppGlobals.getPostProductResponse();
+                return AppGlobals.getPostResponse();
             } else {
                 return AppGlobals.NO_INTERNET;
             }

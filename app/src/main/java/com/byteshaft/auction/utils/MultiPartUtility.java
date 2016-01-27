@@ -53,7 +53,8 @@ public class MultiPartUtility {
                 true);
     }
 
-    // constructor used to post new product to internet
+
+    // constructor used to PUT data on server it can be an ad or user data
     public MultiPartUtility(final URL url, String method, String userName, String password)
             throws IOException {
         postProductProcess = true;
@@ -140,8 +141,8 @@ public class MultiPartUtility {
         if (registrationProcess && status == 201) {
             AppGlobals.setUserExistResponse(status);
         }
-        if (postProductProcess && status == 201) {
-            AppGlobals.setPostProductResponse(status);
+        if (postProductProcess && status == 201 || status == 200) {
+            AppGlobals.setPostResponse(status);
         }
         System.out.println(connection.getResponseCode());
         InputStream is = connection.getInputStream();

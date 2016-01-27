@@ -14,12 +14,9 @@ import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.webkit.URLUtil;
 
 import com.byteshaft.auction.R;
-import com.byteshaft.auction.SelectedAdDetail;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -36,6 +33,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 public class Helpers {
@@ -424,5 +422,15 @@ public class Helpers {
         OutputStream os = connection.getOutputStream();
         os.write(outputInBytes);
         os.close();
+    }
+
+    public static Bitmap getBitMapWithNameCharacter() {
+//        final Resources res = AppGlobals.getContext().getResources();
+        int[] array = AppGlobals.getContext().getResources().getIntArray(R.array.letter_tile_colors);
+        final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
+        final Bitmap letterTile = tileProvider.getLetterTile(Helpers.
+                        getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
+                String.valueOf(array[new Random().nextInt(array.length)]), 100, 100);
+        return letterTile;
     }
 }

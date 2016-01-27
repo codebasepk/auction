@@ -1,4 +1,4 @@
-package com.byteshaft.auction.fragments.seller;
+package com.byteshaft.auction;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,7 +7,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.byteshaft.auction.R;
 import com.squareup.picasso.Picasso;
 
 import uk.co.senab.photoview.PhotoViewAttacher;

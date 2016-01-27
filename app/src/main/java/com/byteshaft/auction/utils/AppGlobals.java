@@ -42,7 +42,7 @@ public class AppGlobals extends Application{
     public static final String LOGIN_URL = String.format("%s/api/users/", BASE_URL);
     public static final String USER_EXIST_URL = String.format("%s/api/users/", BASE_URL);
     public static final String REGISTER_URL = String.format("%s/api/register", BASE_URL);
-    public static int postProductResponse;
+    public static int postResponse;
     public static final String CATEGORY_URL = String.format("%s/api/users/", BASE_URL);
     public static String root;
     public static String profilePicName = "profile_pic.png";
@@ -68,7 +68,9 @@ public class AppGlobals extends Application{
     public static int postBidResponse = 0;
     public static final String GET_USER_SPECIFIC_BIDS = String.format("%s/api/users/", BASE_URL);
     public static Activity sCurrentActivity;
-    public static final String SEARCH_URL = "http://46.101.75.194:8000/api/ads/?category=";
+    public static final String SEARCH_URL = String.format("%s/api/ads/?category=", BASE_URL);
+    public static final String UPDATE_USER_DETAILS_URL = String.format("%s/api/users/",BASE_URL);
+
 
     @Override
     public void onCreate() {
@@ -144,6 +146,7 @@ public class AppGlobals extends Application{
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("saved in internal memory");
     }
 
     // get profile pic as bitmap when needed
@@ -156,11 +159,11 @@ public class AppGlobals extends Application{
         }
     }
 
-    public static void setPostProductResponse(int value) {
-        postProductResponse = value;
+    public static void setPostResponse(int value) {
+        postResponse = value;
     }
 
-    public static int getPostProductResponse() {
-        return postProductResponse;
+    public static int getPostResponse() {
+        return postResponse;
     }
 }

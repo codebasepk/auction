@@ -1,4 +1,4 @@
-package com.byteshaft.auction.fragments.buyer;
+package com.byteshaft.auction.fragments;
 
 import android.content.Context;
 import android.content.Intent;
