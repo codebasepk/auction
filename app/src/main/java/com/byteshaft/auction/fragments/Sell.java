@@ -1,4 +1,4 @@
-package com.byteshaft.auction.fragments.seller;
+package com.byteshaft.auction.fragments;
 
 import android.Manifest;
 import android.app.Activity;

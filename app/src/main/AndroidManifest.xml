@@ -31,7 +31,7 @@
         <activity android:name=".SelectedCategoryList">
             </activity>
         <activity android:name=".SelectedAdDetail"/>
-        <activity android:name=".fragments.seller.ProductImageView" />
+        <activity android:name=".fragments.ProductImageView" />
         <activity android:name=".fragments.ChatActivity"/>
 
         <receiver

@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.byteshaft.auction.R;
-import com.byteshaft.auction.fragments.buyer.Buy;
 import com.byteshaft.auction.register_login.LoginActivity;
 import com.byteshaft.auction.register_login.RegisterActivity;
 import com.byteshaft.auction.utils.AppGlobals;
