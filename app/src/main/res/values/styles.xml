@@ -17,5 +17,4 @@
     <style name="AppTheme.CheckBox">
         <item name="android:colorAccent">@color/colorDefault</item>
     </style>
-
 </resources>

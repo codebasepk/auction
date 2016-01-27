@@ -46,5 +46,20 @@
                 style="?android:attr/progressBarStyle"/>
 
         </LinearLayout>
+        <RelativeLayout
+            android:id="@+id/not_found_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone">
+            <ImageView
+                android:src="@drawable/not_found"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:foregroundGravity="center"
+                android:layout_centerInParent="true"/>
+
+        </RelativeLayout>
     </RelativeLayout>
 </android.support.v4.widget.SwipeRefreshLayout>

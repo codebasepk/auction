@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.byteshaft.auction.utils.AppGlobals;
@@ -47,7 +48,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
 
     public static RecyclerView sRecyclerView;
     private CustomAdapter mAdapter;
-    private ArrayList<String> arrayList;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private String category;
     private String nextUrl;
@@ -65,6 +65,8 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     private Button showMoreButton;
     private ProgressBar mShowMoreProgress;
     private String categorySpecificUrl;
+    private boolean searchProcess;
+    private RelativeLayout notFoundLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +80,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         mShowMoreProgress.setVisibility(View.INVISIBLE);
         showMoreButton.setOnClickListener(this);
         categorySpecificUrl = AppGlobals.SELECTED_CATEGORY_DETAIL_URL + category.toLowerCase();
-//        setTitle(category);
+        notFoundLayout = (RelativeLayout) findViewById(R.id.not_found_layout);
         initializeArrayAndHashMap();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -143,19 +145,47 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.search_selected_item, menu);
+        ImageView mSearchCloseButton = null;
         // Associate searchable configuration with the SearchView
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        android.widget.SearchView searchView =
+        final android.widget.SearchView searchView =
                 (android.widget.SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
-//        ImageView mCloseButton = (ImageView) searchView.findViewById(R.id.search_close_btn);
-//        mCloseButton.setVisibility(View.GONE);
-        int id = getResources().getIdentifier("android:id/search_close_btn", null, null);
-        ImageView imageView = (ImageView) searchView.findViewById(id);
-        imageView.setBackgroundResource(android.R.drawable.ic_menu_search);
+        searchView.setSubmitButtonEnabled(false);
+        LinearLayout linearLayoutOfSearchView = (LinearLayout) searchView.getChildAt(0);
+        final Button button = new Button(getApplicationContext());
+        button.setBackgroundResource(R.drawable.go_button);
+        button.setLayoutParams(new LinearLayout.LayoutParams(50, 50));
+        button.setVisibility(View.GONE);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String searchText = String.valueOf(searchView.getQuery()).replaceAll(" ", "%20");
+                String url = AppGlobals.SEARCH_URL+category.toLowerCase()+"&title="+searchText;
+                searchProcess = true;
+                initializeArrayAndHashMap();
+                new GetSpecificDataTask().execute(url);
+            }
+        });
+        linearLayoutOfSearchView.addView(button);
+        searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (!newText.isEmpty()) {
+                    button.setVisibility(View.VISIBLE);
+                } else {
+                    button.setVisibility(View.GONE);
+                }
+                return true;
+            }
+        });
         return true;
     }
 
@@ -356,32 +386,58 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                 String parsedString;
                 try {
                     HttpURLConnection httpURLConnection = Helpers.openConnectionForUrl(params[0], "GET");
-                    System.out.println(httpURLConnection.getResponseCode());
                     InputStream inputStream = httpURLConnection.getInputStream();
                     parsedString = Helpers.convertInputStreamToString(inputStream);
                     System.out.println(parsedString);
                     JsonParser jsonParser = new JsonParser();
                     JsonObject jsonObject = jsonParser.parse(parsedString).getAsJsonObject();
                     countValue = jsonObject.get("count").getAsInt();
-                    if (!jsonObject.get("next").isJsonNull()) {
-                        nextUrl = jsonObject.get("next").getAsString();
-                    }
-                    JsonArray jsonArray = jsonObject.getAsJsonArray("results");
-                    for (int i = 0; i < jsonArray.size(); i++) {
-                        JsonObject object = jsonArray.get(i).getAsJsonObject();
-                        if (!idsArray.contains(object.get("id").getAsInt())) {
-                            idsArray.add(object.get("id").getAsInt());
-                            titleHashMap.put(object.get("id").getAsInt(),
-                                    object.get("title").getAsString());
-                            descriptionHashMap.put(object.get("id").getAsInt(),
-                                    object.get("description").getAsString());
-                            priceHashMap.put(object.get("id").getAsInt(),
-                                    object.get("price").getAsString());
-                            imagesUrlHashMap.put(object.get("id").getAsInt(),
-                                    object.get("photo1").getAsString());
-                            if (!object.get("currency").isJsonNull()) {
-                                currencyHashMap.put(object.get("id").getAsInt(),
-                                        object.get("currency").getAsString());
+                    nextUrl = "";
+                    if (searchProcess && countValue > 0) {
+                        if (!jsonObject.get("next").isJsonNull()) {
+                            nextUrl = jsonObject.get("next").getAsString();
+                        }
+                        JsonArray jsonArray = jsonObject.getAsJsonArray("results");
+                        for (int i = 0; i < jsonArray.size(); i++) {
+                            JsonObject object = jsonArray.get(i).getAsJsonObject();
+                            if (!idsArray.contains(object.get("id").getAsInt())) {
+                                idsArray.add(object.get("id").getAsInt());
+                                titleHashMap.put(object.get("id").getAsInt(),
+                                        object.get("title").getAsString());
+                                descriptionHashMap.put(object.get("id").getAsInt(),
+                                        object.get("description").getAsString());
+                                priceHashMap.put(object.get("id").getAsInt(),
+                                        object.get("price").getAsString());
+                                imagesUrlHashMap.put(object.get("id").getAsInt(),
+                                        object.get("photo1").getAsString());
+                                if (!object.get("currency").isJsonNull()) {
+                                    currencyHashMap.put(object.get("id").getAsInt(),
+                                            object.get("currency").getAsString());
+                                }
+                            }
+                        }
+
+                    } else {
+                        if (!jsonObject.get("next").isJsonNull()) {
+                            nextUrl = jsonObject.get("next").getAsString();
+                        }
+                        JsonArray jsonArray = jsonObject.getAsJsonArray("results");
+                        for (int i = 0; i < jsonArray.size(); i++) {
+                            JsonObject object = jsonArray.get(i).getAsJsonObject();
+                            if (!idsArray.contains(object.get("id").getAsInt())) {
+                                idsArray.add(object.get("id").getAsInt());
+                                titleHashMap.put(object.get("id").getAsInt(),
+                                        object.get("title").getAsString());
+                                descriptionHashMap.put(object.get("id").getAsInt(),
+                                        object.get("description").getAsString());
+                                priceHashMap.put(object.get("id").getAsInt(),
+                                        object.get("price").getAsString());
+                                imagesUrlHashMap.put(object.get("id").getAsInt(),
+                                        object.get("photo1").getAsString());
+                                if (!object.get("currency").isJsonNull()) {
+                                    currencyHashMap.put(object.get("id").getAsInt(),
+                                            object.get("currency").getAsString());
+                                }
                             }
                         }
                     }
@@ -409,6 +465,9 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
             }
             System.out.println("countvalue:" +countValue);
             showMoreLinearLayout.setVisibility(View.VISIBLE);
+            if (searchProcess) {
+                mAdapter = null;
+            }
             mAdapter = new CustomAdapter(idsList, SelectedCategoryList.this);
             sRecyclerView.setAdapter(mAdapter);
             mSwipeRefreshLayout.setRefreshing(false);
@@ -422,6 +481,12 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                             startActivity(intent);
                         }
                     }));
+            if (nextUrl.trim().isEmpty()) {
+                showMoreLinearLayout.setVisibility(View.GONE);
+            }
+            if (countValue < 1) {
+                notFoundLayout.setVisibility(View.VISIBLE);
+            }
         }
     }
 }
