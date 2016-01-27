@@ -68,7 +68,9 @@ public class AppGlobals extends Application{
     public static int postBidResponse = 0;
     public static final String GET_USER_SPECIFIC_BIDS = String.format("%s/api/users/", BASE_URL);
     public static Activity sCurrentActivity;
-    public static final String SEARCH_URL = "http://46.101.75.194:8000/api/ads/?category=";
+    public static final String SEARCH_URL = String.format("%s/api/ads/?category=", BASE_URL);
+    public static final String UPDATE_USER_DETAILS_URL = String.format("%s/api/users/",BASE_URL);
+
 
     @Override
     public void onCreate() {

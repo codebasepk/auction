@@ -3,6 +3,8 @@ package com.byteshaft.auction.fragments;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,10 +13,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
+import com.byteshaft.auction.utils.MultiPartUtility;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
 
 
 /*
@@ -31,6 +41,12 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
     private EditText mCity;
     private EditText mNewPassword;
     private Button mButtonDone;
+    private boolean emailChanged = false;
+    private boolean passWordChanged = false;
+    public boolean booleanValue = false;
+    private boolean addressChanged = false;
+    private boolean cityChanged = false;
+    private ImageView profilePicImageView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -43,8 +59,13 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
         mAddress = (EditText) mBaseView.findViewById(R.id.user_address);
         mCity = (EditText) mBaseView.findViewById(R.id.user_city);
         mButtonDone = (Button) mBaseView.findViewById(R.id.btn_done);
+        profilePicImageView = (ImageView) mBaseView.findViewById(R.id.profilePic);
         mButtonDone.setOnClickListener(this);
         mButtonDone.setVisibility(View.GONE);
+        addTextWatcherOnEditText(mUserEmail, emailChanged);
+        addTextWatcherOnEditText(mNewPassword, passWordChanged);
+        addTextWatcherOnEditText(mAddress, addressChanged);
+        addTextWatcherOnEditText(mCity, cityChanged);
         setHasOptionsMenu(true);
         getValuesFromSharedPreference();
         return mBaseView;
@@ -61,6 +82,28 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
             case R.id.btn_done:
                 break;
         }
+    }
+
+    private void addTextWatcherOnEditText(EditText editText, boolean status) {
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().isEmpty()) {
+                    booleanValue = true;
+                }
+            }
+        });
+        booleanValue = status;
     }
 
     public void getValuesFromSharedPreference() {
@@ -114,10 +157,39 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
 
     class UpdateUserDetailsTask extends AsyncTask<String, String, String> {
 
+
         @Override
         protected String doInBackground(String... params) {
-            
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                MultiPartUtility http;
+                String username = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+                String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+                try {
+                    http = new MultiPartUtility(new URL(AppGlobals.UPDATE_USER_DETAILS_URL +
+                            username+"/"), "PUT", username, password);
+                    http.addFormField("username", username);
+                    http.addFormField("email", params[1]);
+                    http.addFormField("address", params[2]);
+                    http.addFormField("city", params[3]);
+                    http.addFormField("phone_number", params[4].toLowerCase());
+                    http.addFilePart("photo" ,  new File(""));
+                    final byte[] bytes = http.finish();
+                    try {
+                        OutputStream os = new FileOutputStream("");
+                        os.write(bytes);
+                    } catch (IOException e) {
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
         }
     }
 }
