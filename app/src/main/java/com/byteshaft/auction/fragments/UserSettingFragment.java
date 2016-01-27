@@ -1,8 +1,20 @@
 package com.byteshaft.auction.fragments;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.CursorLoader;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -13,17 +25,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.byteshaft.auction.utils.MultiPartUtility;
+import com.github.siyamed.shapeimageview.CircularImageView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 
@@ -43,10 +59,17 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
     private Button mButtonDone;
     private boolean emailChanged = false;
     private boolean passWordChanged = false;
-    public boolean booleanValue = false;
     private boolean addressChanged = false;
     private boolean cityChanged = false;
-    private ImageView profilePicImageView;
+    private CircularImageView profilePicImageView;
+    private static final int REQUEST_CAMERA = 1212;
+    private static final int SELECT_FILE = 1245;
+    private boolean profilePictureChanged = false;
+    private File destination;
+    private String imageUrl = "";
+    private Uri selectedImageUri;
+    private Bitmap profilePic;
+    private ProgressDialog mProgressDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,33 +82,10 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
         mAddress = (EditText) mBaseView.findViewById(R.id.user_address);
         mCity = (EditText) mBaseView.findViewById(R.id.user_city);
         mButtonDone = (Button) mBaseView.findViewById(R.id.btn_done);
-        profilePicImageView = (ImageView) mBaseView.findViewById(R.id.profilePic);
+        profilePicImageView = (CircularImageView) mBaseView.findViewById(R.id.profilePic);
         mButtonDone.setOnClickListener(this);
         mButtonDone.setVisibility(View.GONE);
-        addTextWatcherOnEditText(mUserEmail, emailChanged);
-        addTextWatcherOnEditText(mNewPassword, passWordChanged);
-        addTextWatcherOnEditText(mAddress, addressChanged);
-        addTextWatcherOnEditText(mCity, cityChanged);
-        setHasOptionsMenu(true);
-        getValuesFromSharedPreference();
-        return mBaseView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_done:
-                break;
-        }
-    }
-
-    private void addTextWatcherOnEditText(EditText editText, boolean status) {
-        editText.addTextChangedListener(new TextWatcher() {
+        mUserEmail.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -99,11 +99,186 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
             @Override
             public void afterTextChanged(Editable s) {
                 if (!s.toString().isEmpty()) {
-                    booleanValue = true;
+                    emailChanged = true;
                 }
             }
         });
-        booleanValue = status;
+        mNewPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().isEmpty()) {
+                    passWordChanged = true;
+                }
+            }
+        });
+        mAddress.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().isEmpty()) {
+                    addressChanged = true;
+                }
+            }
+        });
+        mCity.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().isEmpty()) {
+                    cityChanged = true;
+                }
+            }
+        });
+        try {
+            if (AppGlobals.getProfilePicBitMap() != null) {
+                profilePicImageView.setImageBitmap(AppGlobals.getProfilePicBitMap());
+            } else {
+                if (Helpers.isUserLoggedIn()) {
+                    profilePicImageView.setImageBitmap(Helpers.getBitMapWithNameCharacter());
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        setHasOptionsMenu(true);
+        getValuesFromSharedPreference();
+        profilePicImageView.setOnClickListener(this);
+        return mBaseView;
+    }
+
+    private void selectImage() {
+        final CharSequence[] items = {"Take Photo", "Choose from Library", "Remove photo", "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Add Photo!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals("Take Photo")) {
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent, REQUEST_CAMERA);
+                } else if (items[item].equals("Choose from Library")) {
+                    Intent intent = new Intent(
+                            Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image/*");
+                    startActivityForResult(
+                            Intent.createChooser(intent, "Select File"),
+                            SELECT_FILE);
+                } else if (items[item].equals("Cancel")) {
+                    dialog.dismiss();
+                } else if (items[item].equals("Remove photo")) {
+                    profilePictureChanged = true;
+                    profilePicImageView.setImageBitmap(Helpers.getBitMapWithNameCharacter());
+                }
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_CAMERA) {
+                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+                destination = new File(Environment.getExternalStorageDirectory(),
+                        System.currentTimeMillis() + ".jpg");
+                imageUrl = destination.getAbsolutePath();
+                FileOutputStream fo;
+                try {
+                    destination.createNewFile();
+                    fo = new FileOutputStream(destination);
+                    fo.write(bytes.toByteArray());
+                    fo.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+//                profilePic = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
+                profilePicImageView.setImageBitmap(thumbnail);
+                profilePictureChanged = true;
+            } else if (requestCode == SELECT_FILE) {
+                selectedImageUri = data.getData();
+                String[] projection = {MediaStore.MediaColumns.DATA};
+                CursorLoader cursorLoader = new CursorLoader(getActivity(), selectedImageUri, projection, null, null,
+                        null);
+                Cursor cursor = cursorLoader.loadInBackground();
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                cursor.moveToFirst();
+                String selectedImagePath = cursor.getString(column_index);
+                profilePic = Helpers.getBitMapOfProfilePic(selectedImagePath);
+                profilePicImageView.setImageBitmap(profilePic);
+                imageUrl = String.valueOf(selectedImagePath);
+                profilePictureChanged = true;
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_done:
+                System.out.println(emailChanged);
+                System.out.println(passWordChanged);
+                System.out.println(cityChanged);
+                System.out.println(addressChanged);
+                System.out.println(profilePictureChanged);
+                if (passWordChanged && !Helpers.containsDigit(mNewPassword.getText().toString())) {
+                    Toast.makeText(getActivity(), "password must contain digit", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (emailChanged || passWordChanged || cityChanged || addressChanged ||
+                        profilePictureChanged) {
+                    String password;
+                    if (passWordChanged) {
+                        password = mNewPassword.getText().toString();
+                    } else {
+                        password = mUserCurrentPassword.getText().toString();
+                    }
+                    String[] valueToUpdate = {mUserEmail.getText().toString(),
+                            mAddress.getText().toString(), mCity.getText().toString(),
+                            mPhoneNumber.getText().toString(), password};
+                    new UpdateUserDetailsTask().execute(valueToUpdate);
+                }
+                break;
+            case R.id.profilePic:
+                selectImage();
+                break;
+        }
     }
 
     public void getValuesFromSharedPreference() {
@@ -155,25 +330,38 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
         inflater.inflate(R.menu.edit_user_profile, menu);
     }
 
-    class UpdateUserDetailsTask extends AsyncTask<String, String, String> {
-
+    class UpdateUserDetailsTask extends AsyncTask<String, String, String[]> {
+        private boolean noInternet = false;
 
         @Override
-        protected String doInBackground(String... params) {
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(getActivity());
+            mProgressDialog.setMessage("Updating...");
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+        }
+
+        @Override
+        protected String[] doInBackground(String... params) {
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 MultiPartUtility http;
                 String username = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
                 String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
                 try {
                     http = new MultiPartUtility(new URL(AppGlobals.UPDATE_USER_DETAILS_URL +
-                            username+"/"), "PUT", username, password);
+                            username + "/"), "PUT", username, password);
                     http.addFormField("username", username);
-                    http.addFormField("email", params[1]);
-                    http.addFormField("address", params[2]);
-                    http.addFormField("city", params[3]);
-                    http.addFormField("phone_number", params[4].toLowerCase());
-                    http.addFilePart("photo" ,  new File(""));
-                    final byte[] bytes = http.finish();
+                    http.addFormField("email", params[0]);
+                    http.addFormField("address", params[1]);
+                    http.addFormField("city", params[2]);
+                    http.addFormField("phone_number", params[3]);
+                    http.addFormField("password", params[4]);
+                    if (profilePictureChanged) {
+                        http.addFilePart("photo", new File(""));
+                    }
+                    final byte[] bytes = http.finishFilesUpload();
                     try {
                         OutputStream os = new FileOutputStream("");
                         os.write(bytes);
@@ -183,13 +371,41 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                return new String[]{params[0], params[4], params[3], params[2], params[1]};
+            } else {
+                noInternet = true;
+                return new String[]{String.valueOf(AppGlobals.NO_INTERNET)};
             }
-            return null;
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
+        protected void onPostExecute(String[] strings) {
+            super.onPostExecute(strings);
+            mProgressDialog.dismiss();
+            if (noInternet) {
+                if (Integer.valueOf(strings[0]) == AppGlobals.NO_INTERNET) {
+                    Helpers.alertDialog(getActivity(), "No internet", "No internet available");
+                    return;
+                }
+            }
+            if (AppGlobals.getPostResponse() == HttpURLConnection.HTTP_OK) {
+                Toast.makeText(getActivity(), "updated", Toast.LENGTH_SHORT).show();
+                Helpers.saveDataToSharedPreferences(AppGlobals.KEY_EMAIL, strings[0]);
+                Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PASSWORD, strings[1]);
+                Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER, strings[2]);
+                Helpers.saveDataToSharedPreferences(AppGlobals.KEY_CITY, strings[3]);
+                Helpers.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, strings[4]);
+                if (profilePic == null) {
+                } else {
+                    if (profilePictureChanged) {
+                        AppGlobals.addBitmapToInternalMemory(profilePic, AppGlobals.profilePicName,
+                                AppGlobals.PROFILE_PIC_FOLDER);
+                    }
+                }
+                FragmentTransaction tx = getFragmentManager().beginTransaction();
+                tx.replace(R.id.container, new Buy());
+                tx.commit();
+            }
         }
     }
 }

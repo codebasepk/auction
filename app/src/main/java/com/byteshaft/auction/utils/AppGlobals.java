@@ -42,7 +42,7 @@ public class AppGlobals extends Application{
     public static final String LOGIN_URL = String.format("%s/api/users/", BASE_URL);
     public static final String USER_EXIST_URL = String.format("%s/api/users/", BASE_URL);
     public static final String REGISTER_URL = String.format("%s/api/register", BASE_URL);
-    public static int postProductResponse;
+    public static int postResponse;
     public static final String CATEGORY_URL = String.format("%s/api/users/", BASE_URL);
     public static String root;
     public static String profilePicName = "profile_pic.png";
@@ -158,11 +158,11 @@ public class AppGlobals extends Application{
         }
     }
 
-    public static void setPostProductResponse(int value) {
-        postProductResponse = value;
+    public static void setPostResponse(int value) {
+        postResponse = value;
     }
 
-    public static int getPostProductResponse() {
-        return postProductResponse;
+    public static int getPostResponse() {
+        return postResponse;
     }
 }

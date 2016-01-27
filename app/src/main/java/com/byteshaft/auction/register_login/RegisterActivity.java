@@ -273,7 +273,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                profilePic = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
+//                profilePic = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
                 dpButton.setImageBitmap(thumbnail);
             } else if (requestCode == SELECT_FILE) {
                 selectedImageUri = data.getData();

@@ -141,8 +141,8 @@ public class MultiPartUtility {
         if (registrationProcess && status == 201) {
             AppGlobals.setUserExistResponse(status);
         }
-        if (postProductProcess && status == 201) {
-            AppGlobals.setPostProductResponse(status);
+        if (postProductProcess && status == 201 || status == 200) {
+            AppGlobals.setPostResponse(status);
         }
         System.out.println(connection.getResponseCode());
         InputStream is = connection.getInputStream();
