@@ -61,6 +61,7 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
     private boolean passWordChanged = false;
     private boolean addressChanged = false;
     private boolean cityChanged = false;
+    private boolean phoneNumberChanged = false;
     private CircularImageView profilePicImageView;
     private static final int REQUEST_CAMERA = 1212;
     private static final int SELECT_FILE = 1245;
@@ -85,75 +86,137 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
         profilePicImageView = (CircularImageView) mBaseView.findViewById(R.id.profilePic);
         mButtonDone.setOnClickListener(this);
         mButtonDone.setVisibility(View.GONE);
+        getValuesFromSharedPreference();
         mUserEmail.addTextChangedListener(new TextWatcher() {
+            private boolean textChanged = false;
+            private String textBeforeChanged;
+            private String textAfterChanged;
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                System.out.println(s.toString());
+                textBeforeChanged = s.toString();
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                System.out.println(s.toString());
+                textChanged = true;
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (!s.toString().isEmpty()) {
+                System.out.println(s.toString());
+                textAfterChanged = s.toString();
+                if (!textBeforeChanged.equals(textAfterChanged) &&!s.toString().isEmpty()
+                        && textChanged) {
                     emailChanged = true;
+                } else {
+                    emailChanged = false;
                 }
             }
         });
         mNewPassword.addTextChangedListener(new TextWatcher() {
+            private boolean textChanged = false;
+            private String textBeforeChanged;
+            private String textAfterChanged;
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                textBeforeChanged = s.toString();
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                textChanged = true;
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (!s.toString().isEmpty()) {
+                textAfterChanged = s.toString();
+                if (!textBeforeChanged.equals(textAfterChanged) &&!s.toString().isEmpty()
+                        && textChanged) {
                     passWordChanged = true;
+                } else {
+                    passWordChanged = false;
                 }
             }
         });
         mAddress.addTextChangedListener(new TextWatcher() {
+            private boolean textChanged = false;
+            private String textBeforeChanged;
+            private String textAfterChanged;
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                textBeforeChanged = s.toString();
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                textChanged = true;
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (!s.toString().isEmpty()) {
+                textAfterChanged = s.toString();
+                if (!textBeforeChanged.equals(textAfterChanged) &&!s.toString().isEmpty()
+                        && textChanged) {
                     addressChanged = true;
+                } else {
+                    addressChanged = false;
                 }
             }
         });
         mCity.addTextChangedListener(new TextWatcher() {
+            private boolean textChanged = false;
+            private String textBeforeChanged;
+            private String textAfterChanged;
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                textBeforeChanged = s.toString();
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                textChanged = true;
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (!s.toString().isEmpty()) {
+                textAfterChanged = s.toString();
+                if (!textBeforeChanged.equals(textAfterChanged) &&!s.toString().isEmpty()
+                        && textChanged) {
                     cityChanged = true;
+                } else {
+                    cityChanged = false;
+                }
+            }
+        });
+        mPhoneNumber.addTextChangedListener(new TextWatcher() {
+            private boolean textChanged = false;
+            private String textBeforeChanged;
+            private String textAfterChanged;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                textBeforeChanged = s.toString();
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textChanged = true;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                textAfterChanged = s.toString();
+                if (!textBeforeChanged.equals(textAfterChanged) && !s.toString().isEmpty()
+                        && textChanged) {
+                    phoneNumberChanged = true;
+                } else {
+                    phoneNumberChanged = false;
                 }
             }
         });
@@ -169,7 +232,6 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
             e.printStackTrace();
         }
         setHasOptionsMenu(true);
-        getValuesFromSharedPreference();
         profilePicImageView.setOnClickListener(this);
         return mBaseView;
     }
@@ -257,12 +319,13 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
                 System.out.println(cityChanged);
                 System.out.println(addressChanged);
                 System.out.println(profilePictureChanged);
+                System.out.println(phoneNumberChanged);
                 if (passWordChanged && !Helpers.containsDigit(mNewPassword.getText().toString())) {
                     Toast.makeText(getActivity(), "password must contain digit", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (emailChanged || passWordChanged || cityChanged || addressChanged ||
-                        profilePictureChanged) {
+                        profilePictureChanged || phoneNumberChanged) {
                     String password;
                     if (passWordChanged) {
                         password = mNewPassword.getText().toString();
