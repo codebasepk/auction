@@ -129,7 +129,8 @@
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_send"
             android:layout_width="fill_parent"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/white"
+            android:background="@color/bluish"
             android:hapticFeedbackEnabled="true"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"

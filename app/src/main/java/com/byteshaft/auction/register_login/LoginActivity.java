@@ -303,7 +303,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void getCategoriesAndSave(String userName, String password) throws IOException {
         boolean categoriesAvailable = false;
         String[] categoryList = Helpers.simpleGetRequest(AppGlobals.CATEGORY_URL + userName +
-                        "/interests/", userName, password);
+                "/interests/", userName, password);
         if (Integer.valueOf(categoryList[0]) == HttpURLConnection.HTTP_OK) {
             try {
                 JSONObject jsonObject = new JSONObject((categoryList[1]));

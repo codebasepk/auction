@@ -87,7 +87,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         sRecyclerView = (RecyclerView) findViewById(R.id.specific_recycler);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.specific_category_refresh);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.orange, R.color.green,
-                R.color.colorPrimary, R.color.gray);
+                R.color.light_blue, R.color.gray);
         sRecyclerView.setLayoutManager(linearLayoutManager);
         sRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         sRecyclerView.setHasFixedSize(true);
