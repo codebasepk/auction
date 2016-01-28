@@ -123,7 +123,8 @@
                 android:id="@+id/btn_submit"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/white"
+                android:background="@color/light_blue"
                 android:text="Submit"
                 android:layout_below="@+id/btn_add_image" />
 

@@ -1,5 +1,6 @@
 package com.byteshaft.auction;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -168,7 +169,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
                 try {
                     String[] strings = Helpers.simpleGetRequest(AppGlobals.SINGLE_AD_DETAILS + userName
-                                    + File.separator + AppGlobals.SINGLE_AD_DETAILS_APPEND_END + adPrimaryKey + "/",
+                                    + File.separator + AppGlobals.SINGLE_AD_DETAILS_APPEND_END
+                                    + adPrimaryKey + "/",
                             userName, password);
                     if (HttpURLConnection.HTTP_OK == Integer.valueOf(strings[0])) {
                         JsonParser jsonParser = new JsonParser();
@@ -231,13 +233,44 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     /**
      * Custom class that extends RecyclerView adapter
      */
-    static class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView> {
+    static class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView>
+            implements Button.OnClickListener {
         private BidView bidView;
         private ArrayList<Integer> items;
+        private Activity mActivity;
 
-        public BidsAdapter(ArrayList<Integer> data) {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.delete_bid_button:
+                    AlertDialog.Builder alertDialogBuilder =
+                            new AlertDialog.Builder(mActivity);
+                    alertDialogBuilder.setTitle("Delete Bid");
+                    alertDialogBuilder
+                            .setMessage("Are you sure you want to delete your bid?")
+                            .setCancelable(false)
+                            .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                    break;
+            }
+
+        }
+
+        public BidsAdapter(ArrayList<Integer> data, Activity activity) {
             super();
             this.items = data;
+            this.mActivity = activity;
         }
 
         @Override
@@ -253,6 +286,11 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             bidView.invisibleBidPrimaryKey.setText(String.valueOf(items.get(position)));
             bidView.textView.setText(bidPriceHashMap.get(items.get(position)));
             bidView.bidderTextView.setText(userNameHashMap.get(items.get(position)));
+            if (Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)
+                    .equalsIgnoreCase(userNameHashMap.get(items.get(position)))) {
+                bidView.deleteBidButton.setVisibility(View.VISIBLE);
+                bidView.deleteBidButton.setOnClickListener(this);
+            }
         }
 
         @Override
@@ -264,12 +302,14 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             public TextView textView;
             public TextView bidderTextView;
             public TextView invisibleBidPrimaryKey;
+            public Button deleteBidButton;
 
             public BidView(View itemView) {
                 super(itemView);
                 textView = (TextView) itemView.findViewById(R.id.bid_text_View);
                 bidderTextView = (TextView) itemView.findViewById(R.id.bidder_user_name);
                 invisibleBidPrimaryKey = (TextView) itemView.findViewById(R.id.invisible_bid_primary_key);
+                deleteBidButton = (Button) itemView.findViewById(R.id.delete_bid_button);
             }
         }
     }
@@ -349,14 +389,12 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         protected void onPostExecute(ArrayList<Integer> integers) {
             super.onPostExecute(integers);
             mProgressBar.setVisibility(View.GONE);
-            mBidsAdapter = new BidsAdapter(integers);
+            mBidsAdapter = new BidsAdapter(integers, SelectedAdDetail.this);
             mRecyclerView.setAdapter(mBidsAdapter);
         }
     }
 
-
     public void userInfoDialog() {
-
         LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
         View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(SelectedAdDetail.this);
@@ -369,6 +407,14 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         });
         alertDialog.create();
         alertDialog.show();
+    }
+
+    class DeleteBidTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            return null;
+        }
     }
 }
 
