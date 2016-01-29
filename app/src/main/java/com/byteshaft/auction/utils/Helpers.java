@@ -456,7 +456,7 @@ public class Helpers {
         return connection.getResponseCode();
     }
 
-    public static int simpleRequest(String link)
+    public static int simplePutRequest(String link, String key, String value)
             throws IOException {
         URL url = new URL(link);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -465,7 +465,9 @@ public class Helpers {
                 + ":" + getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
         String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
         connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
-        connection.setRequestMethod("DELETE");
+        connection.setRequestMethod("PUT");
+        String jsonFormattedData = getJsonObjectString(key, value);
+        sendRequestData(connection, jsonFormattedData);
         return connection.getResponseCode();
     }
 }
