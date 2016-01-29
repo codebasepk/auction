@@ -68,6 +68,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public static int sBidItemPrimaryKey = 0;
     public static int itemInArray = 0;
     public static int myBidPrimaryKey = 0;
+    public boolean mCanUpdate = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,9 +147,14 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 }
 
                 if (!placeBidEditText.getText().toString().trim().isEmpty() &&
-                        TextUtils.isDigitsOnly(placeBidEditText.getText().toString())) {
+                        TextUtils.isDigitsOnly(placeBidEditText.getText().toString()) && !mCanUpdate) {
                     String bid = placeBidEditText.getText().toString();
                     new PlaceBidTask().execute(bid);
+                }
+                if (!placeBidEditText.getText().toString().trim().isEmpty() &&
+                        TextUtils.isDigitsOnly(placeBidEditText.getText().toString()) && mCanUpdate) {
+                    String bid = placeBidEditText.getText().toString();
+                    new UpdateBidTask().execute(bid);
                 }
                 break;
         }
@@ -290,7 +296,11 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         public void onBindViewHolder(BidView holder, int position) {
             holder.setIsRecyclable(false);
             bidView.invisibleBidPrimaryKey.setText(String.valueOf(items.get(position)));
-            bidView.textView.setText(bidPriceHashMap.get(items.get(position)));
+            if (!bidPriceHashMap.get(items.get(position)).contains(".00")) {
+                bidView.textView.setText(bidPriceHashMap.get(items.get(position))+".00");
+            } else {
+                bidView.textView.setText(bidPriceHashMap.get(items.get(position)));
+            }
             bidView.bidderTextView.setText(userNameHashMap.get(items.get(position)));
             if (Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)
                     .equalsIgnoreCase(userNameHashMap.get(items.get(position)))) {
@@ -300,6 +310,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 itemInArray = items.get(position);
                 placeBidEditText.setHint(R.string.update_bid);
                 myBidPrimaryKey = items.get(position);
+                mCanUpdate = true;
             }
         }
 
@@ -431,7 +442,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         protected Integer doInBackground(String... params) {
             int responseCode = 0;
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
-                String url = AppGlobals.DELETE_BID_TASK +
+                String url = AppGlobals.DELETE_UPDATE_BID_URL +
                         Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME) + "/ads/"
                         +adPrimaryKey + "/bids/" + myBidPrimaryKey;
                 System.out.println(url);
@@ -457,6 +468,48 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 if (sBidItemPrimaryKey != 0) {
                     mRecyclerView.removeViewAt(sBidItemPrimaryKey);
                 }
+            }
+        }
+    }
+
+    class UpdateBidTask extends AsyncTask<String, String, Integer> {
+        private String updatedAmount;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Integer doInBackground(String... params) {
+            int responseCode = 0;
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String url = AppGlobals.DELETE_UPDATE_BID_URL +
+                        Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME) + "/ads/"
+                        +adPrimaryKey + "/bids/" + myBidPrimaryKey;
+                try {
+                    updatedAmount = params[0];
+                    responseCode = Helpers.simplePutRequest(url, "bid", params[0]);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return responseCode;
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            mProgressBar.setVisibility(View.GONE);
+            if (integer == HttpURLConnection.HTTP_OK) {
+                bidPriceHashMap.remove(myBidPrimaryKey);
+                bidPriceHashMap.put(myBidPrimaryKey, updatedAmount);
+                mRecyclerView.removeAllViews();
+                mBidsAdapter = new BidsAdapter(arrayList, SelectedAdDetail.this);
+                mRecyclerView.setAdapter(mBidsAdapter);
+                placeBidEditText.setText("");
+                Toast.makeText(SelectedAdDetail.this, "Bid Updated!!", Toast.LENGTH_SHORT).show();
             }
         }
     }
