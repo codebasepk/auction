@@ -65,6 +65,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public static HashMap<Integer, String> bidPriceHashMap;
     public BidsAdapter mBidsAdapter;
     private ProductImageView productImageView;
+    public static int sBidItemPrimaryKey = 0;
+    public static int itemInArray = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +81,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         bidPriceHashMap = new HashMap<>();
         placeBidButton = (Button) findViewById(R.id.place_bid);
         placeBidEditText = (EditText) findViewById(R.id.bid_editText);
+        placeBidEditText.setHint(R.string.place_bid);
         placeBidButton.setOnClickListener(this);
         adPrice = (TextView) findViewById(R.id.ad_price);
         mProgressBar = (ProgressBar) findViewById(R.id.bid_loading_progress);
@@ -233,7 +236,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     /**
      * Custom class that extends RecyclerView adapter
      */
-    static class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView>
+     class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView>
             implements Button.OnClickListener {
         private BidView bidView;
         private ArrayList<Integer> items;
@@ -251,6 +254,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                             .setCancelable(false)
                             .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
+                                    new DeleteBidTask().execute();
                                     dialog.dismiss();
                                 }
                             });
@@ -290,6 +294,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     .equalsIgnoreCase(userNameHashMap.get(items.get(position)))) {
                 bidView.deleteBidButton.setVisibility(View.VISIBLE);
                 bidView.deleteBidButton.setOnClickListener(this);
+                sBidItemPrimaryKey = position;
+                itemInArray = items.get(position);
+                placeBidEditText.setHint(R.string.update_bid);
             }
         }
 
@@ -298,7 +305,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             return items.size();
         }
 
-        static class BidView extends RecyclerView.ViewHolder {
+        class BidView extends RecyclerView.ViewHolder {
             public TextView textView;
             public TextView bidderTextView;
             public TextView invisibleBidPrimaryKey;
@@ -389,7 +396,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         protected void onPostExecute(ArrayList<Integer> integers) {
             super.onPostExecute(integers);
             mProgressBar.setVisibility(View.GONE);
-            mBidsAdapter = new BidsAdapter(integers, SelectedAdDetail.this);
+            mBidsAdapter = new BidsAdapter(arrayList, SelectedAdDetail.this);
             mRecyclerView.setAdapter(mBidsAdapter);
         }
     }
@@ -409,11 +416,44 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         alertDialog.show();
     }
 
-    class DeleteBidTask extends AsyncTask<String, String, String> {
+    class DeleteBidTask extends AsyncTask<String, String, Integer> {
 
         @Override
-        protected String doInBackground(String... params) {
-            return null;
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Integer doInBackground(String... params) {
+            int responseCode = 0;
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String url = AppGlobals.DELETE_BID_TASK +
+                        Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME) + "/ads/"
+                        +adPrimaryKey + "/bids/" + sBidItemPrimaryKey;
+                try {
+                    responseCode = Helpers.simpleDeleteRequest(url);
+                    System.out.println(responseCode);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return responseCode;
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            mProgressBar.setVisibility(View.GONE);
+            placeBidEditText.setHint(R.string.place_bid);
+            if (integer == HttpURLConnection.HTTP_NO_CONTENT) {
+                if (itemInArray != 0) {
+                    arrayList.remove(arrayList.indexOf(itemInArray));
+                }
+                if (sBidItemPrimaryKey != 0) {
+                    mRecyclerView.removeViewAt(sBidItemPrimaryKey);
+                }
+            }
         }
     }
 }

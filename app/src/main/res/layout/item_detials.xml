@@ -81,7 +81,6 @@
                         android:ems="12"
                         android:inputType="number"
                         android:background="@drawable/custom_edit_text_background"
-                        android:hint="place bid"
                         android:textStyle="italic"/>
 
                     <Button
