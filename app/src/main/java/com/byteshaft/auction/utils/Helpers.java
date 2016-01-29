@@ -60,7 +60,6 @@ public class Helpers {
      * is mostly intrested in buyer than buyer fragment will be opened else seller
      * this only works for seller and buyer not other fragments
      * It takes String value as parameter
-     *
      */
     public static void saveLastFragmentOpened(String value) {
         SharedPreferences sharedPreferences = getPreferenceManager();
@@ -73,7 +72,8 @@ public class Helpers {
         return sharedPreferences.getString(AppGlobals.lastFragment, "");
     }
 
-    /** Method to save String type data to sharedPreferences Requires String key
+    /**
+     * Method to save String type data to sharedPreferences Requires String key
      * and value as parameter*
      */
     public static void saveDataToSharedPreferences(String key, String value) {
@@ -81,7 +81,8 @@ public class Helpers {
         sharedPreferences.edit().putString(key, value).apply();
     }
 
-    /** Method to save boolean type data to sharedPreferences Requires String key
+    /**
+     * Method to save boolean type data to sharedPreferences Requires String key
      * and boolean value as parameter*
      */
     public static void saveBooleanToSharedPreference(String key, boolean value) {
@@ -153,6 +154,7 @@ public class Helpers {
 
     /**
      * Method to check if user Exist or not
+     *
      * @param username
      * @throws IOException
      * @throws JSONException
@@ -166,8 +168,9 @@ public class Helpers {
 
     /**
      * Methof to
+     *
      * @param targetUrl
-     * @param method etc "POST", "GET"
+     * @param method    etc "POST", "GET"
      * @return
      * @throws IOException
      */
@@ -182,6 +185,7 @@ public class Helpers {
 
     /**
      * Method to check if password contains digit or not
+     *
      * @param s
      * @return
      */
@@ -200,6 +204,7 @@ public class Helpers {
 
     /**
      * Method for the simeple get request here i am using this for login, get interest.
+     *
      * @param userName
      * @param password
      * @return String[] which include user details
@@ -218,7 +223,7 @@ public class Helpers {
             InputStream is = connection.getInputStream();
             parsedString = convertInputStreamToString(is);
             return new String[]{String.valueOf(connection.getResponseCode()), parsedString};
-        }else {
+        } else {
             InputStream is = connection.getErrorStream();
             parsedString = convertInputStreamToString(is);
             JsonParser jsonParser = new JsonParser();
@@ -231,6 +236,7 @@ public class Helpers {
 
     /**
      * convert the InputStream to String, Basically its a JsonObject than we can get user details
+     *
      * @param is
      * @return
      * @throws IOException
@@ -257,6 +263,7 @@ public class Helpers {
 
     /**
      * Just an Alert Dialog
+     *
      * @param activity
      * @param title
      * @param msg
@@ -280,6 +287,7 @@ public class Helpers {
 
     /**
      * Saves the Set of categories selected by user
+     *
      * @param stringSet
      */
     public static void saveCategories(Set<String> stringSet) {
@@ -320,7 +328,7 @@ public class Helpers {
 
     public static String getValidatedUrl(String url) {
         if (!URLUtil.isValidUrl(url) || !Patterns.WEB_URL.matcher(url).matches()) {
-            url =  AppGlobals.BASE_URL  +url;
+            url = AppGlobals.BASE_URL + url;
         }
         return url;
     }
@@ -353,14 +361,14 @@ public class Helpers {
         if (file.exists()) {
             File[] folders = file.listFiles();
             System.out.println(Arrays.toString(folders));
-            for (File folder: folders) {
+            for (File folder : folders) {
                 if (folder.exists()) {
                     removeFiles(folder.getAbsolutePath());
                 }
-                }
             }
-
         }
+
+    }
 
     private static void removeFiles(String path) {
         File file = new File(path);
@@ -392,6 +400,7 @@ public class Helpers {
         File[] files = file.listFiles();
         return files.length;
     }
+
     public static void authPostRequest(String link, String key, String value) throws IOException {
         URL url;
         url = new URL(link);
@@ -432,5 +441,18 @@ public class Helpers {
                         getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
                 String.valueOf(array[new Random().nextInt(array.length)]), 100, 100);
         return letterTile;
+    }
+
+    public static int simpleDeleteRequest(String link)
+            throws IOException {
+        URL url = new URL(link);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("Content-Type", "application/json");
+        String authString = getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)
+                + ":" + getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+        String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
+        connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
+        connection.setRequestMethod("DELETE");
+        return connection.getResponseCode();
     }
 }
