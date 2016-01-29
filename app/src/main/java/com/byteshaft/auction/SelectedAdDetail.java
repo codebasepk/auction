@@ -67,6 +67,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     private ProductImageView productImageView;
     public static int sBidItemPrimaryKey = 0;
     public static int itemInArray = 0;
+    public static int myBidPrimaryKey = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -229,6 +230,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     }
                 });
             }
+            System.out.println(adPrimaryKey);
             new GetBidsTask().execute();
         }
     }
@@ -297,6 +299,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 sBidItemPrimaryKey = position;
                 itemInArray = items.get(position);
                 placeBidEditText.setHint(R.string.update_bid);
+                myBidPrimaryKey = items.get(position);
             }
         }
 
@@ -430,7 +433,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 String url = AppGlobals.DELETE_BID_TASK +
                         Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME) + "/ads/"
-                        +adPrimaryKey + "/bids/" + sBidItemPrimaryKey;
+                        +adPrimaryKey + "/bids/" + myBidPrimaryKey;
+                System.out.println(url);
                 try {
                     responseCode = Helpers.simpleDeleteRequest(url);
                     System.out.println(responseCode);

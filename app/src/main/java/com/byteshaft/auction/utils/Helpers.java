@@ -455,4 +455,17 @@ public class Helpers {
         connection.setRequestMethod("DELETE");
         return connection.getResponseCode();
     }
+
+    public static int simpleRequest(String link)
+            throws IOException {
+        URL url = new URL(link);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("Content-Type", "application/json");
+        String authString = getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)
+                + ":" + getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+        String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
+        connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
+        connection.setRequestMethod("DELETE");
+        return connection.getResponseCode();
+    }
 }
