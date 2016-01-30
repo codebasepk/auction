@@ -419,6 +419,13 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public void userInfoDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
         View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
+        Button contactButton = (Button) promptView.findViewById(R.id.contact_button);
+        contactButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(SelectedAdDetail.this);
         alertDialog.setView(promptView);
         alertDialog.setPositiveButton("Done", new DialogInterface.OnClickListener() {
