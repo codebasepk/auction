@@ -36,7 +36,7 @@
                     android:layout_margin="2dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/orange"
+                    android:textColor="@color/dark_blue"
                     android:layout_gravity="right"
                     android:layout_below="@+id/ad_description"
                     android:layout_alignParentRight="true"
