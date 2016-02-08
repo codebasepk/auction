@@ -91,6 +91,7 @@ public class CategoriesFragment extends Fragment {
                     sCategoriesList.add(item);
                 }
             }
+            selectedCategories = Helpers.getCategories();
             sAdapter = new CategoriesAdapter(sCategoriesList);
             sRecyclerView.setAdapter(sAdapter);
         }
@@ -147,7 +148,6 @@ public class CategoriesFragment extends Fragment {
             this.item = categories;
         }
 
-
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_layout, parent, false);
@@ -157,7 +157,6 @@ public class CategoriesFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
-            selectedCategories = Helpers.getCategories();
             holder.setIsRecyclable(false);
             sViewHolder.textView.setText(item.get(position));
             sViewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -413,7 +412,7 @@ public class CategoriesFragment extends Fragment {
             }
             if (s == HttpURLConnection.HTTP_OK) {
                 Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_SELECTED_CATEGORY_BOOLEAN_STATUS, true);
-                System.out.println(selectedCategories);
+                Log.i("OnPostExecute", String.valueOf(selectedCategories));
                 Helpers.saveCategories(selectedCategories);
                 Toast.makeText(getActivity(), "success", Toast.LENGTH_SHORT).show();
                 FragmentTransaction tx = getFragmentManager().beginTransaction();

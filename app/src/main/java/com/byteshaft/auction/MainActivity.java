@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity
         }
         instance = this;
         if (Helpers.isUserLoggedIn()) {
-            if (!Helpers.getBooleanValueFromSharedPreference(AppGlobals.KEY_CATEGORY_BOOLEAN_STATUS)) {
+            if (Helpers.getCategories().contains("nothing")) {
                 loadFragment(new CategoriesFragment());
             }
             if (!Helpers.getLastFragment().equals("")) {
