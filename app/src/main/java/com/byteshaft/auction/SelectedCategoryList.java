@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -134,8 +135,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
 
     public void onScrolledToBottom() {
         System.out.println("onScrolledToBottom");
-        System.out.println(countValue);
-        System.out.println(idsArray.size());
         if (countValue > idsArray.size()) {
             showMoreLinearLayout.setVisibility(View.VISIBLE);
         }
@@ -152,37 +151,30 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                 (android.widget.SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
-        searchView.setSubmitButtonEnabled(false);
-        LinearLayout linearLayoutOfSearchView = (LinearLayout) searchView.getChildAt(0);
-        final Button button = new Button(getApplicationContext());
-        button.setBackgroundResource(R.drawable.go_button);
-        button.setLayoutParams(new LinearLayout.LayoutParams(50, 50));
-        button.setVisibility(View.GONE);
-        button.setOnClickListener(new View.OnClickListener() {
+        searchView.setOnKeyListener(new View.OnKeyListener() {
             @Override
-            public void onClick(View v) {
-                String searchText = String.valueOf(searchView.getQuery()).replaceAll(" ", "%20");
-                String url = AppGlobals.SEARCH_URL+category.toLowerCase()+"&title="+searchText;
-                searchProcess = true;
-                initializeArrayAndHashMap();
-                new GetSpecificDataTask().execute(url);
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_SEARCH) {
+                    System.out.println("OK");
+                    return true;
+                }
+                return false;
             }
         });
-        linearLayoutOfSearchView.addView(button);
         searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                return false;
+                String url = AppGlobals.SEARCH_URL+category.toLowerCase()+
+                        "&title="+query.replaceAll(" ", "%20");
+                searchProcess = true;
+                initializeArrayAndHashMap();
+                new GetSpecificDataTask().execute(url);
+                return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (!newText.isEmpty()) {
-                    button.setVisibility(View.VISIBLE);
-                } else {
-                    button.setVisibility(View.GONE);
-                }
-                return true;
+                return false;
             }
         });
         return true;

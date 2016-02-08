@@ -165,7 +165,6 @@ public class Buy extends Fragment {
 
         }
 
-
         /* Member class that extends RecyclerView.ViewHolder allows us to access the elements inside
            xml it takes view in constructor
          */
