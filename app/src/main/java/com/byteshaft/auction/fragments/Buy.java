@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
@@ -41,8 +42,11 @@ public class Buy extends Fragment {
         if (categories.contains("nothing")) {
             categories.remove("nothing");
         }
-        System.out.println("Buyer");
-        System.out.println(categories);
+        if (categories.isEmpty()) {
+            FragmentTransaction tx = getFragmentManager().beginTransaction();
+            tx.replace(R.id.container, new CategoriesFragment());
+            tx.commit();
+        }
         mBaseView.setTag(TAG);
         Helpers.saveLastFragmentOpened(getClass().getSimpleName());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -160,7 +164,6 @@ public class Buy extends Fragment {
         public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
 
         }
-
 
         /* Member class that extends RecyclerView.ViewHolder allows us to access the elements inside
            xml it takes view in constructor

@@ -23,6 +23,7 @@ public class AppGlobals extends Application{
     public static final String KEY_SELECTED_CATEGORY_BOOLEAN_STATUS = "selected_category_boolean_status";
     public static final String KEY_CATEGORY_BOOLEAN_STATUS = "category_boolean_status";
     public static final String SELECTED_CATEGORIES = "selected_categories";
+    public static final String KEY_CATEGORIES_AVAILABLE = "categories_availeble";
 
     public static final String detail = "detail";
     public static final String KEY_USERNAME = "username";
