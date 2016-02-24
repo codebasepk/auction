@@ -2,6 +2,7 @@ package com.byteshaft.auction;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class Messages extends AppCompatActivity {
+public class Messages extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private ListView mListView;
     private ProgressDialog mProgressDialog;
@@ -47,6 +49,7 @@ public class Messages extends AppCompatActivity {
                 getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)+ File.separator + "ads" +
                 File.separator + primaryKey + File.separator+ "messages" + File.separator + "names";
         new GetAllMessengersTask().execute(url);
+        mListView.setOnItemClickListener(this);
 
     }
 
@@ -58,6 +61,13 @@ public class Messages extends AppCompatActivity {
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        System.out.println(parent.getItemAtPosition(position));
+        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+        intent.putExtra(AppGlobals.MESSENGER_USERNAME, parent.getItemIdAtPosition(position));
     }
 
     class GetAllMessengersTask extends AsyncTask<String, String, ArrayList<String>> {
