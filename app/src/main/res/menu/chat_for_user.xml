@@ -8,12 +8,12 @@
         android:orderInCategory="100"
         app:showAsAction="always" />
 
-    <!--<item android:id="@+id/chat_button"-->
-        <!--android:title="Chat"-->
-        <!--android:icon="@drawable/chat"-->
-        <!--android:orderInCategory="100"-->
-        <!--app:showAsAction="always" />-->
-    <!-- -->
+    <item android:id="@+id/chat_button"
+        android:title="Chat"
+        android:icon="@drawable/message"
+        android:orderInCategory="100"
+        app:showAsAction="always" />
+
 
     <!--<item android:id="@+id/new_bid_notification"-->
         <!--android:title="Chat"-->
