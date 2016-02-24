@@ -54,9 +54,6 @@
                    />
             </intent-filter>
         </receiver>
-=======
-
->>>>>>> upstream/master
         <!-- [START gcm_listener] -->
         <service
             android:name="com.byteshaft.auction.gcm.MyGcmListenerService"
@@ -81,6 +78,7 @@
         </service>
         <activity
             android:name="nl.changer.polypicker.ImagePickerActivity" />
+        <activity android:name=".Messages"/>
     </application>
 
 </manifest>
