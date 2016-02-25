@@ -36,6 +36,7 @@ public class Messages extends AppCompatActivity implements AdapterView.OnItemCli
     private ListView mListView;
     private ProgressDialog mProgressDialog;
     private int primaryKey;
+    private ArrayList<String> messengers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +50,6 @@ public class Messages extends AppCompatActivity implements AdapterView.OnItemCli
                 getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)+ File.separator + "ads" +
                 File.separator + primaryKey + File.separator+ "messages" + File.separator + "names";
         new GetAllMessengersTask().execute(url);
-        mListView.setOnItemClickListener(this);
 
     }
 
@@ -65,15 +65,15 @@ public class Messages extends AppCompatActivity implements AdapterView.OnItemCli
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        System.out.println(parent.getItemAtPosition(position));
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-        intent.putExtra(AppGlobals.MESSENGER_USERNAME, parent.getItemIdAtPosition(position));
+        intent.putExtra(AppGlobals.MESSENGER_USERNAME, messengers.get(position));
+        intent.putExtra(AppGlobals.PRIMARY_KEY, primaryKey);
+        startActivity(intent);
     }
 
     class GetAllMessengersTask extends AsyncTask<String, String, ArrayList<String>> {
 
         private boolean noInternet = false;
-
 
         @Override
         protected void onPreExecute() {
@@ -87,7 +87,7 @@ public class Messages extends AppCompatActivity implements AdapterView.OnItemCli
 
         @Override
         protected ArrayList<String> doInBackground(String... params) {
-            ArrayList<String> messengers = new ArrayList<>();
+            messengers = new ArrayList<>();
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 String[] data;
                 try {
@@ -99,7 +99,10 @@ public class Messages extends AppCompatActivity implements AdapterView.OnItemCli
                         JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
                         JsonArray jsonArray =  jsonObject.get("messengers").getAsJsonArray();
                         for (int i = 0; i < jsonArray.size(); i++)  {
-                            messengers.add(jsonArray.get(i).getAsString());
+                            if (!Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)
+                                    .equals(jsonArray.get(i).getAsString())) {
+                                messengers.add(jsonArray.get(i).getAsString());
+                            }
                         }
                     }
                 } catch (IOException e) {
@@ -123,8 +126,8 @@ public class Messages extends AppCompatActivity implements AdapterView.OnItemCli
                 MessengerAdapter messengerAdapter = new MessengerAdapter(getApplicationContext(),
                         R.layout.single_message_senders, s);
                 mListView.setAdapter(messengerAdapter);
+                mListView.setOnItemClickListener(Messages.this);
             }
-
         }
     }
 

@@ -5,8 +5,25 @@
 
     <LinearLayout
         android:id="@+id/singleMessageContainer"
+        android:padding="10dp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/messageId"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <com.github.siyamed.shapeimageview.CircularImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/messenger"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="6dp"
+            android:layout_marginLeft="10dp"
+            app:siBorderWidth="2dp"
+            app:siBorderColor="#696969"/>
 
         <TextView
             android:id="@+id/singleMessage"
