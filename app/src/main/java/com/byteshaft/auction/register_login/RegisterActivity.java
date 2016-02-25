@@ -72,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.register_fragment);
+        setContentView(R.layout.register);
         setTitle("Register");
         sRegisterActivityInstance = this;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

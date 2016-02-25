@@ -72,6 +72,8 @@ public class AppGlobals extends Application{
     public static final String SEARCH_URL = String.format("%s/api/ads/?category=", BASE_URL);
     public static final String UPDATE_USER_DETAILS_URL = String.format("%s/api/users/",BASE_URL);
     public static final String DELETE_UPDATE_BID_URL =  String.format("%s/api/users/", BASE_URL);
+    public static final String GET_ALL_MESSAGES_URL = String.format("%s/api/users/", BASE_URL);
+    public static final String PRIMARY_KEY = "ad_primary_key";
 
 
     @Override
