@@ -63,16 +63,18 @@
                 <TextView
                     android:id="@+id/specific_category_title"
                     android:textStyle="bold"
+                    android:text="thisjjfjf"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
                     android:layout_gravity="center"
-                    android:layout_marginTop="5dp" />
+                    android:layout_alignParentTop="true"
+                    android:layout_alignLeft="@+id/specific_category_description"
+                    android:layout_alignStart="@+id/specific_category_description" />
 
                 <TextView
                     android:id="@+id/specific_category_description"
                     android:textStyle="italic"
+                    android:text="description jjjfhhfh hf hf h"
                     android:layout_toRightOf="@+id/specific_category_image"
                     android:layout_toEndOf="@+id/specific_category_image"
                     android:layout_below="@+id/specific_category_title"

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" >
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/singleMessageContainer"
         android:padding="10dp"
         android:layout_width="fill_parent"
@@ -11,7 +11,7 @@
 
         <TextView
             android:id="@+id/messageId"
-            android:visibility="gone"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -21,7 +21,6 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:padding="6dp"
-            android:layout_marginLeft="10dp"
             app:siBorderWidth="2dp"
             app:siBorderColor="#696969"/>
 
@@ -29,10 +28,23 @@
             android:id="@+id/singleMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dip"
-            android:background="@drawable/bubble_b"
             android:paddingLeft="10dip"
-            android:textColor="@android:color/primary_text_light" />
-    </LinearLayout>
+            android:background="@drawable/bubble_b"
+            android:textColor="@android:color/primary_text_light"
+            android:layout_alignBottom="@+id/messenger"
+            android:layout_centerHorizontal="true" />
 
-</LinearLayout>
+        <com.github.siyamed.shapeimageview.CircularImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/myMessage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="6dp"
+            app:siBorderWidth="2dp"
+            app:siBorderColor="#696969"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+
+</RelativeLayout>
