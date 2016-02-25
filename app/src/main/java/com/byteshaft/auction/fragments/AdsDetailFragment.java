@@ -14,7 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
@@ -89,6 +91,13 @@ public class AdsDetailFragment extends Fragment {
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
             holder.setIsRecyclable(false);
+            customView.cardView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Toast.makeText(AppGlobals.getContext(), "clicked " + position, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
             customView.idTextView.setText(String.valueOf(items.get(position)));
             customView.titleTextView.setText(titleHashMap.get(items.get(position)).toUpperCase());
             customView.descriptionTextView.setText(descriptionHashMap.get(items.get(position)));
@@ -136,6 +145,7 @@ public class AdsDetailFragment extends Fragment {
         public TextView titleTextView;
         public ImageView imageView;
         public ProgressBar progressBar;
+        public RelativeLayout cardView;
 
         public CustomView(View itemView) {
             super(itemView);
@@ -145,6 +155,7 @@ public class AdsDetailFragment extends Fragment {
             descriptionTextView = (TextView) itemView.findViewById(R.id.all_categories_description);
             priceTextView = (TextView) itemView.findViewById(R.id.all_categories_price);
             progressBar = (ProgressBar) itemView.findViewById(R.id.all_categories_image_progressBar);
+            cardView = (RelativeLayout) itemView.findViewById(R.id.items_layout);
         }
     }
 
