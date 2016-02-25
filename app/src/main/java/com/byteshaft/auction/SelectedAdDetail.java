@@ -69,6 +69,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public static int itemInArray = 0;
     public static int myBidPrimaryKey = 0;
     public boolean mCanUpdate = false;
+    private MenuItem item;
+    public String productPostUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +79,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         productImageView = new ProductImageView();
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.detail, 0);
         String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
+        setTitle(productName.toLowerCase());
         descriptionTextView = (TextView) findViewById(R.id.ad_description);
         imagesUrls = new ArrayList<>();
         userNameHashMap = new HashMap<>();
@@ -87,7 +90,6 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         placeBidButton.setOnClickListener(this);
         adPrice = (TextView) findViewById(R.id.ad_price);
         mProgressBar = (ProgressBar) findViewById(R.id.bid_loading_progress);
-        setTitle(productName);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mRecyclerView = (RecyclerView) findViewById(R.id.bids_recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -117,6 +119,12 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             case R.id.user_info_button:
                 userInfoDialog();
                 break;
+            case R.id.chat_button:
+                Intent intent = new Intent(getApplicationContext(), Messages.class);
+                System.out.println(adPrimaryKey);
+                intent.putExtra(AppGlobals.PRIMARY_KEY, adPrimaryKey);
+                startActivity(intent);
+                break;
         }
         return false;
     }
@@ -125,6 +133,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.chat_for_user, menu);
+        item = menu.findItem(R.id.chat_button);
+//        item.setVisible(false);
         return true;
     }
 
@@ -185,11 +195,13 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     if (HttpURLConnection.HTTP_OK == Integer.valueOf(strings[0])) {
                         JsonParser jsonParser = new JsonParser();
                         JsonObject jsonObject = jsonParser.parse(strings[1]).getAsJsonObject();
+                        System.out.println(jsonObject);
                         id = jsonObject.get("id").getAsInt();
                         description = jsonObject.get("description").getAsString();
                         price = jsonObject.get("price").getAsString();
                         title = jsonObject.get("title").getAsString();
                         currency = jsonObject.get("currency").getAsString();
+//                        productPostUsername = jsonObject.get("username").getAsString();
 
                         for (int i = 1; i < 9; i++) {
                             String photoCounter = ("photo") + i;
@@ -236,7 +248,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     }
                 });
             }
-            System.out.println(adPrimaryKey);
+            if (productPostUsername != null) {
+                item.setVisible(true);
+            }
             new GetBidsTask().execute();
         }
     }
@@ -422,7 +436,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         contactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+
+
+
             }
         });
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(SelectedAdDetail.this);
