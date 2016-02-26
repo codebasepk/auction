@@ -148,6 +148,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 holder = (ViewHolder) convertView.getTag();
             }
             if (sDirectionHashMap.get(idsList.get(position)).equals("incoming")) {
+                holder.title.setText(null);
                 holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
                 holder.title.setText(sMessages.get(idsList.get(position)));
                 final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
@@ -158,6 +159,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 holder.imageView.setVisibility(View.VISIBLE);
                 holder.imageView.setImageBitmap(letterTile);
             } else {
+                holder.title.setText(null);
                 holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
                 holder.title.setText(sMessages.get(idsList.get(position)));
                 final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
