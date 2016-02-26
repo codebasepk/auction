@@ -144,7 +144,7 @@ public class CategoriesFragment extends Fragment {
 
         private ArrayList<String> item;
 
-        public CategoriesAdapter(ArrayList<String> categories) {
+        public CategoriesAdapter(ArrayList<String> categories)   {
             this.item = categories;
         }
 
