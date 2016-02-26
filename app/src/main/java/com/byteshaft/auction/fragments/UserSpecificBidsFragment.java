@@ -181,7 +181,9 @@ public class UserSpecificBidsFragment extends Fragment {
                         nextUrl = jsonObject.get("next").getAsString();
                     }
                     JsonArray jsonArray = jsonObject.getAsJsonArray("results");
+                    System.out.println(jsonArray);
                     for (int i = 0; i < jsonArray.size(); i++) {
+                        System.out.println(jsonArray + "okay");
                         JsonObject object = jsonArray.get(i).getAsJsonObject();
                         if (!idsArray.contains(object.get("id").getAsInt())) {
                             idsArray.add(object.get("id").getAsInt());
@@ -191,8 +193,8 @@ public class UserSpecificBidsFragment extends Fragment {
                                     object.get("description").getAsString());
                             priceHashMap.put(object.get("id").getAsInt(),
                                     object.get("price").getAsString());
-                            //bidPriceHashMap.put(object.get("id").getAsInt(),
-                            //object.get("bidsPrice").getAsString());
+//                            bidPriceHashMap.put(object.get("id").getAsInt(),
+//                            object.get("bidsPrice").getAsString());
                             imagesUrlHashMap.put(object.get("id").getAsInt(),
                                     object.get("photo1").getAsString());
                             if (!object.get("currency").isJsonNull()) {
