@@ -31,6 +31,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -48,7 +49,6 @@ public class AdsDetailFragment extends Fragment {
     private static HashMap<Integer, String> titleHashMap;
     public static CustomView customView;
     private ProgressDialog mProgressDialog;
-
 
 
     @Nullable
@@ -99,8 +99,7 @@ public class AdsDetailFragment extends Fragment {
                         public void onLongPress(MotionEvent e) {
                             super.onLongPress(e);
                             View childView = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
-                            if(childView != null && mListener != null)
-                            {
+                            if (childView != null && mListener != null) {
                                 mListener.onItemLongClick(items.get(mRecyclerView
                                         .getChildPosition(childView)), mRecyclerView
                                         .getChildPosition(childView));
@@ -133,10 +132,11 @@ public class AdsDetailFragment extends Fragment {
 
         public interface OnItemClickListener {
             void onItem(Integer item);
+
             void onItemLongClick(Integer adPrimaryKey, int position);
         }
 
-        public  CustomAdapter(ArrayList<Integer> categories, Activity activity) {
+        public CustomAdapter(ArrayList<Integer> categories, Activity activity) {
             this.items = categories;
             this.mActivity = activity;
         }
@@ -150,14 +150,13 @@ public class AdsDetailFragment extends Fragment {
         }
 
 
-
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
             holder.setIsRecyclable(false);
             customView.idTextView.setText(String.valueOf(items.get(position)));
             customView.titleTextView.setText(titleHashMap.get(items.get(position)).toUpperCase());
             customView.descriptionTextView.setText(descriptionHashMap.get(items.get(position)));
-            customView.priceTextView.setText(priceHashMap.get(items.get(position)) + " "+
+            customView.priceTextView.setText(priceHashMap.get(items.get(position)) + " " +
                     currencyHashMap.get(items.get(position)));
             Picasso.with(mActivity)
                     .load(imagesUrlHashMap.get(items.get(position)))
@@ -290,7 +289,7 @@ public class AdsDetailFragment extends Fragment {
                 }
 
                 @Override
-                public void onItemLongClick(Integer adPrimaryKey, final int position) {
+                public void onItemLongClick(final Integer adPrimaryKey, final int position) {
                     System.out.println(position);
                     System.out.println(adPrimaryKey);
 
@@ -301,7 +300,9 @@ public class AdsDetailFragment extends Fragment {
 
                                 @Override
                                 public void onClick(DialogInterface arg0, int arg1) {
-                                    removeItem(position);
+                                    String[] data = {String.valueOf(adPrimaryKey),
+                                            String.valueOf(position)};
+                                    new DeleteAdTask().execute(data);
                                 }
                             });
 
@@ -324,5 +325,40 @@ public class AdsDetailFragment extends Fragment {
     public void removeItem(int position) {
         idsArray.remove(position);
         customAdapter.notifyDataSetChanged();
+    }
+
+    class DeleteAdTask extends AsyncTask<String, String, Integer> {
+
+        private int position = 987456123;
+
+        @Override
+        protected Integer doInBackground(String... params) {
+            int status = 0;
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String url = String.format("%s%s/ads/%s/", AppGlobals.DELETE_AD_URL,
+                        Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
+                        params[0]);
+                System.out.println(url);
+                try {
+                    status = Helpers.simpleDeleteRequest(url);
+                    if (status == HttpURLConnection.HTTP_NOT_FOUND) {
+                        position = Integer.valueOf(params[1]);
+                    }
+                    System.out.println(status);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return status;
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            if (integer == HttpURLConnection.HTTP_NOT_FOUND && position != 987456123) {
+                removeItem(position);
+            }
+        }
     }
 }
