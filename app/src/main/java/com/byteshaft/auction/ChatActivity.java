@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +29,7 @@ import com.google.gson.JsonParser;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -145,21 +147,26 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-            holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
-            holder.title.setText(sMessages.get(idsList.get(position)));
-            final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
-            Bitmap letterTile;
-            System.out.println(sDirectionHashMap.get(idsList.get(position)).equals("incoming"));
             if (sDirectionHashMap.get(idsList.get(position)).equals("incoming")) {
+                holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
+                holder.title.setText(sMessages.get(idsList.get(position)));
+                final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
+                Bitmap letterTile;
                 letterTile = tileProvider.getLetterTile(sSenderName.get(idsList.get(position)),
                         "#2093cd", 100, 100);
                 holder.myMessage.setVisibility(View.INVISIBLE);
+                holder.imageView.setVisibility(View.VISIBLE);
                 holder.imageView.setImageBitmap(letterTile);
             } else {
+                holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
+                holder.title.setText(sMessages.get(idsList.get(position)));
+                final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
+                Bitmap letterTile;
                 letterTile = tileProvider.getLetterTile(sSenderName.get(idsList.get(position)),
                         "#f58559", 100, 100);
                 holder.title.setBackgroundResource(R.drawable.bubble_a);
                 holder.imageView.setVisibility(View.INVISIBLE);
+                holder.myMessage.setVisibility(View.VISIBLE);
                 holder.myMessage.setImageBitmap(letterTile);
             }
             return convertView;
@@ -236,5 +243,42 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         }
+    }
+
+    class sendMessageTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+                String passWord = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+                String url = AppGlobals.SEND_MESSAGE_URL + userName+ File.separator + "ads" + File.separator
+                        + adPrimaryKey + File.separator + "messages";
+                URL link;
+                try {
+                    link = new URL(url);
+                    HttpURLConnection connection = (HttpURLConnection) link.openConnection();
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setRequestMethod("POST");
+                    String authString = userName
+                            + ":" + passWord;
+                    String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
+                    connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
+                    String jsonFormattedData = getJsonObjectString(
+                            Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
+                            params[0]);
+                    Helpers.sendRequestData(connection, jsonFormattedData);
+                    System.out.println(connection.getResponseCode());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+    }
+
+    private static String getJsonObjectString(String messenger_name, String message) {
+        return String.format("{\"bidder_name\": \"%s\" , \"message\": \"%s\"}",
+                messenger_name, message);
     }
 }

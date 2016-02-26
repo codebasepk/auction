@@ -426,7 +426,7 @@ public class Helpers {
         return String.format("{\"%s\": \"%s\"}", key, pushKey);
     }
 
-    private static void sendRequestData(HttpURLConnection connection, String body) throws IOException {
+    public static void sendRequestData(HttpURLConnection connection, String body) throws IOException {
         byte[] outputInBytes = body.getBytes("UTF-8");
         OutputStream os = connection.getOutputStream();
         os.write(outputInBytes);

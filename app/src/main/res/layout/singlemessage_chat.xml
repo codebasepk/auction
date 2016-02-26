@@ -28,6 +28,8 @@
             android:id="@+id/singleMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
             android:paddingLeft="10dip"
             android:background="@drawable/bubble_b"
             android:textColor="@android:color/primary_text_light"
