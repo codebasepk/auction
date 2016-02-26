@@ -2,9 +2,10 @@ package com.byteshaft.auction.fragments;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,11 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.byteshaft.auction.R;
-import com.byteshaft.auction.SelectedCategoryList;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.google.gson.JsonArray;
@@ -47,7 +46,6 @@ public class AdsDetailFragment extends Fragment {
     private static HashMap<Integer, String> imagesUrlHashMap;
     private static HashMap<Integer, String> currencyHashMap;
     private static HashMap<Integer, String> titleHashMap;
-    public ArrayList<Integer> arrayList;
     public static CustomView customView;
     private ProgressDialog mProgressDialog;
 
@@ -60,7 +58,6 @@ public class AdsDetailFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new
                 LinearLayoutManager(getActivity().getApplicationContext());
         idsArray = new ArrayList<>();
-        arrayList = new ArrayList<>();
         descriptionHashMap = new HashMap<>();
         priceHashMap = new HashMap<>();
         imagesUrlHashMap = new HashMap<>();
@@ -105,7 +102,8 @@ public class AdsDetailFragment extends Fragment {
                             if(childView != null && mListener != null)
                             {
                                 mListener.onItemLongClick(items.get(mRecyclerView
-                                        .getChildPosition(childView)));
+                                        .getChildPosition(childView)), mRecyclerView
+                                        .getChildPosition(childView));
                             }
                         }
                     });
@@ -135,7 +133,7 @@ public class AdsDetailFragment extends Fragment {
 
         public interface OnItemClickListener {
             void onItem(Integer item);
-            void onItemLongClick(Integer adPrimaryKey);
+            void onItemLongClick(Integer adPrimaryKey, int position);
         }
 
         public  CustomAdapter(ArrayList<Integer> categories, Activity activity) {
@@ -203,7 +201,6 @@ public class AdsDetailFragment extends Fragment {
         public TextView titleTextView;
         public ImageView imageView;
         public ProgressBar progressBar;
-        RelativeLayout layout;
 
         public CustomView(View itemView) {
             super(itemView);
@@ -213,7 +210,6 @@ public class AdsDetailFragment extends Fragment {
             descriptionTextView = (TextView) itemView.findViewById(R.id.all_categories_description);
             priceTextView = (TextView) itemView.findViewById(R.id.all_categories_price);
             progressBar = (ProgressBar) itemView.findViewById(R.id.all_categories_image_progressBar);
-//            layout = (RelativeLayout) itemView.findViewById(R.id.layout);
         }
     }
 
@@ -294,10 +290,39 @@ public class AdsDetailFragment extends Fragment {
                 }
 
                 @Override
-                public void onItemLongClick(Integer adPrimaryKey) {
+                public void onItemLongClick(Integer adPrimaryKey, final int position) {
+                    System.out.println(position);
                     System.out.println(adPrimaryKey);
+
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                    alertDialogBuilder.setMessage("Do you want to delete this add?");
+                    alertDialogBuilder.setPositiveButton("Ok",
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface arg0, int arg1) {
+                                    removeItem(position);
+                                }
+                            });
+
+                    alertDialogBuilder.setNegativeButton("cancel",
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface arg0, int arg1) {
+
+                                }
+                            });
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
                 }
             }));
         }
+    }
+
+    public void removeItem(int position) {
+        idsArray.remove(position);
+        customAdapter.notifyDataSetChanged();
     }
 }
