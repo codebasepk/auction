@@ -151,7 +151,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 holder.title.setText(null);
                 holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
                 holder.title.setText(sMessages.get(idsList.get(position)));
-                final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
+                BitmapWithCharacter tileProvider = new BitmapWithCharacter();
                 Bitmap letterTile;
                 letterTile = tileProvider.getLetterTile(sSenderName.get(idsList.get(position)),
                         "#2093cd", 100, 100);
@@ -162,7 +162,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 holder.title.setText(null);
                 holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
                 holder.title.setText(sMessages.get(idsList.get(position)));
-                final BitmapWithCharacter tileProvider = new BitmapWithCharacter();
+                BitmapWithCharacter tileProvider = new BitmapWithCharacter();
                 Bitmap letterTile;
                 letterTile = tileProvider.getLetterTile(sSenderName.get(idsList.get(position)),
                         "#f58559", 100, 100);
