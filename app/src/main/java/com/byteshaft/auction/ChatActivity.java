@@ -1,11 +1,11 @@
 package com.byteshaft.auction;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.BitmapWithCharacter;
@@ -37,7 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 
-public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
+public class ChatActivity extends Activity implements View.OnClickListener {
 
     private ImageButton buttonSend;
     private EditText editTextMessage;
@@ -53,12 +54,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isScrollingUp = false;
     private ArrayList<Integer> arrayList;
     private ProgressBar mProgressBar;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_activity);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar = (Toolbar) findViewById(R.id.tool);
+        setActionBar(toolbar);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         userNameToFetchMessages = getIntent().getStringExtra(AppGlobals.MESSENGER_USERNAME);
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.PRIMARY_KEY, 0);
         editTextMessage = (EditText) findViewById(R.id.et_chat);
@@ -66,7 +70,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mProgressBar = (ProgressBar) findViewById(R.id.load_messages);
         buttonSend.setOnClickListener(this);
         mBubbleList = (com.byteshaft.auction.utils.List) findViewById(R.id.lv_chat);
-        setTitle(userNameToFetchMessages);
+        getActionBar().setTitle(userNameToFetchMessages);
         String url = AppGlobals.GET_USER_SPECIFIC_MESSAGES + Helpers
                 .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME) + File.separator + "ads" +
                 File.separator + adPrimaryKey + File.separator + "messages";
@@ -91,6 +95,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
+
 
     @Override
     public void onClick(View v) {
@@ -165,10 +170,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 Bitmap letterTile;
                 letterTile = tileProvider.getLetterTile(sSenderName.get(idsList.get(position)),
                         "#2093cd", 100, 100);
+                holder.title.setBackgroundResource(R.drawable.bubble_b);
                 holder.myMessage.setVisibility(View.INVISIBLE);
                 holder.imageView.setVisibility(View.VISIBLE);
                 holder.imageView.setImageBitmap(letterTile);
-            } else {
+            } else if (sDirectionHashMap.get(idsList.get(position)).equals("outgoing")){
                 holder.title.setText(null);
                 holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
                 holder.title.setText(sMessages.get(idsList.get(position)));
@@ -238,7 +244,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                                 sMessages.put(currentId, jObject.get("message").getAsString());
                             }
                         }
-                        Collections.reverse(arrayList);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -254,13 +259,24 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             super.onPostExecute(integers);
             mProgressBar.setVisibility(View.GONE);
             if (loadMore && isScrollingUp) {
-                adapter.notifyDataSetChanged();
+                adapter = null;
+                ArrayList<Integer> tempElements = new ArrayList<>(integers);
+                Collections.reverse(tempElements);
+                adapter = new ChatArrayAdapter(
+                        getApplicationContext(), R.layout.singlemessage_chat, tempElements);
+                mBubbleList.setAdapter(adapter);
                 isScrollingUp = false;
                 loadMore = false;
             } else {
                 if (!noInternet) {
+                    System.out.println(integers);
+                    ArrayList<Integer> tempElements = new ArrayList<>(integers);
+                    Collections.reverse(tempElements);
+                    System.out.println(tempElements);
+                    System.out.println(sMessages.get(tempElements.get(0)));
+                    System.out.println(sMessages.get(tempElements.get(tempElements.size()-1)));
                     adapter = new ChatArrayAdapter(
-                            getApplicationContext(), R.layout.singlemessage_chat, integers);
+                            getApplicationContext(), R.layout.singlemessage_chat, tempElements);
                     mBubbleList.setAdapter(adapter);
                 }
             }
@@ -268,6 +284,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     class SendMessageTask extends AsyncTask<String, String, String[]> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
 
         @Override
         protected String[] doInBackground(String... params) {
@@ -303,20 +325,31 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(String[] strings) {
             super.onPostExecute(strings);
+            mProgressBar.setVisibility(View.GONE);
             if (Integer.valueOf(strings[0]) == HttpURLConnection.HTTP_OK) {
                 JsonParser jsonParser = new JsonParser();
                 JsonObject jsonObject = jsonParser.parse(strings[2]).getAsJsonObject();
                 if (!arrayList.contains(jsonObject.get("id").getAsInt())) {
                     int currentId = jsonObject.get("id").getAsInt();
-                    arrayList.add(currentId);
+                    System.out.println(arrayList);
+                    arrayList.add(0, currentId);
+                    System.out.println(arrayList);
                     sDirectionHashMap.put(currentId, jsonObject.get("direction")
                             .getAsString());
                     sSenderName.put(currentId, jsonObject.get("sender_name").getAsString());
                     sMessages.put(currentId, jsonObject.get("message").getAsString());
+                    adapter = null;
+                    ArrayList<Integer> tempElements = new ArrayList<>(arrayList);
+                    Collections.reverse(tempElements);
+                    System.out.println(tempElements);
+                    System.out.println(sMessages.get(tempElements.get(0)));
+                    System.out.println(sMessages.get(tempElements.get(tempElements.size() - 1)));
+                    adapter = new ChatArrayAdapter(
+                            getApplicationContext(), R.layout.singlemessage_chat, tempElements);
+                    mBubbleList.setAdapter(adapter);
+                    editTextMessage.setText("");
                 }
             }
-            Collections.reverse(arrayList);
-            adapter.notifyDataSetChanged();
         }
     }
 

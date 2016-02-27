@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <android.widget.Toolbar
+        android:id="@+id/tool"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/dark_blue"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
 
     <ProgressBar
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_margin="10dp"
         android:id="@+id/load_messages"
-        android:layout_gravity="center"
+        android:layout_gravity="right"
         android:layout_centerHorizontal="true"
         android:visibility="gone"
         style="?android:attr/progressBarStyle"/>
+    </android.widget.Toolbar>
 
     <LinearLayout
+        android:layout_marginTop="70dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
