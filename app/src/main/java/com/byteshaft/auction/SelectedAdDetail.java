@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -24,7 +23,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,7 +70,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public static int myBidPrimaryKey = 0;
     public boolean mCanUpdate = false;
     private MenuItem item;
-    public String productPostUsername;
+    public String productOwner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,9 +113,6 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             case android.R.id.home:
                 onBackPressed();
                 return true;
-//            case R.id.chat_button:
-//                Intent intent = new Intent(this, ChatActivity.class);
-//                startActivity(intent);
             case R.id.user_info_button:
                 userInfoDialog();
                 break;
@@ -136,7 +131,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.chat_for_user, menu);
         item = menu.findItem(R.id.chat_button);
-//        item.setVisible(false);
+        item.setVisible(false);
         return true;
     }
 
@@ -203,7 +198,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                         price = jsonObject.get("price").getAsString();
                         title = jsonObject.get("title").getAsString();
                         currency = jsonObject.get("currency").getAsString();
-//                        productPostUsername = jsonObject.get("username").getAsString();
+                        productOwner = jsonObject.get("owner").getAsString();
 
                         for (int i = 1; i < 9; i++) {
                             String photoCounter = ("photo") + i;
@@ -250,7 +245,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     }
                 });
             }
-            if (productPostUsername != null) {
+            if (productOwner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
                 item.setVisible(true);
             }
             new GetBidsTask().execute();

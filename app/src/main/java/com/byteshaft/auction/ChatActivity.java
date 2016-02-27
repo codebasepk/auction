@@ -28,9 +28,11 @@ import com.google.gson.JsonParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 
@@ -91,6 +93,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.button_chat_send:
+                if (!editTextMessage.getText().toString().trim().isEmpty()) {
+                    new SendMessageTask().execute(editTextMessage.getText().toString());
+                }
+                break;
+        }
 
     }
 
@@ -220,6 +229,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                                 sMessages.put(currentId, jObject.get("message").getAsString());
                             }
                         }
+                        Collections.reverse(arrayList);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -247,14 +257,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    class sendMessageTask extends AsyncTask<String, String, String> {
+    class SendMessageTask extends AsyncTask<String, String, String[]> {
 
         @Override
-        protected String doInBackground(String... params) {
+        protected String[] doInBackground(String... params) {
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String parsedString;
                 String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
                 String passWord = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
-                String url = AppGlobals.SEND_MESSAGE_URL + userName+ File.separator + "ads" + File.separator
+                String url = AppGlobals.SEND_MESSAGE_URL + userName + File.separator + "ads" + File.separator
                         + adPrimaryKey + File.separator + "messages";
                 URL link;
                 try {
@@ -266,18 +277,37 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                             + ":" + passWord;
                     String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
                     connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
-                    String jsonFormattedData = getJsonObjectString(
-                            Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
-                            params[0]);
+                    String jsonFormattedData = getJsonObjectString(userName, params[0]);
                     Helpers.sendRequestData(connection, jsonFormattedData);
-                    System.out.println(connection.getResponseCode());
+                    InputStream is = connection.getInputStream();
+                    parsedString = Helpers.convertInputStreamToString(is);
+                    return new String[]{String.valueOf(connection.getResponseCode()), params[0],
+                            parsedString};
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            return null;
+            return new String[] {String.valueOf(AppGlobals.NO_INTERNET)};
         }
-    }
+
+        @Override
+        protected void onPostExecute(String[] strings) {
+            super.onPostExecute(strings);
+            if (Integer.valueOf(strings[0]) == HttpURLConnection.HTTP_OK) {
+                JsonParser jsonParser = new JsonParser();
+                JsonObject jsonObject = jsonParser.parse(strings[2]).getAsJsonObject();
+                    if (!arrayList.contains(jsonObject.get("id").getAsInt())) {
+                        int currentId = jsonObject.get("id").getAsInt();
+                        arrayList.add(currentId);
+                        sDirectionHashMap.put(currentId, jsonObject.get("direction")
+                                .getAsString());
+                        sSenderName.put(currentId, jsonObject.get("sender_name").getAsString());
+                        sMessages.put(currentId, jsonObject.get("message").getAsString());
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+        }
 
     private static String getJsonObjectString(String messenger_name, String message) {
         return String.format("{\"bidder_name\": \"%s\" , \"message\": \"%s\"}",
