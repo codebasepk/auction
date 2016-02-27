@@ -71,6 +71,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public boolean mCanUpdate = false;
     private MenuItem item;
     public String productOwner;
+    private TextView deliveryTimeTextView;
+    private String delivery_time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
         setTitle(productName.toLowerCase());
         descriptionTextView = (TextView) findViewById(R.id.ad_description);
+        deliveryTimeTextView = (TextView) findViewById(R.id.delivery_time);
         imagesUrls = new ArrayList<>();
         userNameHashMap = new HashMap<>();
         bidPriceHashMap = new HashMap<>();
@@ -199,7 +202,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                         title = jsonObject.get("title").getAsString();
                         currency = jsonObject.get("currency").getAsString();
                         productOwner = jsonObject.get("owner").getAsString();
-
+                        delivery_time = jsonObject.get("delivery_time").getAsString();
                         for (int i = 1; i < 9; i++) {
                             String photoCounter = ("photo") + i;
                             if (!jsonObject.get(photoCounter).isJsonNull()) {
@@ -222,6 +225,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             mProgressDialog.dismiss();
             descriptionTextView.setText("Description: \n \n" + description);
             adPrice.setText(price + currency);
+            deliveryTimeTextView.setText("Delivery time " + delivery_time + "h");
             LinearLayout layout = (LinearLayout) findViewById(R.id.linear);
             int value = 0;
             for (String url : imagesUrls) {
@@ -429,11 +433,15 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public void userInfoDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
         View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
+        TextView sellerName = (TextView) promptView.findViewById(R.id.seller_user_name);
+        sellerName.setText(productOwner);
         Button contactButton = (Button) promptView.findViewById(R.id.contact_button);
         contactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                intent.putExtra(AppGlobals.PRIMARY_KEY, adPrimaryKey);
+                startActivity(intent);
 
 
             }

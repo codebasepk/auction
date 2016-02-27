@@ -71,6 +71,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
     private ViewGroup mSelectedImagesContainer;
     private HashSet<Uri> mMedia = new HashSet<>();
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_CAMERA = 0;
+    private EditText deliveryTimeEditText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -91,6 +92,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         submitButton = (Button) mBaseView.findViewById(R.id.btn_submit);
         addImageButton = (ImageButton) mBaseView.findViewById(R.id.btn_add_image);
         currencyGroup = (RadioGroup) mBaseView.findViewById(R.id.currency_group);
+        deliveryTimeEditText = (EditText) mBaseView.findViewById(R.id.deliverTime);
         submitButton.setOnClickListener(this);
         addImageButton.setOnClickListener(this);
         categorySpinner = (Spinner) mBaseView.findViewById(R.id.spinner);
@@ -111,7 +113,6 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         });
         categorySpinner.setSelection(0, true);
         category = (String) categorySpinner.getSelectedItem();
-        System.out.println(category);
         return mBaseView;
     }
 
@@ -146,14 +147,18 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                     Toast.makeText(getActivity(), "All fields must be filled", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                if(Integer.valueOf(deliveryTimeEditText.getText().toString()) > 24) {
+                    Toast.makeText(getActivity(), "delivery time must be less than 24 hours", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (!itemTitle.getText().toString().trim().isEmpty() &&
                         !itemDescription.getText().toString().trim().isEmpty() &&
                         !mItemAmount.getText().toString().isEmpty() && imagesArray.size() > 0 &&
-                        !currency.trim().isEmpty()) {
+                        !currency.trim().isEmpty() && Integer.valueOf(deliveryTimeEditText.getText().toString()) < 24) {
                     category = categorySpinner.getSelectedItem().toString();
                     String[] dataToUpload = {itemTitle.getText().toString(),
                             itemDescription.getText().toString(), mItemAmount.getText().toString(),
-                            currency, category};
+                            currency, category, deliveryTimeEditText.getText().toString()};
                     new PostDataTask().execute(dataToUpload);
                 }
                 break;
@@ -299,6 +304,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 String username = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
                 String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
                 try {
+                    System.out.println(new URL(AppGlobals.POST_AD_URL + username + "/" + "ads/post"));
                     http = new MultiPartUtility(new URL(AppGlobals.POST_AD_URL + username + "/" + "ads/post"),
                             "POST", username, password);
                     http.addFormField("title", params[0]);
@@ -306,6 +312,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                     http.addFormField("price", params[2]);
                     http.addFormField("currency", params[3]);
                     http.addFormField("category", params[4].toLowerCase());
+                    http.addFormField("delivery_time", params[5]);
                     int photo = 1;
                     for (Uri item : imagesArray) {
                         http.addFilePart(("photo" + photo), new File(item.getPath()));

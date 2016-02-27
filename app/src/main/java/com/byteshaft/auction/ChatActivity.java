@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -40,8 +41,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private ImageButton buttonSend;
     private EditText editTextMessage;
-    private String contactName;
-    private String mContextUserTable;
     public ChatArrayAdapter adapter;
     public String userNameToFetchMessages;
     private int adPrimaryKey;
@@ -53,6 +52,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private static boolean loadMore = false;
     private boolean isScrollingUp = false;
     private ArrayList<Integer> arrayList;
+    private ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +63,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.PRIMARY_KEY, 0);
         editTextMessage = (EditText) findViewById(R.id.et_chat);
         buttonSend = (ImageButton) findViewById(R.id.button_chat_send);
+        mProgressBar = (ProgressBar) findViewById(R.id.load_messages);
         buttonSend.setOnClickListener(this);
         mBubbleList = (com.byteshaft.auction.utils.List) findViewById(R.id.lv_chat);
         setTitle(userNameToFetchMessages);
@@ -136,7 +137,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         @Override
-        public int getCount () {
+        public int getCount() {
             return idsList.size();
         }
 
@@ -198,6 +199,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         private boolean noInternet = false;
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected ArrayList<Integer> doInBackground(String... params) {
             if (isScrollingUp) {
                 loadMore = true;
@@ -243,6 +250,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(ArrayList<Integer> integers) {
             super.onPostExecute(integers);
+            mProgressBar.setVisibility(View.GONE);
             if (loadMore && isScrollingUp) {
                 adapter.notifyDataSetChanged();
                 isScrollingUp = false;
@@ -287,7 +295,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     e.printStackTrace();
                 }
             }
-            return new String[] {String.valueOf(AppGlobals.NO_INTERNET)};
+            return new String[]{String.valueOf(AppGlobals.NO_INTERNET)};
         }
 
         @Override
@@ -296,18 +304,19 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             if (Integer.valueOf(strings[0]) == HttpURLConnection.HTTP_OK) {
                 JsonParser jsonParser = new JsonParser();
                 JsonObject jsonObject = jsonParser.parse(strings[2]).getAsJsonObject();
-                    if (!arrayList.contains(jsonObject.get("id").getAsInt())) {
-                        int currentId = jsonObject.get("id").getAsInt();
-                        arrayList.add(currentId);
-                        sDirectionHashMap.put(currentId, jsonObject.get("direction")
-                                .getAsString());
-                        sSenderName.put(currentId, jsonObject.get("sender_name").getAsString());
-                        sMessages.put(currentId, jsonObject.get("message").getAsString());
-                    }
+                if (!arrayList.contains(jsonObject.get("id").getAsInt())) {
+                    int currentId = jsonObject.get("id").getAsInt();
+                    arrayList.add(currentId);
+                    sDirectionHashMap.put(currentId, jsonObject.get("direction")
+                            .getAsString());
+                    sSenderName.put(currentId, jsonObject.get("sender_name").getAsString());
+                    sMessages.put(currentId, jsonObject.get("message").getAsString());
                 }
-                adapter.notifyDataSetChanged();
             }
+            Collections.reverse(arrayList);
+            adapter.notifyDataSetChanged();
         }
+    }
 
     private static String getJsonObjectString(String messenger_name, String message) {
         return String.format("{\"bidder_name\": \"%s\" , \"message\": \"%s\"}",
