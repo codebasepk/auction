@@ -440,6 +440,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                intent.putExtra(AppGlobals.MESSENGER_USERNAME, productOwner);
                 intent.putExtra(AppGlobals.PRIMARY_KEY, adPrimaryKey);
                 startActivity(intent);
 

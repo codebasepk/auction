@@ -97,6 +97,7 @@ public class Messages extends AppCompatActivity implements AdapterView.OnItemCli
                     if (Integer.valueOf(data[0]) == HttpURLConnection.HTTP_OK) {
                         JsonParser jsonParser = new JsonParser();
                         JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
+                        System.out.println(jsonObject);
                         JsonArray jsonArray =  jsonObject.get("messengers").getAsJsonArray();
                         for (int i = 0; i < jsonArray.size(); i++)  {
                             if (!Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)

@@ -350,6 +350,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 itemTitle.setText("");
                 itemDescription.setText("");
                 mItemAmount.setText("");
+                deliveryTimeEditText.setText("");
             } else if (s.equals(AppGlobals.NO_INTERNET)) {
                 Helpers.alertDialog(getActivity(), "No Internet", "please check your internet" +
                         " and try again");

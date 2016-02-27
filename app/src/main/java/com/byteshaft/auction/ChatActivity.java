@@ -212,11 +212,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 arrayList = new ArrayList<>();
             }
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                System.out.println(params[0]);
                 String[] data;
                 try {
                     data = Helpers.simpleGetRequest(params[0],
                             Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
                             Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD));
+                    System.out.println(data[1]);
                     if (Integer.valueOf(data[0]) == HttpURLConnection.HTTP_OK) {
                         JsonParser jsonParser = new JsonParser();
                         JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
