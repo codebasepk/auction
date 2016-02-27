@@ -2,9 +2,10 @@ package com.byteshaft.auction.fragments;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,11 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.byteshaft.auction.R;
-import com.byteshaft.auction.SelectedCategoryList;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.google.gson.JsonArray;
@@ -32,6 +31,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -47,10 +47,8 @@ public class AdsDetailFragment extends Fragment {
     private static HashMap<Integer, String> imagesUrlHashMap;
     private static HashMap<Integer, String> currencyHashMap;
     private static HashMap<Integer, String> titleHashMap;
-    public ArrayList<Integer> arrayList;
     public static CustomView customView;
     private ProgressDialog mProgressDialog;
-
 
 
     @Nullable
@@ -60,7 +58,6 @@ public class AdsDetailFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new
                 LinearLayoutManager(getActivity().getApplicationContext());
         idsArray = new ArrayList<>();
-        arrayList = new ArrayList<>();
         descriptionHashMap = new HashMap<>();
         priceHashMap = new HashMap<>();
         imagesUrlHashMap = new HashMap<>();
@@ -102,10 +99,10 @@ public class AdsDetailFragment extends Fragment {
                         public void onLongPress(MotionEvent e) {
                             super.onLongPress(e);
                             View childView = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
-                            if(childView != null && mListener != null)
-                            {
+                            if (childView != null && mListener != null) {
                                 mListener.onItemLongClick(items.get(mRecyclerView
-                                        .getChildPosition(childView)));
+                                        .getChildPosition(childView)), mRecyclerView
+                                        .getChildPosition(childView));
                             }
                         }
                     });
@@ -135,10 +132,11 @@ public class AdsDetailFragment extends Fragment {
 
         public interface OnItemClickListener {
             void onItem(Integer item);
-            void onItemLongClick(Integer adPrimaryKey);
+
+            void onItemLongClick(Integer adPrimaryKey, int position);
         }
 
-        public  CustomAdapter(ArrayList<Integer> categories, Activity activity) {
+        public CustomAdapter(ArrayList<Integer> categories, Activity activity) {
             this.items = categories;
             this.mActivity = activity;
         }
@@ -152,14 +150,13 @@ public class AdsDetailFragment extends Fragment {
         }
 
 
-
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
             holder.setIsRecyclable(false);
             customView.idTextView.setText(String.valueOf(items.get(position)));
             customView.titleTextView.setText(titleHashMap.get(items.get(position)).toUpperCase());
             customView.descriptionTextView.setText(descriptionHashMap.get(items.get(position)));
-            customView.priceTextView.setText(priceHashMap.get(items.get(position)) + " "+
+            customView.priceTextView.setText(priceHashMap.get(items.get(position)) + " " +
                     currencyHashMap.get(items.get(position)));
             Picasso.with(mActivity)
                     .load(imagesUrlHashMap.get(items.get(position)))
@@ -203,7 +200,6 @@ public class AdsDetailFragment extends Fragment {
         public TextView titleTextView;
         public ImageView imageView;
         public ProgressBar progressBar;
-        RelativeLayout layout;
 
         public CustomView(View itemView) {
             super(itemView);
@@ -213,7 +209,6 @@ public class AdsDetailFragment extends Fragment {
             descriptionTextView = (TextView) itemView.findViewById(R.id.all_categories_description);
             priceTextView = (TextView) itemView.findViewById(R.id.all_categories_price);
             progressBar = (ProgressBar) itemView.findViewById(R.id.all_categories_image_progressBar);
-//            layout = (RelativeLayout) itemView.findViewById(R.id.layout);
         }
     }
 
@@ -294,10 +289,76 @@ public class AdsDetailFragment extends Fragment {
                 }
 
                 @Override
-                public void onItemLongClick(Integer adPrimaryKey) {
+                public void onItemLongClick(final Integer adPrimaryKey, final int position) {
+                    System.out.println(position);
                     System.out.println(adPrimaryKey);
+
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                    alertDialogBuilder.setMessage("Do you want to delete this add?");
+                    alertDialogBuilder.setPositiveButton("Ok",
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface arg0, int arg1) {
+                                    String[] data = {String.valueOf(adPrimaryKey),
+                                            String.valueOf(position)};
+                                    new DeleteAdTask().execute(data);
+                                }
+                            });
+
+                    alertDialogBuilder.setNegativeButton("cancel",
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface arg0, int arg1) {
+
+                                }
+                            });
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
                 }
             }));
+        }
+    }
+
+    public void removeItem(int position) {
+        idsArray.remove(position);
+        customAdapter.notifyDataSetChanged();
+    }
+
+    class DeleteAdTask extends AsyncTask<String, String, Integer> {
+
+        private int position = 987456123;
+
+        @Override
+        protected Integer doInBackground(String... params) {
+            int status = 0;
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String url = String.format("%s%s/ads/%s/", AppGlobals.DELETE_AD_URL,
+                        Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
+                        params[0]);
+                System.out.println(url);
+                try {
+                    status = Helpers.simpleDeleteRequest(url);
+                    if (status == HttpURLConnection.HTTP_NOT_FOUND) {
+                        position = Integer.valueOf(params[1]);
+                    }
+                    System.out.println(status);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return status;
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            if (integer == HttpURLConnection.HTTP_NOT_FOUND && position != 987456123) {
+                removeItem(position);
+            }
         }
     }
 }
