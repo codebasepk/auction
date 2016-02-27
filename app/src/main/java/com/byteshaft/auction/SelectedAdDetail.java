@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -24,7 +23,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,7 +70,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public static int myBidPrimaryKey = 0;
     public boolean mCanUpdate = false;
     private MenuItem item;
-    public String productPostUsername;
+    public String productOwner;
+    private TextView deliveryTimeTextView;
+    private String delivery_time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +83,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
         setTitle(productName.toLowerCase());
         descriptionTextView = (TextView) findViewById(R.id.ad_description);
+        deliveryTimeTextView = (TextView) findViewById(R.id.delivery_time);
         imagesUrls = new ArrayList<>();
         userNameHashMap = new HashMap<>();
         bidPriceHashMap = new HashMap<>();
@@ -115,9 +116,6 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             case android.R.id.home:
                 onBackPressed();
                 return true;
-//            case R.id.chat_button:
-//                Intent intent = new Intent(this, ChatActivity.class);
-//                startActivity(intent);
             case R.id.user_info_button:
                 userInfoDialog();
                 break;
@@ -136,7 +134,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.chat_for_user, menu);
         item = menu.findItem(R.id.chat_button);
-//        item.setVisible(false);
+        item.setVisible(false);
         return true;
     }
 
@@ -203,8 +201,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                         price = jsonObject.get("price").getAsString();
                         title = jsonObject.get("title").getAsString();
                         currency = jsonObject.get("currency").getAsString();
-//                        productPostUsername = jsonObject.get("username").getAsString();
-
+                        productOwner = jsonObject.get("owner").getAsString();
+                        delivery_time = jsonObject.get("delivery_time").getAsString();
                         for (int i = 1; i < 9; i++) {
                             String photoCounter = ("photo") + i;
                             if (!jsonObject.get(photoCounter).isJsonNull()) {
@@ -227,6 +225,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             mProgressDialog.dismiss();
             descriptionTextView.setText("Description: \n \n" + description);
             adPrice.setText(price + currency);
+            deliveryTimeTextView.setText("Delivery time " + delivery_time + "h");
             LinearLayout layout = (LinearLayout) findViewById(R.id.linear);
             int value = 0;
             for (String url : imagesUrls) {
@@ -250,7 +249,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     }
                 });
             }
-            if (productPostUsername != null) {
+            if (productOwner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
                 item.setVisible(true);
             }
             new GetBidsTask().execute();
@@ -434,11 +433,16 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public void userInfoDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
         View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
+        TextView sellerName = (TextView) promptView.findViewById(R.id.seller_user_name);
+        sellerName.setText(productOwner);
         Button contactButton = (Button) promptView.findViewById(R.id.contact_button);
         contactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                intent.putExtra(AppGlobals.MESSENGER_USERNAME, productOwner);
+                intent.putExtra(AppGlobals.PRIMARY_KEY, adPrimaryKey);
+                startActivity(intent);
 
 
             }

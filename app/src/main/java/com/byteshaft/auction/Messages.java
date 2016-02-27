@@ -2,6 +2,7 @@ package com.byteshaft.auction;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,11 +31,12 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class Messages extends AppCompatActivity {
+public class Messages extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private ListView mListView;
     private ProgressDialog mProgressDialog;
     private int primaryKey;
+    private ArrayList<String> messengers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,10 +63,17 @@ public class Messages extends AppCompatActivity {
         return false;
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+        intent.putExtra(AppGlobals.MESSENGER_USERNAME, messengers.get(position));
+        intent.putExtra(AppGlobals.PRIMARY_KEY, primaryKey);
+        startActivity(intent);
+    }
+
     class GetAllMessengersTask extends AsyncTask<String, String, ArrayList<String>> {
 
         private boolean noInternet = false;
-
 
         @Override
         protected void onPreExecute() {
@@ -77,7 +87,7 @@ public class Messages extends AppCompatActivity {
 
         @Override
         protected ArrayList<String> doInBackground(String... params) {
-            ArrayList<String> messengers = new ArrayList<>();
+            messengers = new ArrayList<>();
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 String[] data;
                 try {
@@ -87,9 +97,13 @@ public class Messages extends AppCompatActivity {
                     if (Integer.valueOf(data[0]) == HttpURLConnection.HTTP_OK) {
                         JsonParser jsonParser = new JsonParser();
                         JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
+                        System.out.println(jsonObject);
                         JsonArray jsonArray =  jsonObject.get("messengers").getAsJsonArray();
                         for (int i = 0; i < jsonArray.size(); i++)  {
-                            messengers.add(jsonArray.get(i).getAsString());
+                            if (!Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)
+                                    .equals(jsonArray.get(i).getAsString())) {
+                                messengers.add(jsonArray.get(i).getAsString());
+                            }
                         }
                     }
                 } catch (IOException e) {
@@ -113,8 +127,8 @@ public class Messages extends AppCompatActivity {
                 MessengerAdapter messengerAdapter = new MessengerAdapter(getApplicationContext(),
                         R.layout.single_message_senders, s);
                 mListView.setAdapter(messengerAdapter);
+                mListView.setOnItemClickListener(Messages.this);
             }
-
         }
     }
 
