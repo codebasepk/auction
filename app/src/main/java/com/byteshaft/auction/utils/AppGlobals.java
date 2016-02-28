@@ -79,7 +79,6 @@ public class AppGlobals extends Application{
     public static final String SEND_MESSAGE_URL = String.format("%s/api/users/", BASE_URL);
     public static final String DELETE_AD_URL = String.format("%s/api/users/", BASE_URL);
 
-
     @Override
     public void onCreate() {
         super.onCreate();

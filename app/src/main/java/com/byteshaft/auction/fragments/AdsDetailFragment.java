@@ -1,6 +1,7 @@
 package com.byteshaft.auction.fragments;
 
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -10,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
@@ -69,11 +71,6 @@ public class AdsDetailFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
         new GetAllAdsDetailTask().execute();
         return mBaseView;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
     }
 
     static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
@@ -274,7 +271,11 @@ public class AdsDetailFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<Integer> integers) {
             super.onPostExecute(integers);
-            mProgressDialog.dismiss();
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+                mProgressDialog = null;
+
+            }
             if (internetAvailable) {
                 Helpers.alertDialog(getActivity(), "No internet", "Internet Not available");
                 return;
@@ -285,7 +286,6 @@ public class AdsDetailFragment extends Fragment {
                     getContext(), new CustomAdapter.OnItemClickListener() {
                 @Override
                 public void onItem(Integer item) {
-                    System.out.println(item);
                 }
 
                 @Override
