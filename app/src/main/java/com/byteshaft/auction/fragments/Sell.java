@@ -451,4 +451,47 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
             }
         }
     }
+    class UpdateAdTask extends AsyncTask<String, String, Integer> {
+
+        @Override
+        protected Integer doInBackground(String... params) {
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                MultiPartUtility http;
+                String username = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+                String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+                try {
+                    System.out.println(new URL(AppGlobals.POST_AD_URL + username + "/" + "ads/post"));
+                    http = new MultiPartUtility(new URL(AppGlobals.POST_AD_URL + username + "/" + "ads/post"),
+                            "POST", username, password);
+                    http.addFormField("title", params[0]);
+                    http.addFormField("description", params[1]);
+                    http.addFormField("price", params[2]);
+                    http.addFormField("currency", params[3]);
+                    http.addFormField("category", params[4].toLowerCase());
+                    http.addFormField("delivery_time", params[5]);
+                    int photo = 1;
+//                    for (String item : imagesUrls) {
+//                        http.addFilePart(("photo" + photo), new File(item.getPath()));
+//                        System.out.println(item.getPath());
+//                        System.out.println(photo);
+//                        photo++;
+//                    }
+                    final byte[] bytes = http.finishFilesUpload();
+                    for (Uri item : imagesArray) {
+                        try {
+                            OutputStream os = new FileOutputStream(item.getPath());
+                            os.write(bytes);
+                        } catch (IOException e) {
+
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return AppGlobals.getPostResponse();
+            } else {
+                return AppGlobals.NO_INTERNET;
+            }
+        }
+    }
 }
