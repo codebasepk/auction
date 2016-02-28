@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,11 +33,14 @@ import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.byteshaft.auction.utils.MultiPartUtility;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,10 +76,27 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
     private HashSet<Uri> mMedia = new HashSet<>();
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_CAMERA = 0;
     private EditText deliveryTimeEditText;
+    private int adPrimaryKey;
+    private ArrayList<String> imagesUrls;
+    private String description;
+    private String price;
+    private String title;
+    private String delivery_time;
+    private String productOwner;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.seller_fragment, container, false);
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            int myInt = bundle.getInt("update", -1);
+            if (myInt != -1) {
+                adPrimaryKey = myInt;
+                System.out.println(myInt);
+                imagesUrls = new ArrayList<>();
+                new GetItemDetailsTask().execute();
+            }
+        }
         Helpers.saveLastFragmentOpened(getClass().getSimpleName());
         list = new ArrayList<>();
         categoryStringSet = Helpers.getSavedStringSet(AppGlobals.ALL_CATEGORIES);
@@ -101,6 +122,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_dropdown_item, list);
         categorySpinner.setAdapter(adapter);
+        submitButton.setText("submit");
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -147,7 +169,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                     Toast.makeText(getActivity(), "All fields must be filled", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(Integer.valueOf(deliveryTimeEditText.getText().toString()) > 24) {
+                if (Integer.valueOf(deliveryTimeEditText.getText().toString()) > 24) {
                     Toast.makeText(getActivity(), "delivery time must be less than 24 hours", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -205,7 +227,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         while (iterator.hasNext()) {
             Uri uri = iterator.next();
             Log.i(TAG, " uri: " + uri);
-            if (mMedia.size() >= 1 && mMedia.size()<=8) {
+            if (mMedia.size() >= 1 && mMedia.size() <= 8) {
                 mSelectedImagesContainer.setVisibility(View.VISIBLE);
             }
             final View imageHolder = LayoutInflater.from(getActivity()).inflate(R.layout.media_layout, null);
@@ -279,7 +301,6 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 }
             }
         }
-
     }
 
     /*
@@ -354,6 +375,79 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
             } else if (s.equals(AppGlobals.NO_INTERNET)) {
                 Helpers.alertDialog(getActivity(), "No Internet", "please check your internet" +
                         " and try again");
+            }
+        }
+    }
+
+    class GetItemDetailsTask extends AsyncTask<String, String, ArrayList<Bitmap>> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(getActivity());
+            mProgressDialog.setMessage("loading ...");
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+        }
+
+        @Override
+        protected ArrayList<Bitmap> doInBackground(String... params) {
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+                String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+                try {
+                    String[] strings = Helpers.simpleGetRequest(AppGlobals.SINGLE_AD_DETAILS + userName
+                                    + File.separator + AppGlobals.SINGLE_AD_DETAILS_APPEND_END
+                                    + adPrimaryKey + "/",
+                            userName, password);
+                    System.out.println(AppGlobals.SINGLE_AD_DETAILS + userName
+                            + File.separator + AppGlobals.SINGLE_AD_DETAILS_APPEND_END
+                            + adPrimaryKey + "/");
+                    if (HttpURLConnection.HTTP_OK == Integer.valueOf(strings[0])) {
+                        JsonParser jsonParser = new JsonParser();
+                        JsonObject jsonObject = jsonParser.parse(strings[1]).getAsJsonObject();
+                        System.out.println(jsonObject);
+                        description = jsonObject.get("description").getAsString();
+                        price = jsonObject.get("price").getAsString();
+                        category = jsonObject.get("category").getAsString();
+                        title = jsonObject.get("title").getAsString();
+                        currency = jsonObject.get("currency").getAsString();
+                        productOwner = jsonObject.get("owner").getAsString();
+                        delivery_time = jsonObject.get("delivery_time").getAsString();
+                        for (int i = 1; i < 9; i++) {
+                            String photoCounter = ("photo") + i;
+                            if (!jsonObject.get(photoCounter).isJsonNull()) {
+                                imagesUrls.add((AppGlobals.BASE_URL +
+                                        jsonObject.get(photoCounter).getAsString()));
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+//
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Bitmap> bitmap) {
+            super.onPostExecute(bitmap);
+            mProgressDialog.dismiss();
+            itemTitle.setText(title);
+            itemDescription.setText(description);
+            mItemAmount.setText(price);
+            deliveryTimeEditText.setText(delivery_time);
+            if (currency.equals("SAR")) {
+                currencyGroup.check(R.id.radio_riyal);
+            } else if (currency.equals("USD")) {
+                currencyGroup.check(R.id.radio_dollar);
+            }
+            categorySpinner.setSelection(list.indexOf(category));
+            submitButton.setText("update");
+            for (String urls : imagesUrls) {
+                mMedia.add(Uri.parse(urls));
             }
         }
     }
