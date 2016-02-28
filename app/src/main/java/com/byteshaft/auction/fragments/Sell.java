@@ -200,7 +200,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         while (iterator.hasNext()) {
             Uri uri = iterator.next();
             Log.i(TAG, " uri: " + uri);
-            if (mMedia.size() >= 1 && mMedia.size()<=8) {
+            if (mMedia.size() >= 1 && mMedia.size() <= 8) {
                 mSelectedImagesContainer.setVisibility(View.VISIBLE);
             }
             final View imageHolder = LayoutInflater.from(getActivity()).inflate(R.layout.media_layout, null);

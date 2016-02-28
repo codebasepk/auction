@@ -1,6 +1,7 @@
 package com.byteshaft.auction.fragments;
 
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -9,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
@@ -72,11 +74,6 @@ public class AdsDetailFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
         new GetAllAdsDetailTask().execute();
         return mBaseView;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
     }
 
     static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
@@ -203,7 +200,6 @@ public class AdsDetailFragment extends Fragment {
         public TextView titleTextView;
         public ImageView imageView;
         public ProgressBar progressBar;
-        RelativeLayout layout;
 
         public CustomView(View itemView) {
             super(itemView);
@@ -213,7 +209,6 @@ public class AdsDetailFragment extends Fragment {
             descriptionTextView = (TextView) itemView.findViewById(R.id.all_categories_description);
             priceTextView = (TextView) itemView.findViewById(R.id.all_categories_price);
             progressBar = (ProgressBar) itemView.findViewById(R.id.all_categories_image_progressBar);
-//            layout = (RelativeLayout) itemView.findViewById(R.id.layout);
         }
     }
 
@@ -279,7 +274,11 @@ public class AdsDetailFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<Integer> integers) {
             super.onPostExecute(integers);
-            mProgressDialog.dismiss();
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+                mProgressDialog = null;
+
+            }
             if (internetAvailable) {
                 Helpers.alertDialog(getActivity(), "No internet", "Internet Not available");
                 return;
@@ -290,7 +289,14 @@ public class AdsDetailFragment extends Fragment {
                     getContext(), new CustomAdapter.OnItemClickListener() {
                 @Override
                 public void onItem(Integer item) {
-                    System.out.println(item);
+                    Sell sell = new Sell();
+                    Bundle args = new Bundle();
+                    args.putString(AppGlobals.KEY_CHANGE_TITLE,"Update");
+                    sell.setArguments(args);
+                    getFragmentManager().beginTransaction()
+                            .replace(R.id.container, sell)
+                            .addToBackStack(null)
+                            .commit();
                 }
 
                 @Override
