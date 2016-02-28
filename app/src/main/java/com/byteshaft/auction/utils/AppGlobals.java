@@ -73,8 +73,11 @@ public class AppGlobals extends Application{
     public static final String UPDATE_USER_DETAILS_URL = String.format("%s/api/users/",BASE_URL);
     public static final String DELETE_UPDATE_BID_URL =  String.format("%s/api/users/", BASE_URL);
     public static final String GET_ALL_MESSAGES_URL = String.format("%s/api/users/", BASE_URL);
+    public static final String GET_USER_SPECIFIC_MESSAGES = String.format("%s/api/users/", BASE_URL);
     public static final String PRIMARY_KEY = "ad_primary_key";
-    public static final String KEY_CHANGE_TITLE = "key_to_change_title";
+    public static final String MESSENGER_USERNAME = "messenger_user_name";
+    public static final String SEND_MESSAGE_URL = String.format("%s/api/users/", BASE_URL);
+    public static final String DELETE_AD_URL = String.format("%s/api/users/", BASE_URL);
 
     @Override
     public void onCreate() {

@@ -16,6 +16,9 @@
             android:layout_margin="5dp">
 
             <RelativeLayout
+                android:id="@+id/layout"
+                android:clickable="true"
+                android:background="?android:attr/selectableItemBackground"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent">
 

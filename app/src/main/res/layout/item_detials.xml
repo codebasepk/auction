@@ -31,7 +31,14 @@
                     android:layout_gravity="left"
                     android:textStyle="italic" />
 
-                <TextView
+                    <TextView
+                        android:id="@+id/delivery_time"
+                        android:layout_marginRight="100dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"/>
+
+                    <TextView
                     android:id="@+id/ad_price"
                     android:layout_margin="2dp"
                     android:layout_width="wrap_content"

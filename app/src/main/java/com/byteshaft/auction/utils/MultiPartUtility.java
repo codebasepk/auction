@@ -144,8 +144,8 @@ public class MultiPartUtility {
         if (postProductProcess && status == 201 || status == 200) {
             AppGlobals.setPostResponse(status);
         }
-        System.out.println(connection.getResponseCode());
         InputStream is = connection.getInputStream();
+        System.out.println(is.toString());
         final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         final byte[] buffer = new byte[4096];
         int bytesRead;
