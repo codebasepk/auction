@@ -9,7 +9,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
@@ -27,17 +26,26 @@ public class MyGcmListenerService extends GcmListenerService {
      *             For Set of keys use data.keySet().
      */
     // [START receive_message]
+
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        String message = data.getString("message");
-        Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Message: " + message);
+//        System.out.println(data);
+//        String readyData = data.toString().replace("Bundle", "");
 
-        if (from.startsWith("/topics/")) {
-            // message received from some topic.
-        } else {
-            // normal downstream message.
-        }
+
+//        JsonParser jsonParser = new JsonParser();
+//
+//        JsonArray jsonArray = (JsonArray) jsonParser.parse(data.toString());
+//        System.out.println(jsonArray);
+
+//        Log.d(TAG, "From: " + from);
+//        Log.d(TAG, "Message: " + message);
+//
+//        if (from.startsWith("/topics/")) {
+//            // message received from some topic.
+//        } else {
+//            // normal downstream message.
+//        }
 
         // [START_EXCLUDE]
         /**
@@ -51,7 +59,7 @@ public class MyGcmListenerService extends GcmListenerService {
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
-        sendNotification(message);
+        sendNotification("test");
         // [END_EXCLUDE]
     }
     // [END receive_message]

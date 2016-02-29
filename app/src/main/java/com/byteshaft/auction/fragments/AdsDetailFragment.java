@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
+import com.byteshaft.auction.utils.SimpleDividerItemDecoration;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -67,6 +69,7 @@ public class AdsDetailFragment extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
         new GetAllAdsDetailTask().execute();
         return mBaseView;
     }
@@ -112,8 +115,6 @@ public class AdsDetailFragment extends Fragment {
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
             View childView = rv.findChildViewUnder(e.getX(), e.getY());
             if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-                System.out.println((rv.getChildPosition(childView)));
-                System.out.println(items);
                 mListener.onItem(items.get(rv.getChildPosition(childView)));
                 return true;
             }
@@ -285,7 +286,13 @@ public class AdsDetailFragment extends Fragment {
                     getContext(), new CustomAdapter.OnItemClickListener() {
                 @Override
                 public void onItem(Integer item) {
-                    System.out.println(item);
+                    Sell sell = new Sell();
+                    FragmentTransaction tx = getFragmentManager().beginTransaction();
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("update", item);
+                    sell.setArguments(bundle);
+                    tx.replace(R.id.container, sell);
+                    tx.commit();
                 }
 
                 @Override

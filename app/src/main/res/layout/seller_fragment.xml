@@ -140,7 +140,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/btn_add_image"
                 android:background="@color/light_blue"
-                android:text="Submit"
                 android:textColor="@color/white" />
 
         </RelativeLayout>

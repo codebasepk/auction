@@ -81,20 +81,29 @@ public class RegistrationIntentService extends IntentService {
         }
     }
     // [END subscribe_topics]
-    class sendPushNotificationKey extends AsyncTask<String, String, String> {
+    class sendPushNotificationKey extends AsyncTask<String, String, Boolean> {
 
         @Override
-        protected String doInBackground(String... params) {
+        protected Boolean doInBackground(String... params) {
             String url = AppGlobals.PUSH_NOTIFICATION_KEY+params[0] + "/push_id";
             try {
                 Helpers.authPostRequest(url, params[1], params[2]);
+                return true;
             } catch (IOException e) {
-                e.printStackTrace();
+                return false;
             }
-            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            if (aBoolean) {
+                //Save boolean in
+                Helpers.saveBooleanToSharedPreference(AppGlobals.PUSH_KEY_STATUS, true);
+            } else {
+                Helpers.saveBooleanToSharedPreference(AppGlobals.PUSH_KEY_STATUS, false);
+            }
         }
     }
-
-
 }
 

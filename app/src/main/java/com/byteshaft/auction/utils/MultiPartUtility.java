@@ -138,6 +138,7 @@ public class MultiPartUtility {
                     .append(CRLF);
         writer.close();
         final int status = connection.getResponseCode();
+        System.out.println(status);
         if (registrationProcess && status == 201) {
             AppGlobals.setUserExistResponse(status);
         }

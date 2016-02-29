@@ -13,7 +13,7 @@ import java.net.URL;
 
 public class GcmSender {
 
-    public static final String API_KEY = "AIzaSyAsl2hfesm538eZUrhvIwGHCZeoRB4Ovjs";
+    public static final String API_KEY = "AIzaSyAKqZ5WrMh3ZinQLkVH8ftdE2qi1DRCCZg";
 
     public static void main(String[] args) {
         try {
@@ -47,9 +47,7 @@ public class GcmSender {
             System.out.println(resp);
             System.out.println("Check your device/emulator for notification or logcat for " +
                     "confirmation of the receipt of the GCM message.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
     }
