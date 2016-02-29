@@ -13,10 +13,6 @@ import android.support.v4.app.NotificationCompat;
 import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
 import com.google.android.gms.gcm.GcmListenerService;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 
 public class MyGcmListenerService extends GcmListenerService {
 
@@ -35,16 +31,6 @@ public class MyGcmListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         System.out.println(data);
         String readyData = data.toString().replace("Bundle", "");
-//        JsonParser jsonParser = new JsonParser();
-        System.out.println("String to Json Array Stmt");
-        try {
-            JsonParser parser = new JsonParser();
-            JsonElement tradeElement = parser.parse(readyData);
-            JsonArray trade = tradeElement.getAsJsonArray();
-            System.out.println(trade);
-        } catch (JsonSyntaxException e) {
-            e.printStackTrace();
-        }
 
 
 //        JsonParser jsonParser = new JsonParser();
