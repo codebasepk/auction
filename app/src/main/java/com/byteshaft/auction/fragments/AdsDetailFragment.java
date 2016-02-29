@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
+import com.byteshaft.auction.utils.SimpleDividerItemDecoration;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -68,6 +69,7 @@ public class AdsDetailFragment extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
         new GetAllAdsDetailTask().execute();
         return mBaseView;
     }

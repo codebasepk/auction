@@ -34,6 +34,7 @@ import com.byteshaft.auction.utils.Helpers;
 import com.byteshaft.auction.utils.MultiPartUtility;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -81,6 +82,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
     private String title;
     private String delivery_time;
     private String productOwner;
+    private boolean updateProcess = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -93,6 +95,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 System.out.println(myInt);
                 imagesUrls = new ArrayList<>();
                 new GetItemDetailsTask().execute();
+                updateProcess = true;
             }
         }
         Helpers.saveLastFragmentOpened(getClass().getSimpleName());
@@ -157,7 +160,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                     Toast.makeText(AppGlobals.getContext(), "please select currency", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (imagesArray.size() < 1) {
+                if (imagesArray.size() < 1 && !updateProcess) {
                     Toast.makeText(AppGlobals.getContext(), "please select at least one image", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -171,7 +174,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                     Toast.makeText(getActivity(), "delivery time must be less than 24 hours", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (!itemTitle.getText().toString().trim().isEmpty() &&
+                if (!updateProcess &&!itemTitle.getText().toString().trim().isEmpty() &&
                         !itemDescription.getText().toString().trim().isEmpty() &&
                         !mItemAmount.getText().toString().isEmpty() && imagesArray.size() > 0 &&
                         !currency.trim().isEmpty() && Integer.valueOf(deliveryTimeEditText.getText().toString()) < 24) {
@@ -180,6 +183,20 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                             itemDescription.getText().toString(), mItemAmount.getText().toString(),
                             currency, category, deliveryTimeEditText.getText().toString()};
                     new PostDataTask().execute(dataToUpload);
+                }
+                if (updateProcess && mMedia.size() < 1) {
+                    Toast.makeText(AppGlobals.getContext(), "please select at least one image", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (updateProcess && !itemTitle.getText().toString().trim().isEmpty() &&
+                        !itemDescription.getText().toString().trim().isEmpty() &&
+                        !mItemAmount.getText().toString().isEmpty() && mMedia.size() > 0 &&
+                        !currency.trim().isEmpty() &&
+                        Integer.valueOf(deliveryTimeEditText.getText().toString()) < 24) {
+                    String[] dataToUpdate = {itemTitle.getText().toString(),
+                            itemDescription.getText().toString(), mItemAmount.getText().toString(),
+                            currency, category, deliveryTimeEditText.getText().toString()};
+                    new UpdateAdTask().execute(dataToUpdate);
                 }
                 break;
             case R.id.btn_add_image:
@@ -241,19 +258,30 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 }
             });
 
-            if (!uri.toString().contains("content://")) {
+            if (!uri.toString().contains("content://") && !uri.toString().contains("http://")) {
                 // probably a relative uri
                 uri = Uri.fromFile(new File(uri.toString()));
+                imageFetcher.loadImage(uri, thumbnail);
+                mSelectedImagesContainer.addView(imageHolder);
+                // set the dimension to correctly
+                // show the image thumbnail.
+                int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50,
+                        getResources().getDisplayMetrics());
+                int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50,
+                        getResources().getDisplayMetrics());
+                thumbnail.setLayoutParams(new FrameLayout.LayoutParams(width, height));
+            } else if (uri.toString().contains("http://")) {
+                Picasso.with(getActivity()).load(uri).into(thumbnail);
+                mSelectedImagesContainer.addView(imageHolder);
+                // set the dimension to correctly
+                // show the image thumbnail.
+                int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50,
+                        getResources().getDisplayMetrics());
+                int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50,
+                        getResources().getDisplayMetrics());
+                thumbnail.setLayoutParams(new FrameLayout.LayoutParams(width, height));
+
             }
-            imageFetcher.loadImage(uri, thumbnail);
-            mSelectedImagesContainer.addView(imageHolder);
-            // set the dimension to correctly
-            // show the image thumbnail.
-            int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50,
-                    getResources().getDisplayMetrics());
-            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50,
-                    getResources().getDisplayMetrics());
-            thumbnail.setLayoutParams(new FrameLayout.LayoutParams(width, height));
         }
     }
 
@@ -361,7 +389,6 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         @Override
         protected void onPostExecute(Integer s) {
             super.onPostExecute(s);
-            System.out.println(s);
             mProgressDialog.dismiss();
             if (s.equals(201)) {
                 imagesArray.clear();
@@ -454,15 +481,40 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
     class UpdateAdTask extends AsyncTask<String, String, Integer> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(getActivity());
+            mProgressDialog.setMessage("updating ...");
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+        }
+
+        @Override
         protected Integer doInBackground(String... params) {
+            ArrayList<Uri> uriList = new ArrayList<>();
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                int counter = 0;
+                System.out.println(mMedia);
+                for (Uri uri : mMedia) {
+                    if (uri.toString().contains("http://")) {
+                        AppGlobals.addBitmapToInternalMemory(Helpers.downloadImage(uri.toString())
+                                , counter + ".png",
+                                AppGlobals.TEMP_FOLDER);
+                    }
+                    counter++;
+                }
                 MultiPartUtility http;
                 String username = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
                 String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
                 try {
-                    System.out.println(new URL(AppGlobals.POST_AD_URL + username + "/" + "ads/post"));
-                    http = new MultiPartUtility(new URL(AppGlobals.POST_AD_URL + username + "/" + "ads/post"),
-                            "POST", username, password);
+                    System.out.println(AppGlobals.SINGLE_AD_DETAILS + username
+                            + File.separator + AppGlobals.SINGLE_AD_DETAILS_APPEND_END
+                            + adPrimaryKey + "/");
+                    http = new MultiPartUtility(new URL(AppGlobals.SINGLE_AD_DETAILS + username
+                            + File.separator + AppGlobals.SINGLE_AD_DETAILS_APPEND_END
+                            + adPrimaryKey + "/"),
+                            "PUT", username, password);
                     http.addFormField("title", params[0]);
                     http.addFormField("description", params[1]);
                     http.addFormField("price", params[2]);
@@ -470,14 +522,23 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                     http.addFormField("category", params[4].toLowerCase());
                     http.addFormField("delivery_time", params[5]);
                     int photo = 1;
-//                    for (String item : imagesUrls) {
-//                        http.addFilePart(("photo" + photo), new File(item.getPath()));
-//                        System.out.println(item.getPath());
-//                        System.out.println(photo);
-//                        photo++;
-//                    }
+                    File file = new File(AppGlobals.root +AppGlobals.TEMP_FOLDER);
+                    File[] files = file.listFiles();
+                    for (File images : files) {
+                        http.addFilePart(("photo" + photo), images);
+                        uriList.add(Uri.fromFile(images));
+                        photo++;
+                    }
+                    if (imagesUrls.size() > 0) {
+                        for (Uri item : imagesArray) {
+                            http.addFilePart(("photo" + photo), new File(item.getPath()));
+                            uriList.add(item);
+                            photo++;
+                        }
+
+                    }
                     final byte[] bytes = http.finishFilesUpload();
-                    for (Uri item : imagesArray) {
+                    for (Uri item : uriList) {
                         try {
                             OutputStream os = new FileOutputStream(item.getPath());
                             os.write(bytes);
@@ -491,6 +552,22 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 return AppGlobals.getPostResponse();
             } else {
                 return AppGlobals.NO_INTERNET;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            mProgressDialog.dismiss();
+            if (integer == HttpURLConnection.HTTP_OK) {
+                imagesArray.clear();
+                mMedia.clear();
+                showMedia();
+                Helpers.alertDialog(getActivity(), "Success!", "Your Product is Updated");
+                itemTitle.setText("");
+                itemDescription.setText("");
+                mItemAmount.setText("");
+                deliveryTimeEditText.setText("");
             }
         }
     }

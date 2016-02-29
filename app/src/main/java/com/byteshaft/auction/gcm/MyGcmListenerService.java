@@ -29,8 +29,8 @@ public class MyGcmListenerService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        System.out.println(data);
-        String readyData = data.toString().replace("Bundle", "");
+//        System.out.println(data);
+//        String readyData = data.toString().replace("Bundle", "");
 
 
 //        JsonParser jsonParser = new JsonParser();
