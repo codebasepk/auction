@@ -10,8 +10,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
-import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
+import com.byteshaft.auction.SelectedAdDetail;
+import com.byteshaft.auction.utils.AppGlobals;
 import com.google.android.gms.gcm.GcmListenerService;
 
 public class MyGcmListenerService extends GcmListenerService {
@@ -29,25 +30,16 @@ public class MyGcmListenerService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
-//        System.out.println(data);
-//        String readyData = data.toString().replace("Bundle", "");
-
-
-//        JsonParser jsonParser = new JsonParser();
-//
-//        JsonArray jsonArray = (JsonArray) jsonParser.parse(data.toString());
-//        System.out.println(jsonArray);
-
-//        Log.d(TAG, "From: " + from);
-//        Log.d(TAG, "Message: " + message);
-//
-//        if (from.startsWith("/topics/")) {
-//            // message received from some topic.
-//        } else {
-//            // normal downstream message.
-//        }
-
-        // [START_EXCLUDE]
+        System.out.println(data);
+        String readyData = data.toString().replace("Bundle", "");
+        System.out.println(readyData);
+        String type = data.getString("type");
+        switch (type) {
+            case "new_ad_posted":
+                sendNotification("A new ad is posted in your subscribed category", "new ad",
+                        SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
+                break;
+        }
         /**
          * Production applications would usually process the message here.
          * Eg: - Syncing with server.
@@ -59,7 +51,6 @@ public class MyGcmListenerService extends GcmListenerService {
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
-        sendNotification("test");
         // [END_EXCLUDE]
     }
     // [END receive_message]
@@ -69,8 +60,9 @@ public class MyGcmListenerService extends GcmListenerService {
      *
      * @param message GCM message received.
      */
-    private void sendNotification(String message) {
-        Intent intent = new Intent(this, MainActivity.class);
+    private void sendNotification(String message, String title, Class  activity, String key, int value ) {
+        Intent intent = new Intent(this, activity);
+        intent.putExtra(key, value);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
@@ -78,7 +70,7 @@ public class MyGcmListenerService extends GcmListenerService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_stat_ic_notification)
-                .setContentTitle("GCM Message")
+                .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
