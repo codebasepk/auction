@@ -10,9 +10,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
+import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.SelectedAdDetail;
 import com.byteshaft.auction.utils.AppGlobals;
+import com.byteshaft.auction.utils.Helpers;
 import com.google.android.gms.gcm.GcmListenerService;
 
 public class MyGcmListenerService extends GcmListenerService {
@@ -31,27 +33,33 @@ public class MyGcmListenerService extends GcmListenerService {
     @Override
     public void onMessageReceived(String from, Bundle data) {
         System.out.println(data);
-        String readyData = data.toString().replace("Bundle", "");
-        System.out.println(readyData);
         String type = data.getString("type");
         switch (type) {
             case "new_ad_posted":
-                sendNotification("A new ad is posted in your subscribed category", "new ad",
-                        SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
+                if (data.getString("ad_owner").equals(Helpers
+                        .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
+                    sendNotification("A new ad is posted in your subscribed category", "new ad",
+                            SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
+                }
+            case "half_time_no_bid":
+                if (data.getString("ad_owner").equals(Helpers
+                        .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
+                    sendNotification("Ad is posted 12h ago , you might be interested in this one", "No Bid",
+                            SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
+                }
+                break;
+            case "sold_to_highest_bidder":
+                if (data.getString("ad_owner").equals(Helpers
+                        .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
+                    sendNotification("you bid on a product, its sold to highest bidder", "Product sold",
+                            SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
+                }
+                break;
+            case "ad_expired":
+                    sendNotification("An ad is expired", "ad Expired",
+                            MainActivity.class, "", 0);
                 break;
         }
-        /**
-         * Production applications would usually process the message here.
-         * Eg: - Syncing with server.
-         *     - Store message in local database.
-         *     - Update UI.
-         */
-
-        /**
-         * In some cases it may be useful to show a notification indicating to the user
-         * that a message was received.
-         */
-        // [END_EXCLUDE]
     }
     // [END receive_message]
 

@@ -174,7 +174,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                     Toast.makeText(getActivity(), "delivery time must be less than 24 hours", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (!updateProcess &&!itemTitle.getText().toString().trim().isEmpty() &&
+                if (!updateProcess && !itemTitle.getText().toString().trim().isEmpty() &&
                         !itemDescription.getText().toString().trim().isEmpty() &&
                         !mItemAmount.getText().toString().isEmpty() && imagesArray.size() > 0 &&
                         !currency.trim().isEmpty() && Integer.valueOf(deliveryTimeEditText.getText().toString()) < 24) {
@@ -478,6 +478,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
             showMedia();
         }
     }
+
     class UpdateAdTask extends AsyncTask<String, String, Integer> {
 
         @Override
@@ -522,7 +523,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                     http.addFormField("category", params[4].toLowerCase());
                     http.addFormField("delivery_time", params[5]);
                     int photo = 1;
-                    File file = new File(AppGlobals.root +AppGlobals.TEMP_FOLDER);
+                    File file = new File(AppGlobals.root + AppGlobals.TEMP_FOLDER);
                     File[] files = file.listFiles();
                     for (File images : files) {
                         http.addFilePart(("photo" + photo), images);
@@ -568,6 +569,15 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 itemDescription.setText("");
                 mItemAmount.setText("");
                 deliveryTimeEditText.setText("");
+            }
+            File file = new File(AppGlobals.root + AppGlobals.TEMP_FOLDER);
+            if (file.exists()) {
+                File[] folders = file.listFiles();
+                for (File folder : folders) {
+                    if (folder.exists()) {
+                        Helpers.removeFiles(folder.getAbsolutePath());
+                    }
+                }
             }
         }
     }
