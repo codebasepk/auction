@@ -4,11 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -25,10 +23,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.byteshaft.auction.fragments.AdsDetailFragment;
-import com.byteshaft.auction.fragments.CategoriesFragment;
-import com.byteshaft.auction.fragments.UserSettingFragment;
 import com.byteshaft.auction.fragments.Buy;
+import com.byteshaft.auction.fragments.CategoriesFragment;
 import com.byteshaft.auction.fragments.Sell;
+import com.byteshaft.auction.fragments.UserSettingFragment;
 import com.byteshaft.auction.fragments.UserSpecificBidsFragment;
 import com.byteshaft.auction.gcm.QuickstartPreferences;
 import com.byteshaft.auction.gcm.RegistrationIntentService;
@@ -60,29 +58,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Helpers.isUserLoggedIn()) {
-            mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    SharedPreferences sharedPreferences =
-                            PreferenceManager.getDefaultSharedPreferences(context);
-                    boolean sentToken = sharedPreferences
-                            .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
-                    if (sentToken) {
-                        System.out.println(R.string.gcm_send_message);
-                    } else {
-                        System.out.println(R.string.token_error_message);
-                    }
-                }
-
-            };
-
-            if (checkPlayServices()) {
-                // Start IntentService to register this application with GCM.
-                Intent intent = new Intent(this, RegistrationIntentService.class);
-                startService(intent);
-            }
-        }
         instance = this;
         if (Helpers.isUserLoggedIn()) {
             if (Helpers.getCategories().contains("nothing")) {
@@ -116,6 +91,26 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        if (Helpers.isUserLoggedIn()) {
+            final boolean sentToken = Helpers.getBooleanValueFromSharedPreference(
+                    QuickstartPreferences.SENT_TOKEN_TO_SERVER);
+            mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (sentToken) {
+                        System.out.println(R.string.gcm_send_message);
+                    } else {
+                        System.out.println(R.string.token_error_message);
+                    }
+                }
+
+            };
+            if (checkPlayServices() && !sentToken) {
+                // Start IntentService to register this application with GCM.
+                Intent intent = new Intent(this, RegistrationIntentService.class);
+                startService(intent);
+            }
+        }
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
         if (Helpers.isUserLoggedIn() && !Helpers.getBooleanValueFromSharedPreference(

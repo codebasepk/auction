@@ -28,7 +28,6 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
@@ -69,7 +68,6 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
     private ArrayList<String> list;
     private Set<String> categoryStringSet;
     private ProgressDialog mProgressDialog;
-    private static final String TAG = MainActivity.class.getSimpleName();
     private static final int INTENT_REQUEST_GET_IMAGES = 13;
     private static final int INTENT_REQUEST_GET_N_IMAGES = 14;
     private ViewGroup mSelectedImagesContainer;
@@ -226,7 +224,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         final ImageInternalFetcher imageFetcher = new ImageInternalFetcher(getActivity(), 500);
         while (iterator.hasNext()) {
             Uri uri = iterator.next();
-            Log.i(TAG, " uri: " + uri);
+            Log.i("TAG", " uri: " + uri);
             if (mMedia.size() >= 1 && mMedia.size() <= 8) {
                 mSelectedImagesContainer.setVisibility(View.VISIBLE);
             }
@@ -291,7 +289,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 System.arraycopy(parcelableUris, 0, uris, 0, parcelableUris.length);
                 if (uris != null) {
                     for (Uri uri : uris) {
-                        Log.i(TAG, " uri: " + uri);
+                        Log.i("TAG", " uri: " + uri);
                         if (!imagesArray.contains(uri)) {
                             imagesArray.add(uri);
                         }
@@ -328,11 +326,12 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                     System.out.println(new URL(AppGlobals.POST_AD_URL + username + "/" + "ads/post"));
                     http = new MultiPartUtility(new URL(AppGlobals.POST_AD_URL + username + "/" + "ads/post"),
                             "POST", username, password);
+                    System.out.println(params[4]);
                     http.addFormField("title", params[0]);
                     http.addFormField("description", params[1]);
                     http.addFormField("price", params[2]);
                     http.addFormField("currency", params[3]);
-                    http.addFormField("category", params[4].toLowerCase());
+                    http.addFormField("category", params[4]);
                     http.addFormField("delivery_time", params[5]);
                     int photo = 1;
                     for (Uri item : imagesArray) {
@@ -449,6 +448,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
             for (String urls : imagesUrls) {
                 mMedia.add(Uri.parse(urls));
             }
+            showMedia();
         }
     }
     class UpdateAdTask extends AsyncTask<String, String, Integer> {
