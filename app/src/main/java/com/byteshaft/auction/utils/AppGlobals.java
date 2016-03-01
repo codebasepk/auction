@@ -80,7 +80,7 @@ public class AppGlobals extends Application{
     public static final String PUSH_KEY_STATUS = "push_key_status";
     public static final String TEMP_FOLDER = "/temp_folder";
     public static final String PRODUCT_OWNER = "product_owner";
-    public static final String MESSAGE_RECEIVER= "message_sender";
+    public static final String MESSAGE_RECEIVER = "message_sender";
 
     @Override
     public void onCreate() {

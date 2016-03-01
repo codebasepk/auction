@@ -341,7 +341,7 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                     if (messageReceiver != null && !messageReceiver.equals("")) {
                         sendMessageTo = messageReceiver;
                     } else {
-                        sendMessageTo = productOwner;
+                        sendMessageTo = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
                     }
                     String jsonFormattedData = getJsonObjectString(sendMessageTo, params[0]);
                     Helpers.sendRequestData(connection, jsonFormattedData);
