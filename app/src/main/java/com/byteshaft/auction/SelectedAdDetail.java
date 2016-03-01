@@ -126,6 +126,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 Intent intent = new Intent(getApplicationContext(), Messages.class);
                 System.out.println(adPrimaryKey);
                 intent.putExtra(AppGlobals.PRIMARY_KEY, adPrimaryKey);
+                intent.putExtra(AppGlobals.PRODUCT_OWNER, productOwner);
                 startActivity(intent);
                 break;
         }
@@ -447,15 +448,19 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
 
     public void userInfoDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
-        View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
+        final View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
         TextView sellerName = (TextView) promptView.findViewById(R.id.seller_user_name);
         sellerName.setText(productOwner);
         Button contactButton = (Button) promptView.findViewById(R.id.contact_button);
+        if (productOwner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
+            contactButton.setVisibility(View.GONE);
+        }
         contactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-                intent.putExtra(AppGlobals.MESSENGER_USERNAME, productOwner);
+                System.out.println(productOwner);
+                intent.putExtra(AppGlobals.PRODUCT_OWNER, productOwner);
                 intent.putExtra(AppGlobals.PRIMARY_KEY, adPrimaryKey);
                 startActivity(intent);
 

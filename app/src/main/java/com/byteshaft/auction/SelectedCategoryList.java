@@ -79,7 +79,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         mShowMoreProgress = (ProgressBar) findViewById(R.id.show_progressBar);
         mShowMoreProgress.setVisibility(View.INVISIBLE);
         showMoreButton.setOnClickListener(this);
-        categorySpecificUrl = AppGlobals.SELECTED_CATEGORY_DETAIL_URL + category.toLowerCase();
+        categorySpecificUrl = AppGlobals.SELECTED_CATEGORY_DETAIL_URL + category;
         notFoundLayout = (RelativeLayout) findViewById(R.id.not_found_layout);
         initializeArrayAndHashMap();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
