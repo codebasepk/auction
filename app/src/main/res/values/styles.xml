@@ -7,6 +7,13 @@
         <item name="colorPrimaryDark">@color/primary_blue</item>
         <item name="colorAccent">@color/colorDefault</item>
         <item name="android:typeface">serif</item>
+        <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
+    </style>
+
+    <style name="Widget.Styled.ActionBar" parent="@style/Widget.AppCompat.Light.ActionBar">
+        <!-- Setting values in the android namespace affects API levels 14+ -->
+        <item name="android:background">#FFFFFF</item>
+
     </style>
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>

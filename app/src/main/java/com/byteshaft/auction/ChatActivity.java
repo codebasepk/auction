@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -68,23 +67,29 @@ public class ChatActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_activity);
-        toolbar = (Toolbar) findViewById(R.id.tool);
-        setActionBar(toolbar);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        Log.i("productOwner", productOwner);
+//        toolbar = (Toolbar) findViewById(R.id.tool);
+//        setActionBar(toolbar);
+//        getActionBar().setDisplayHomeAsUpEnabled(true);
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.PRIMARY_KEY, 0);
         productOwner = getIntent().getStringExtra(AppGlobals.PRODUCT_OWNER);
         messageReceiver = getIntent().getStringExtra(AppGlobals.MESSAGE_RECEIVER);
-        Log.i("productOwner", productOwner);
         editTextMessage = (EditText) findViewById(R.id.et_chat);
         buttonSend = (ImageButton) findViewById(R.id.button_chat_send);
         mProgressBar = (ProgressBar) findViewById(R.id.load_messages);
         buttonSend.setOnClickListener(this);
         mBubbleList = (com.byteshaft.auction.utils.List) findViewById(R.id.lv_chat);
-        getActionBar().setTitle(userNameToFetchMessages);
-        String url = AppGlobals.GET_USER_SPECIFIC_MESSAGES + productOwner + File.separator + "ads" +
+        setTitle(userNameToFetchMessages);
+        String url;
+        String messagesTarget;
+        if (messageReceiver != null && !messageReceiver.equals("")) {
+            messagesTarget = messageReceiver;
+        } else {
+            messagesTarget = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+        }
+        url = AppGlobals.GET_USER_SPECIFIC_MESSAGES + messagesTarget + File.separator + "ads" +
                 File.separator + adPrimaryKey + File.separator + "messages";
         System.out.println(url);
+        System.out.println("product owner " + productOwner);
         sMessages = new HashMap<>();
         sSenderName = new HashMap<>();
         sDirectionHashMap = new HashMap<>();
@@ -229,19 +234,16 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                 arrayList = new ArrayList<>();
             }
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
-                System.out.println(params[0]);
                 String[] data;
                 try {
                     data = Helpers.simpleGetRequest(params[0], Helpers
                                     .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
                             Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD));
-                    System.out.println(data[1]);
                     if (Integer.valueOf(data[0]) == HttpURLConnection.HTTP_OK) {
                         JsonParser jsonParser = new JsonParser();
                         Object json = new JSONTokener(data[1]).nextValue();
                         if (json instanceof JSONObject) {
                             JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
-                            System.out.println(jsonObject);
                             if (!jsonObject.get("next").isJsonNull()) {
                                 sNextUrl = jsonObject.get("next").getAsString();
                             }
@@ -301,7 +303,6 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                 if (!noInternet) {
                     ArrayList<Integer> tempElements = new ArrayList<>(integers);
                     Collections.reverse(tempElements);
-                    System.out.println(tempElements);
                     adapter = new ChatArrayAdapter(
                             getApplicationContext(), R.layout.singlemessage_chat, tempElements);
                     mBubbleList.setAdapter(adapter);
@@ -326,7 +327,6 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                 String passWord = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
                 String url = AppGlobals.SEND_MESSAGE_URL + messageReceiver + File.separator + "ads" + File.separator
                         + adPrimaryKey + File.separator + "messages";
-                System.out.println(url);
                 URL link;
                 try {
                     link = new URL(url);
@@ -365,9 +365,7 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                 JsonObject jsonObject = jsonParser.parse(strings[2]).getAsJsonObject();
                 if (!arrayList.contains(jsonObject.get("id").getAsInt())) {
                     int currentId = jsonObject.get("id").getAsInt();
-                    System.out.println(arrayList);
                     arrayList.add(0, currentId);
-                    System.out.println(arrayList);
                     sDirectionHashMap.put(currentId, jsonObject.get("direction")
                             .getAsString());
                     sSenderName.put(currentId, jsonObject.get("sender_name").getAsString());
@@ -375,9 +373,6 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                     adapter = null;
                     ArrayList<Integer> tempElements = new ArrayList<>(arrayList);
                     Collections.reverse(tempElements);
-                    System.out.println(tempElements);
-                    System.out.println(sMessages.get(tempElements.get(0)));
-                    System.out.println(sMessages.get(tempElements.get(tempElements.size() - 1)));
                     adapter = new ChatArrayAdapter(
                             getApplicationContext(), R.layout.singlemessage_chat, tempElements);
                     mBubbleList.setAdapter(adapter);
