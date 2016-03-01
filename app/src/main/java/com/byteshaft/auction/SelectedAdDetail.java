@@ -367,6 +367,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
                 String url = AppGlobals.POST_BID_URL + userName + "/ads/" + adPrimaryKey + "/bids/post";
+                System.out.println(url);
                 try {
                     Helpers.authPostRequest(url, "bid", params[0]);
                 } catch (IOException e) {

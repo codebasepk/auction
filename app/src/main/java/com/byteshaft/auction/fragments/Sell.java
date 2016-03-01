@@ -470,6 +470,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
             } else if (currency.equals("USD")) {
                 currencyGroup.check(R.id.radio_dollar);
             }
+            getActivity().setTitle("Update");
             categorySpinner.setSelection(list.indexOf(category));
             submitButton.setText("update");
             for (String urls : imagesUrls) {
