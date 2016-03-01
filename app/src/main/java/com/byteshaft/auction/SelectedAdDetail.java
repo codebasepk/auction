@@ -74,6 +74,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     private TextView deliveryTimeTextView;
     private String delivery_time;
     private String productStatus = "";
+    private LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +88,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         }
         descriptionTextView = (TextView) findViewById(R.id.ad_description);
         deliveryTimeTextView = (TextView) findViewById(R.id.delivery_time);
+        linearLayout = (LinearLayout) findViewById(R.id.post_bid_layout);
         imagesUrls = new ArrayList<>();
         userNameHashMap = new HashMap<>();
         bidPriceHashMap = new HashMap<>();
@@ -260,6 +262,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             System.out.println(productOwner == null);
             if (productOwner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
                 item.setVisible(true);
+                linearLayout.setVisibility(View.GONE);
             }
             if (!productStatus.equals("true")) {
                 new GetBidsTask().execute();
