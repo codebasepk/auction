@@ -34,7 +34,7 @@ public class MyGcmListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         System.out.println(data);
         String type = data.getString("type");
-        System.out.println(type);
+        System.out.println(data.getString("ad_owner"));
         switch (type) {
             case "new_ad_posted":
                 if (!data.getString("ad_owner").equals(Helpers
