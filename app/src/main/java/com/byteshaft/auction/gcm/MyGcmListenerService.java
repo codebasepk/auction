@@ -34,13 +34,15 @@ public class MyGcmListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         System.out.println(data);
         String type = data.getString("type");
+        System.out.println(type);
         switch (type) {
             case "new_ad_posted":
-                if (data.getString("ad_owner").equals(Helpers
+                if (!data.getString("ad_owner").equals(Helpers
                         .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
-                    sendNotification("A new ad is posted in your subscribed category", "new ad",
+                    sendNotification("A new ad is posted in your subscribed category", "New Ad Posted !!",
                             SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
                 }
+                break;
             case "half_time_no_bid":
                 if (data.getString("ad_owner").equals(Helpers
                         .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
@@ -51,12 +53,12 @@ public class MyGcmListenerService extends GcmListenerService {
             case "sold_to_highest_bidder":
                 if (data.getString("ad_owner").equals(Helpers
                         .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
-                    sendNotification("you bid on a product, its sold to highest bidder", "Product sold",
+                    sendNotification("You bid on a product, its sold to highest bidder", "Product sold",
                             SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
                 }
                 break;
             case "ad_expired":
-                    sendNotification("An ad is expired", "ad Expired",
+                    sendNotification("An ad is expired", "Ad Expired",
                             MainActivity.class, "", 0);
                 break;
         }
