@@ -37,6 +37,7 @@ public class Messages extends AppCompatActivity implements AdapterView.OnItemCli
     private ProgressDialog mProgressDialog;
     private int primaryKey;
     private ArrayList<String> messengers;
+    private String productOwner = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,7 @@ public class Messages extends AppCompatActivity implements AdapterView.OnItemCli
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mListView = (ListView) findViewById(R.id.messengerListView);
         primaryKey = getIntent().getIntExtra(AppGlobals.PRIMARY_KEY, 0);
+        productOwner = getIntent().getStringExtra(AppGlobals.PRODUCT_OWNER);
         System.out.println(primaryKey);
         String url = AppGlobals.GET_ALL_MESSAGES_URL + Helpers.
                 getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)+ File.separator + "ads" +
@@ -66,8 +68,9 @@ public class Messages extends AppCompatActivity implements AdapterView.OnItemCli
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-        intent.putExtra(AppGlobals.MESSENGER_USERNAME, messengers.get(position));
         intent.putExtra(AppGlobals.PRIMARY_KEY, primaryKey);
+        intent.putExtra(AppGlobals.PRODUCT_OWNER, productOwner);
+        intent.putExtra(AppGlobals.MESSAGE_RECEIVER, messengers.get(position));
         startActivity(intent);
     }
 

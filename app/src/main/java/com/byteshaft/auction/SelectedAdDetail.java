@@ -73,6 +73,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public String productOwner;
     private TextView deliveryTimeTextView;
     private String delivery_time;
+    private String productStatus = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +126,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 Intent intent = new Intent(getApplicationContext(), Messages.class);
                 System.out.println(adPrimaryKey);
                 intent.putExtra(AppGlobals.PRIMARY_KEY, adPrimaryKey);
+                intent.putExtra(AppGlobals.PRODUCT_OWNER, productOwner);
                 startActivity(intent);
                 break;
         }
@@ -204,6 +206,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                         title = jsonObject.get("title").getAsString();
                         currency = jsonObject.get("currency").getAsString();
                         productOwner = jsonObject.get("owner").getAsString();
+                        if (!jsonObject.get("sold").isJsonNull()) {
+                            productStatus = jsonObject.get("sold").getAsString();
+                        }
                         delivery_time = jsonObject.get("delivery_time").getAsString();
                         for (int i = 1; i < 9; i++) {
                             String photoCounter = ("photo") + i;
@@ -256,7 +261,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             if (productOwner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
                 item.setVisible(true);
             }
-            new GetBidsTask().execute();
+            if (!productStatus.equals("true")) {
+                new GetBidsTask().execute();
+            }
         }
     }
 
@@ -414,11 +421,15 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     for (int i = 0; i < jsonArray.size(); i++) {
                         JsonObject object = jsonArray.get(i).getAsJsonObject();
                         if (!arrayList.contains(object.get("id").getAsInt())) {
-                            arrayList.add(object.get("id").getAsInt());
-                            userNameHashMap.put(object.get("id").getAsInt(),
-                                    object.get("bidder_name").getAsString());
-                            bidPriceHashMap.put(object.get("id").getAsInt(),
-                                    object.get("bid").getAsString());
+                            if (!productOwner
+                                    .equals(Helpers.getStringDataFromSharedPreference
+                                            (AppGlobals.KEY_USERNAME))) {
+                                arrayList.add(object.get("id").getAsInt());
+                                userNameHashMap.put(object.get("id").getAsInt(),
+                                        object.get("bidder_name").getAsString());
+                                bidPriceHashMap.put(object.get("id").getAsInt(),
+                                        object.get("bid").getAsString());
+                            }
                         }
                     }
                 }
@@ -437,15 +448,19 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
 
     public void userInfoDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
-        View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
+        final View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
         TextView sellerName = (TextView) promptView.findViewById(R.id.seller_user_name);
         sellerName.setText(productOwner);
         Button contactButton = (Button) promptView.findViewById(R.id.contact_button);
+        if (productOwner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
+            contactButton.setVisibility(View.GONE);
+        }
         contactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-                intent.putExtra(AppGlobals.MESSENGER_USERNAME, productOwner);
+                System.out.println(productOwner);
+                intent.putExtra(AppGlobals.PRODUCT_OWNER, productOwner);
                 intent.putExtra(AppGlobals.PRIMARY_KEY, adPrimaryKey);
                 startActivity(intent);
 

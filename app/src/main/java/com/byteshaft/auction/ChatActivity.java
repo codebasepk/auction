@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +28,11 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +61,8 @@ public class ChatActivity extends Activity implements View.OnClickListener {
     private ArrayList<Integer> arrayList;
     private ProgressBar mProgressBar;
     private Toolbar toolbar;
+    private String productOwner = "";
+    private String messageReceiver = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,17 +71,20 @@ public class ChatActivity extends Activity implements View.OnClickListener {
         toolbar = (Toolbar) findViewById(R.id.tool);
         setActionBar(toolbar);
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        userNameToFetchMessages = getIntent().getStringExtra(AppGlobals.MESSENGER_USERNAME);
+        Log.i("productOwner", productOwner);
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.PRIMARY_KEY, 0);
+        productOwner = getIntent().getStringExtra(AppGlobals.PRODUCT_OWNER);
+        messageReceiver = getIntent().getStringExtra(AppGlobals.MESSAGE_RECEIVER);
+        Log.i("productOwner", productOwner);
         editTextMessage = (EditText) findViewById(R.id.et_chat);
         buttonSend = (ImageButton) findViewById(R.id.button_chat_send);
         mProgressBar = (ProgressBar) findViewById(R.id.load_messages);
         buttonSend.setOnClickListener(this);
         mBubbleList = (com.byteshaft.auction.utils.List) findViewById(R.id.lv_chat);
         getActionBar().setTitle(userNameToFetchMessages);
-        String url = AppGlobals.GET_USER_SPECIFIC_MESSAGES + Helpers
-                .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME) + File.separator + "ads" +
+        String url = AppGlobals.GET_USER_SPECIFIC_MESSAGES + productOwner + File.separator + "ads" +
                 File.separator + adPrimaryKey + File.separator + "messages";
+        System.out.println(url);
         sMessages = new HashMap<>();
         sSenderName = new HashMap<>();
         sDirectionHashMap = new HashMap<>();
@@ -174,7 +185,7 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                 holder.myMessage.setVisibility(View.INVISIBLE);
                 holder.imageView.setVisibility(View.VISIBLE);
                 holder.imageView.setImageBitmap(letterTile);
-            } else if (sDirectionHashMap.get(idsList.get(position)).equals("outgoing")){
+            } else if (sDirectionHashMap.get(idsList.get(position)).equals("outgoing")) {
                 holder.title.setText(null);
                 holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
                 holder.title.setText(sMessages.get(idsList.get(position)));
@@ -221,31 +232,50 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                 System.out.println(params[0]);
                 String[] data;
                 try {
-                    data = Helpers.simpleGetRequest(params[0],
-                            Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
+                    data = Helpers.simpleGetRequest(params[0], Helpers
+                                    .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME),
                             Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD));
                     System.out.println(data[1]);
                     if (Integer.valueOf(data[0]) == HttpURLConnection.HTTP_OK) {
                         JsonParser jsonParser = new JsonParser();
-                        JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
-                        System.out.println(jsonObject);
-                        if (!jsonObject.get("next").isJsonNull()) {
-                            sNextUrl = jsonObject.get("next").getAsString();
-                        }
-                        JsonArray jsonArray = jsonObject.get("results").getAsJsonArray();
-                        for (int i = 0; i < jsonArray.size(); i++) {
-                            JsonObject jObject = jsonArray.get(i).getAsJsonObject();
-                            if (!arrayList.contains(jObject.get("id").getAsInt())) {
-                                int currentId = jObject.get("id").getAsInt();
-                                arrayList.add(currentId);
-                                sDirectionHashMap.put(currentId, jObject.get("direction")
-                                        .getAsString());
-                                sSenderName.put(currentId, jObject.get("sender_name").getAsString());
-                                sMessages.put(currentId, jObject.get("message").getAsString());
+                        Object json = new JSONTokener(data[1]).nextValue();
+                        if (json instanceof JSONObject) {
+                            JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
+                            System.out.println(jsonObject);
+                            if (!jsonObject.get("next").isJsonNull()) {
+                                sNextUrl = jsonObject.get("next").getAsString();
+                            }
+                            JsonArray jsonArray = jsonObject.get("results").getAsJsonArray();
+                            for (int i = 0; i < jsonArray.size(); i++) {
+                                JsonObject jObject = jsonArray.get(i).getAsJsonObject();
+                                if (!arrayList.contains(jObject.get("id").getAsInt())) {
+                                    int currentId = jObject.get("id").getAsInt();
+                                    arrayList.add(currentId);
+                                    sDirectionHashMap.put(currentId, jObject.get("direction")
+                                            .getAsString());
+                                    sSenderName.put(currentId, jObject.get("sender_name").getAsString());
+                                    sMessages.put(currentId, jObject.get("message").getAsString());
+                                }
+                            }
+                        } else if (json instanceof JSONArray) {
+                            JsonArray jsonArray = (JsonArray) jsonParser.parse(data[1]);
+                            for (int i = 0; i < jsonArray.size(); i++) {
+                                JsonObject jObject = jsonArray.get(i).getAsJsonObject();
+                                if (!arrayList.contains(jObject.get("id").getAsInt())) {
+                                    int currentId = jObject.get("id").getAsInt();
+                                    arrayList.add(currentId);
+                                    sDirectionHashMap.put(currentId, jObject.get("direction")
+                                            .getAsString());
+                                    sSenderName.put(currentId, jObject.get("sender_name").getAsString());
+                                    sMessages.put(currentId, jObject.get("message").getAsString());
+                                }
                             }
                         }
+
                     }
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             } else {
@@ -269,12 +299,9 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                 loadMore = false;
             } else {
                 if (!noInternet) {
-                    System.out.println(integers);
                     ArrayList<Integer> tempElements = new ArrayList<>(integers);
                     Collections.reverse(tempElements);
                     System.out.println(tempElements);
-                    System.out.println(sMessages.get(tempElements.get(0)));
-                    System.out.println(sMessages.get(tempElements.get(tempElements.size()-1)));
                     adapter = new ChatArrayAdapter(
                             getApplicationContext(), R.layout.singlemessage_chat, tempElements);
                     mBubbleList.setAdapter(adapter);
@@ -297,8 +324,9 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                 String parsedString;
                 String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
                 String passWord = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
-                String url = AppGlobals.SEND_MESSAGE_URL + userName + File.separator + "ads" + File.separator
+                String url = AppGlobals.SEND_MESSAGE_URL + messageReceiver + File.separator + "ads" + File.separator
                         + adPrimaryKey + File.separator + "messages";
+                System.out.println(url);
                 URL link;
                 try {
                     link = new URL(url);
@@ -309,7 +337,13 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                             + ":" + passWord;
                     String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
                     connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
-                    String jsonFormattedData = getJsonObjectString(userName, params[0]);
+                    String sendMessageTo;
+                    if (messageReceiver != null && !messageReceiver.equals("")) {
+                        sendMessageTo = messageReceiver;
+                    } else {
+                        sendMessageTo = productOwner;
+                    }
+                    String jsonFormattedData = getJsonObjectString(sendMessageTo, params[0]);
                     Helpers.sendRequestData(connection, jsonFormattedData);
                     InputStream is = connection.getInputStream();
                     parsedString = Helpers.convertInputStreamToString(is);
