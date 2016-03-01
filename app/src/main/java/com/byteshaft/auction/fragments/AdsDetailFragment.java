@@ -179,16 +179,21 @@ public class AdsDetailFragment extends Fragment {
                         @Override
                         public void onError() {
                             if (mRecyclerView.findViewHolderForAdapterPosition(position) != null) {
-                                mRecyclerView.findViewHolderForAdapterPosition(position).
-                                        itemView.findViewById(R.id.specific_image_progressBar)
-                                        .setVisibility(View.GONE);
+                                if (mRecyclerView.findViewHolderForAdapterPosition(position).
+                                        itemView.findViewById(R.id.specific_image_progressBar) != null) {
+                                    mRecyclerView.findViewHolderForAdapterPosition(position).
+                                            itemView.findViewById(R.id.specific_image_progressBar)
+                                            .setVisibility(View.GONE);
+                                }
+                                }
+
                             }
-
                         }
-                    });
-        }
 
-        @Override
+                        );
+                    }
+
+            @Override
         public int getItemCount() {
             return items.size();
         }

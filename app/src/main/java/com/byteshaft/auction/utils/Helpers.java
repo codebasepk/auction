@@ -31,7 +31,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -360,7 +359,6 @@ public class Helpers {
         File file = new File(AppGlobals.root);
         if (file.exists()) {
             File[] folders = file.listFiles();
-            System.out.println(Arrays.toString(folders));
             for (File folder : folders) {
                 if (folder.exists()) {
                     removeFiles(folder.getAbsolutePath());
@@ -370,7 +368,7 @@ public class Helpers {
 
     }
 
-    private static void removeFiles(String path) {
+    public static void removeFiles(String path) {
         File file = new File(path);
         if (file.exists()) {
             String deleteCmd = "rm -r " + path;

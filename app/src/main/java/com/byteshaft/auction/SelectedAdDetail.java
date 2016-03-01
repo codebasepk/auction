@@ -81,7 +81,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         productImageView = new ProductImageView();
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.detail, 0);
         String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
-        setTitle(productName.toLowerCase());
+        if (productName != null) {
+            setTitle(productName.toLowerCase());
+        }
         descriptionTextView = (TextView) findViewById(R.id.ad_description);
         deliveryTimeTextView = (TextView) findViewById(R.id.delivery_time);
         imagesUrls = new ArrayList<>();
@@ -227,6 +229,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             adPrice.setText(price + currency);
             deliveryTimeTextView.setText("Delivery time " + delivery_time + "h");
             LinearLayout layout = (LinearLayout) findViewById(R.id.linear);
+            setTitle(title);
             int value = 0;
             for (String url : imagesUrls) {
                 ImageView imageView = new ImageView(SelectedAdDetail.this);
@@ -249,6 +252,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                     }
                 });
             }
+            System.out.println(productOwner == null);
             if (productOwner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
                 item.setVisible(true);
             }
