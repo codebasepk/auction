@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -62,6 +64,7 @@ public class ChatActivity extends Activity implements View.OnClickListener {
     private Toolbar toolbar;
     private String productOwner = "";
     private String messageReceiver = "";
+    private String messageDirection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,13 +86,15 @@ public class ChatActivity extends Activity implements View.OnClickListener {
         String messagesTarget;
         if (messageReceiver != null && !messageReceiver.equals("")) {
             messagesTarget = messageReceiver;
+            messageDirection = "incoming";
+            System.out.println("messageReceiver");
         } else {
+            System.out.println("username");
+            messageDirection = "outgoing";
             messagesTarget = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
         }
         url = AppGlobals.GET_USER_SPECIFIC_MESSAGES + messagesTarget + File.separator + "ads" +
                 File.separator + adPrimaryKey + File.separator + "messages";
-        System.out.println(url);
-        System.out.println("product owner " + productOwner);
         sMessages = new HashMap<>();
         sSenderName = new HashMap<>();
         sDirectionHashMap = new HashMap<>();
@@ -140,10 +145,13 @@ public class ChatActivity extends Activity implements View.OnClickListener {
 
         private ArrayList<Integer> idsList;
         private ViewHolder holder;
+        private String direction;
 
-        public ChatArrayAdapter(Context context, int resource, ArrayList<Integer> idsList) {
+        public ChatArrayAdapter(Context context, int resource, ArrayList<Integer> idsList,
+                                String direction) {
             super(context, resource, idsList);
             this.idsList = idsList;
+            this.direction = direction;
 
         }
 
@@ -169,39 +177,56 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                 convertView = inflater.inflate(R.layout.singlemessage_chat, parent, false);
                 holder = new ViewHolder();
                 holder.layout = (RelativeLayout) convertView.findViewById(R.id.singleMessageContainer);
-                holder.title = (TextView) convertView.findViewById(R.id.singleMessage);
+                holder.messageBody = (TextView) convertView.findViewById(R.id.singleMessage);
                 holder.invisibleTextView = (TextView) convertView.findViewById(R.id.messageId);
                 holder.imageView = (CircularImageView) convertView.findViewById(R.id.messenger);
                 holder.myMessage = (CircularImageView) convertView.findViewById(R.id.myMessage);
-//                holder.messageLayout = (RelativeLayout) convertView.findViewById(R.id.messageLayout);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-            if (sDirectionHashMap.get(idsList.get(position)).equals("incoming")) {
-                holder.title.setText(null);
+
+            if (sDirectionHashMap.get(idsList.get(position)).equals(direction)) {
+                RelativeLayout.LayoutParams layoutParams = new
+                        RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+                layoutParams.setMargins(150,0,0,0);
+                holder.messageBody.setText(null);
                 holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
-                holder.title.setText(sMessages.get(idsList.get(position)));
+                holder.layout.setGravity(Gravity.RIGHT);
+                holder.layout.setGravity(Gravity.END);
+                holder.messageBody.setBackgroundResource(R.drawable.bubble_b);
+                holder.myMessage.setVisibility(View.INVISIBLE);
+                holder.imageView.setVisibility(View.VISIBLE);
                 BitmapWithCharacter tileProvider = new BitmapWithCharacter();
                 Bitmap letterTile;
                 letterTile = tileProvider.getLetterTile(sSenderName.get(idsList.get(position)),
                         "#2093cd", 100, 100);
-                holder.title.setBackgroundResource(R.drawable.bubble_b);
-                holder.myMessage.setVisibility(View.INVISIBLE);
-                holder.imageView.setVisibility(View.VISIBLE);
+
                 holder.imageView.setImageBitmap(letterTile);
-            } else if (sDirectionHashMap.get(idsList.get(position)).equals("outgoing")) {
-                holder.title.setText(null);
+                holder.messageBody.setText(sMessages.get(idsList.get(position)));
+                holder.messageBody.setLayoutParams(layoutParams);
+
+            } else {
+                holder.messageBody.setText(null);
+                RelativeLayout.LayoutParams layoutParams = new
+                        RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+                layoutParams.setMargins(430, 5, 0, 0);
                 holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
-                holder.title.setText(sMessages.get(idsList.get(position)));
+                holder.layout.setGravity(Gravity.LEFT);
+                holder.layout.setGravity(Gravity.START);
+                holder.messageBody.setBackgroundResource(R.drawable.bubble_a);
+                holder.imageView.setVisibility(View.INVISIBLE);
+                holder.myMessage.setVisibility(View.VISIBLE);
                 BitmapWithCharacter tileProvider = new BitmapWithCharacter();
                 Bitmap letterTile;
                 letterTile = tileProvider.getLetterTile(sSenderName.get(idsList.get(position)),
                         "#f58559", 100, 100);
-                holder.title.setBackgroundResource(R.drawable.bubble_a);
-                holder.imageView.setVisibility(View.INVISIBLE);
-                holder.myMessage.setVisibility(View.VISIBLE);
                 holder.myMessage.setImageBitmap(letterTile);
+                holder.messageBody.setText(sMessages.get(idsList.get(position)));
+                holder.messageBody.setLayoutParams(layoutParams);
+
             }
             return convertView;
         }
@@ -209,7 +234,7 @@ public class ChatActivity extends Activity implements View.OnClickListener {
 
     // custom Member class for viewHolder to access xml elements
     static class ViewHolder {
-        public TextView title;
+        public TextView messageBody;
         public TextView invisibleTextView;
         public CircularImageView imageView;
         public RelativeLayout layout;
@@ -250,7 +275,10 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                             JsonArray jsonArray = jsonObject.get("results").getAsJsonArray();
                             for (int i = 0; i < jsonArray.size(); i++) {
                                 JsonObject jObject = jsonArray.get(i).getAsJsonObject();
-                                if (!arrayList.contains(jObject.get("id").getAsInt())) {
+                                if (!arrayList.contains(jObject.get("id").getAsInt())
+                                        && (jObject.get("sender_name").getAsString()
+                                        .equals(productOwner) || jObject.get("sender_name")
+                                        .getAsString().equals(messageReceiver))) {
                                     int currentId = jObject.get("id").getAsInt();
                                     arrayList.add(currentId);
                                     sDirectionHashMap.put(currentId, jObject.get("direction")
@@ -295,7 +323,8 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                 ArrayList<Integer> tempElements = new ArrayList<>(integers);
                 Collections.reverse(tempElements);
                 adapter = new ChatArrayAdapter(
-                        getApplicationContext(), R.layout.singlemessage_chat, tempElements);
+                        getApplicationContext(), R.layout.singlemessage_chat, tempElements,
+                        messageDirection);
                 mBubbleList.setAdapter(adapter);
                 isScrollingUp = false;
                 loadMore = false;
@@ -304,7 +333,8 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                     ArrayList<Integer> tempElements = new ArrayList<>(integers);
                     Collections.reverse(tempElements);
                     adapter = new ChatArrayAdapter(
-                            getApplicationContext(), R.layout.singlemessage_chat, tempElements);
+                            getApplicationContext(), R.layout.singlemessage_chat, tempElements,
+                            messageDirection);
                     mBubbleList.setAdapter(adapter);
                 }
             }
@@ -325,8 +355,8 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                 String parsedString;
                 String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
                 String passWord = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
-                String url = AppGlobals.SEND_MESSAGE_URL + messageReceiver + File.separator + "ads" + File.separator
-                        + adPrimaryKey + File.separator + "messages";
+                String url = AppGlobals.SEND_MESSAGE_URL + productOwner + File.separator +
+                        "ads" + File.separator + adPrimaryKey + File.separator + "messages";
                 URL link;
                 try {
                     link = new URL(url);
@@ -335,7 +365,8 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                     connection.setRequestMethod("POST");
                     String authString = userName
                             + ":" + passWord;
-                    String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
+                    String authStringEncoded = Base64.encodeToString(authString.getBytes(),
+                            Base64.DEFAULT);
                     connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
                     String sendMessageTo;
                     if (messageReceiver != null && !messageReceiver.equals("")) {
@@ -368,13 +399,15 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                     arrayList.add(0, currentId);
                     sDirectionHashMap.put(currentId, jsonObject.get("direction")
                             .getAsString());
+                    Log.i("SEND", sDirectionHashMap.toString());
                     sSenderName.put(currentId, jsonObject.get("sender_name").getAsString());
                     sMessages.put(currentId, jsonObject.get("message").getAsString());
                     adapter = null;
                     ArrayList<Integer> tempElements = new ArrayList<>(arrayList);
                     Collections.reverse(tempElements);
                     adapter = new ChatArrayAdapter(
-                            getApplicationContext(), R.layout.singlemessage_chat, tempElements);
+                            getApplicationContext(), R.layout.singlemessage_chat, tempElements,
+                            messageDirection);
                     mBubbleList.setAdapter(adapter);
                     editTextMessage.setText("");
                 }
