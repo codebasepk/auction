@@ -81,6 +81,7 @@ public class AppGlobals extends Application{
     public static final String TEMP_FOLDER = "/temp_folder";
     public static final String PRODUCT_OWNER = "product_owner";
     public static final String MESSAGE_RECEIVER = "message_sender";
+    public static final String REVIEW_URL = String.format("%s/api/users/", BASE_URL);
 
     @Override
     public void onCreate() {

@@ -271,6 +271,8 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                             JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
                             if (!jsonObject.get("next").isJsonNull()) {
                                 sNextUrl = jsonObject.get("next").getAsString();
+                            } else {
+                                sNextUrl = "";
                             }
                             JsonArray jsonArray = jsonObject.get("results").getAsJsonArray();
                             for (int i = 0; i < jsonArray.size(); i++) {

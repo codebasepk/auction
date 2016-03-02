@@ -40,7 +40,7 @@ import java.util.HashMap;
 public class AdsDetailFragment extends Fragment {
 
     private View mBaseView;
-    public static RecyclerView mRecyclerView;
+    public static RecyclerView sRecyclerView;
     private CustomAdapter customAdapter;
     public static String nextUrl;
     private static HashMap<Integer, String> descriptionHashMap;
@@ -65,11 +65,11 @@ public class AdsDetailFragment extends Fragment {
         imagesUrlHashMap = new HashMap<>();
         currencyHashMap = new HashMap<>();
         titleHashMap = new HashMap<>();
-        mRecyclerView = (RecyclerView) mBaseView.findViewById(R.id.my_ads_details);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
+        sRecyclerView = (RecyclerView) mBaseView.findViewById(R.id.my_ads_details);
+        sRecyclerView.setLayoutManager(linearLayoutManager);
+        sRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
+        sRecyclerView.setHasFixedSize(true);
+        sRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
         new GetAllAdsDetailTask().execute();
         return mBaseView;
     }
@@ -101,10 +101,10 @@ public class AdsDetailFragment extends Fragment {
                         @Override
                         public void onLongPress(MotionEvent e) {
                             super.onLongPress(e);
-                            View childView = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
+                            View childView = sRecyclerView.findChildViewUnder(e.getX(), e.getY());
                             if (childView != null && mListener != null) {
-                                mListener.onItemLongClick(items.get(mRecyclerView
-                                        .getChildPosition(childView)), mRecyclerView
+                                mListener.onItemLongClick(items.get(sRecyclerView
+                                        .getChildPosition(childView)), sRecyclerView
                                         .getChildPosition(childView));
                             }
                         }
@@ -166,10 +166,10 @@ public class AdsDetailFragment extends Fragment {
                     .into(customView.imageView, new Callback() {
                         @Override
                         public void onSuccess() {
-                            if (mRecyclerView.findViewHolderForAdapterPosition(position) != null) {
-                                if (mRecyclerView.findViewHolderForAdapterPosition(position).
+                            if (sRecyclerView.findViewHolderForAdapterPosition(position) != null) {
+                                if (sRecyclerView.findViewHolderForAdapterPosition(position).
                                         itemView.findViewById(R.id.specific_image_progressBar) != null) {
-                                    mRecyclerView.findViewHolderForAdapterPosition(position).
+                                    sRecyclerView.findViewHolderForAdapterPosition(position).
                                             itemView.findViewById(R.id.specific_image_progressBar)
                                             .setVisibility(View.GONE);
                                 }
@@ -178,10 +178,10 @@ public class AdsDetailFragment extends Fragment {
 
                         @Override
                         public void onError() {
-                            if (mRecyclerView.findViewHolderForAdapterPosition(position) != null) {
-                                if (mRecyclerView.findViewHolderForAdapterPosition(position).
+                            if (sRecyclerView.findViewHolderForAdapterPosition(position) != null) {
+                                if (sRecyclerView.findViewHolderForAdapterPosition(position).
                                         itemView.findViewById(R.id.specific_image_progressBar) != null) {
-                                    mRecyclerView.findViewHolderForAdapterPosition(position).
+                                    sRecyclerView.findViewHolderForAdapterPosition(position).
                                             itemView.findViewById(R.id.specific_image_progressBar)
                                             .setVisibility(View.GONE);
                                 }
@@ -247,6 +247,8 @@ public class AdsDetailFragment extends Fragment {
                     JsonObject jsonObject = jsonParser.parse(response[1]).getAsJsonObject();
                     if (!jsonObject.get("next").isJsonNull()) {
                         nextUrl = jsonObject.get("next").getAsString();
+                    } else {
+                        nextUrl = "";
                     }
                     JsonArray jsonArray = jsonObject.getAsJsonArray("results");
                     System.out.println(jsonArray);
@@ -286,8 +288,8 @@ public class AdsDetailFragment extends Fragment {
                 return;
             }
             customAdapter = new CustomAdapter(idsArray, getActivity());
-            mRecyclerView.setAdapter(customAdapter);
-            mRecyclerView.addOnItemTouchListener(new CustomAdapter(integers,
+            sRecyclerView.setAdapter(customAdapter);
+            sRecyclerView.addOnItemTouchListener(new CustomAdapter(integers,
                     getContext(), new CustomAdapter.OnItemClickListener() {
                 @Override
                 public void onItem(Integer item) {
