@@ -79,6 +79,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     private int ratingValue = 0;
     private ArrayList<Integer> reviewIdList;
     private HashMap<Integer, Integer>  starsSet;
+    private android.support.v7.widget.AppCompatRatingBar ratingBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -243,7 +244,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             new GetSellerRating().execute(link);
             descriptionTextView.setText("Description: \n \n" + description);
             adPrice.setText(price + currency);
-            deliveryTimeTextView.setText("Delivery time " + delivery_time + "h");
+            deliveryTimeTextView.setText(delivery_time + "H");
             LinearLayout layout = (LinearLayout) findViewById(R.id.linear);
             setTitle(title);
             int value = 0;
@@ -468,9 +469,16 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
         final View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
         TextView sellerName = (TextView) promptView.findViewById(R.id.seller_user_name);
+        TextView textView = (TextView) promptView.findViewById(R.id.write_review);
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reviewDialog();
+            }
+        });
         sellerName.setText(productOwner);
         Button contactButton = (Button) promptView.findViewById(R.id.contact_button);
-        android.support.v7.widget.AppCompatRatingBar ratingBar =
+        ratingBar =
                 (android.support.v7.widget.AppCompatRatingBar) promptView.findViewById(R.id.ratingBar);
         if (reviewIdList.size() > 0) {
             int rating = ratingValue / reviewIdList.size();
@@ -492,6 +500,21 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
 
             }
         });
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(SelectedAdDetail.this);
+        alertDialog.setView(promptView);
+        alertDialog.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alertDialog.create();
+        alertDialog.show();
+    }
+
+    public void reviewDialog() {
+        LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
+        final View promptView = layoutInflater.inflate(R.layout.review_dialog_layout, null);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(SelectedAdDetail.this);
         alertDialog.setView(promptView);
         alertDialog.setPositiveButton("Done", new DialogInterface.OnClickListener() {
