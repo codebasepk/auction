@@ -80,6 +80,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     private ArrayList<Integer> reviewIdList;
     private HashMap<Integer, Integer>  starsSet;
     private android.support.v7.widget.AppCompatRatingBar ratingBar;
+    public String reviewGiven;
+    public String winner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,6 +220,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                         if (!jsonObject.get("sold").isJsonNull()) {
                             productStatus = jsonObject.get("sold").getAsString();
                         }
+//                        winner = jsonObject.get("winner").getAsString();
+//                        reviewGiven = jsonObject.get("reviewGiven").getAsString();
                         delivery_time = jsonObject.get("delivery_time").getAsString();
                         for (int i = 1; i < 9; i++) {
                             String photoCounter = ("photo") + i;
@@ -470,6 +474,11 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         final View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
         TextView sellerName = (TextView) promptView.findViewById(R.id.seller_user_name);
         TextView textView = (TextView) promptView.findViewById(R.id.write_review);
+        if (winner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
+            if (reviewGiven.equals("false")) {
+                textView.setVisibility(View.VISIBLE);
+            }
+        }
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
