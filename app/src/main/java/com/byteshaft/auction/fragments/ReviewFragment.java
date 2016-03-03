@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.byteshaft.auction.R;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
+import com.byteshaft.auction.utils.SimpleDividerItemDecoration;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -46,9 +47,11 @@ public class ReviewFragment extends Fragment{
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
         reviewerName = new HashMap<>();
         reviewValues = new HashMap<>();
         reviewMessages = new HashMap<>();
+        reviewIds = new ArrayList<>();
         return mBaseView;
 
     }
@@ -83,15 +86,17 @@ public class ReviewFragment extends Fragment{
                         next = "";
                     }
                     JsonArray jsonArray = jsonObject.get("results").getAsJsonArray();
+                    System.out.println(jsonArray);
                     for (int i = 0; i < jsonArray.size(); i++) {
                         JsonObject jObject = jsonArray.get(i).getAsJsonObject();
-                        if (!reviewIds.contains(jsonObject.get("reviewer").getAsInt())) {
-                            reviewIds.add(jsonObject.get("reviewer").getAsInt());
-                            reviewerName.put(jsonObject.get("reviewer").getAsInt(),
+                        System.out.println();
+                        if (!reviewIds.contains(jObject.get("reviewer").getAsInt())) {
+                            reviewIds.add(jObject.get("reviewer").getAsInt());
+                            reviewerName.put(jObject.get("reviewer").getAsInt(),
                                     jObject.get("reviewer_name").getAsString());
-                            reviewMessages.put(jsonObject.get("reviewer").getAsInt(),
+                            reviewMessages.put(jObject.get("reviewer").getAsInt(),
                                     jObject.get("review").getAsString());
-                            reviewValues.put(jsonObject.get("reviewer").getAsInt(),
+                            reviewValues.put(jObject.get("reviewer").getAsInt(),
                                     jObject.get("stars").getAsString());
                         }
                     }
@@ -109,7 +114,8 @@ public class ReviewFragment extends Fragment{
             super.onPostExecute(integer);
             mProgressDialog.dismiss();
             if (integer == HttpURLConnection.HTTP_OK) {
-                
+                ReviewAdapter reviewAdapter = new ReviewAdapter(reviewIds);
+                mRecyclerView.setAdapter(reviewAdapter);
 
             } else if (integer == AppGlobals.NO_INTERNET) {
                 Helpers.alertDialog(getActivity(), "No internet", "please check internet connection");
@@ -141,7 +147,7 @@ public class ReviewFragment extends Fragment{
             customView.idTextView.setText(String.valueOf(reviewsId.get(position)));
             customView.reviewer.setText(reviewerName.get(reviewsId.get(position)));
             customView.ratingBar.setRating(Float.parseFloat(reviewValues.get(reviewsId.get(position))));
-            customView.ratingBar.setStepSize(Float.parseFloat(reviewValues.get(reviewsId.get(position))));
+            System.out.println(Float.parseFloat(reviewValues.get(reviewsId.get(position))));
 
         }
 
