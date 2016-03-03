@@ -25,7 +25,7 @@
         android:textSize="15sp"
         android:layout_marginTop="5dp" />
 
-    <RatingBar
+    <android.support.v7.widget.AppCompatRatingBar
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/seller_user_name"

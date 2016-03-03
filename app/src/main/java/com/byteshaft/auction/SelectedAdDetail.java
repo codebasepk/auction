@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -75,6 +76,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     private String delivery_time;
     private String productStatus = "";
     private LinearLayout linearLayout;
+    private int ratingValue = 0;
+    private ArrayList<Integer> reviewIdList;
+    private HashMap<Integer, Integer>  starsSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +96,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         imagesUrls = new ArrayList<>();
         userNameHashMap = new HashMap<>();
         bidPriceHashMap = new HashMap<>();
+        reviewIdList = new ArrayList<>();
+        starsSet = new HashMap<>();
         placeBidButton = (Button) findViewById(R.id.place_bid);
         placeBidEditText = (EditText) findViewById(R.id.bid_editText);
         placeBidEditText.setHint(R.string.place_bid);
@@ -232,6 +238,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         protected void onPostExecute(ArrayList<Bitmap> bitmap) {
             super.onPostExecute(bitmap);
             mProgressDialog.dismiss();
+            String link = AppGlobals.REVIEW_URL + productOwner + File.separator + "reviews"
+                    + File.separator;
+            new GetSellerRating().execute(link);
             descriptionTextView.setText("Description: \n \n" + description);
             adPrice.setText(price + currency);
             deliveryTimeTextView.setText("Delivery time " + delivery_time + "h");
@@ -406,6 +415,12 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     class GetBidsTask extends AsyncTask<String, String, ArrayList<Integer>> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected ArrayList<Integer> doInBackground(String... params) {
             String[] data = new String[0];
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
@@ -455,6 +470,13 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         TextView sellerName = (TextView) promptView.findViewById(R.id.seller_user_name);
         sellerName.setText(productOwner);
         Button contactButton = (Button) promptView.findViewById(R.id.contact_button);
+        android.support.v7.widget.AppCompatRatingBar ratingBar =
+                (android.support.v7.widget.AppCompatRatingBar) promptView.findViewById(R.id.ratingBar);
+        if (reviewIdList.size() > 0) {
+            int rating = ratingValue / reviewIdList.size();
+            Log.i("divided", String.valueOf(rating));
+            ratingBar.setRating(Float.parseFloat(String.valueOf(rating)));
+        }
         if (productOwner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
             contactButton.setVisibility(View.GONE);
         }
@@ -562,6 +584,58 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 mRecyclerView.setAdapter(mBidsAdapter);
                 placeBidEditText.setText("");
                 Toast.makeText(SelectedAdDetail.this, "Bid Updated!!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    class GetSellerRating extends AsyncTask<String, String, String> {
+
+        private String next;
+
+        @Override
+        protected String doInBackground(String... params) {
+            String[] data;
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
+                String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+                try {
+                    data = Helpers.simpleGetRequest(params[0], userName, password);
+                    JsonParser jsonParser = new JsonParser();
+                    JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
+                    if (!jsonObject.get("next").isJsonNull()) {
+                        next = jsonObject.get("next").getAsString();
+                    } else {
+                        next = "";
+                    }
+                    JsonArray jsonArray = jsonObject.get("results").getAsJsonArray();
+                    for (int i = 0; i < jsonArray.size(); i++) {
+                        JsonObject jObject = jsonArray.get(i).getAsJsonObject();
+                        if (!reviewIdList.contains(jObject.get("reviewer").getAsInt())) {
+                            reviewIdList.add(jObject.get("reviewer").getAsInt());
+                            starsSet.put(jObject.get("reviewer").getAsInt(),
+                                    jObject.get("stars").getAsInt());
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (!next.equals("")) {
+                new GetSellerRating().execute(next);
+            } else {
+                int value = 0;
+                for (int id: reviewIdList) {
+                    int currentStarValue =  starsSet.get(id);
+                    value = value + currentStarValue;
+                }
+                ratingValue = value;
+                System.out.println(ratingValue);
             }
         }
     }
