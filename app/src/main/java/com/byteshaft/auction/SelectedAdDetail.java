@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -524,6 +525,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public void reviewDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
         final View promptView = layoutInflater.inflate(R.layout.review_dialog_layout, null);
+        RatingBar reviewRatingBar = (RatingBar) findViewById(R.id.review_bar);
+        EditText reviewEditText = (EditText) findViewById(R.id.review_edittext);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(SelectedAdDetail.this);
         alertDialog.setView(promptView);
         alertDialog.setPositiveButton("Done", new DialogInterface.OnClickListener() {
