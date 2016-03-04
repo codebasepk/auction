@@ -40,7 +40,9 @@ public class ReviewFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.review_layout, container, false);
-        new GetReviewsTask().execute();
+        String url = AppGlobals.REVIEW_URL + Helpers.getStringDataFromSharedPreference(
+                AppGlobals.KEY_USERNAME) + File.separator + "reviews" + File.separator;
+        new GetReviewsTask().execute(url);
         LinearLayoutManager linearLayoutManager = new
                 LinearLayoutManager(getActivity().getApplicationContext());
         mRecyclerView = (RecyclerView) mBaseView.findViewById(R.id.Review_list);
@@ -58,14 +60,18 @@ public class ReviewFragment extends Fragment{
 
     class GetReviewsTask extends AsyncTask<String, String, Integer> {
 
+        private boolean runningAgain = false;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(getActivity());
-            mProgressDialog.setMessage("loading reviews...");
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.show();
+            if (mProgressDialog == null) {
+                mProgressDialog = new ProgressDialog(getActivity());
+                mProgressDialog.setMessage("loading reviews...");
+                mProgressDialog.setIndeterminate(false);
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.show();
+            }
         }
 
         @Override
@@ -74,10 +80,8 @@ public class ReviewFragment extends Fragment{
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 String userName = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME);
                 String password = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
-                String url = AppGlobals.REVIEW_URL + userName + File.separator + "reviews"
-                        + File.separator;
                 try {
-                    data = Helpers.simpleGetRequest(url, userName, password);
+                    data = Helpers.simpleGetRequest(params[0], userName, password);
                     JsonParser jsonParser = new JsonParser();
                     JsonObject jsonObject = jsonParser.parse(data[1]).getAsJsonObject();
                     if (!jsonObject.get("next").isJsonNull()) {
@@ -112,8 +116,14 @@ public class ReviewFragment extends Fragment{
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-            mProgressDialog.dismiss();
-            if (integer == HttpURLConnection.HTTP_OK) {
+            System.out.println(next);
+            if (next.contains("http://")) {
+                new GetReviewsTask().execute(next);
+                runningAgain = true;
+
+            }
+            if (!runningAgain && integer == HttpURLConnection.HTTP_OK) {
+                mProgressDialog.dismiss();
                 ReviewAdapter reviewAdapter = new ReviewAdapter(reviewIds);
                 mRecyclerView.setAdapter(reviewAdapter);
 
@@ -148,7 +158,6 @@ public class ReviewFragment extends Fragment{
             customView.reviewer.setText(reviewerName.get(reviewsId.get(position)));
             customView.ratingBar.setRating(Float.parseFloat(reviewValues.get(reviewsId.get(position))));
             System.out.println(Float.parseFloat(reviewValues.get(reviewsId.get(position))));
-
         }
 
         @Override
