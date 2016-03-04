@@ -468,4 +468,15 @@ public class Helpers {
         sendRequestData(connection, jsonFormattedData);
         return connection.getResponseCode();
     }
+
+    public static void saveBooleanForReview(int key, boolean value) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putBoolean(String.valueOf(key), value).apply();
+    }
+
+    // Method to get boolean value from sharedPreference requires key as parameter
+    public static Boolean getBooleanValueForReview(int key) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getBoolean(String.valueOf(key), false);
+    }
 }

@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,6 +39,7 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -79,8 +81,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     private LinearLayout linearLayout;
     private int ratingValue = 0;
     private ArrayList<Integer> reviewIdList;
-    private HashMap<Integer, Integer>  starsSet;
+    private HashMap<Integer, Integer> starsSet;
     private android.support.v7.widget.AppCompatRatingBar ratingBar;
+    public String winner = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -219,6 +222,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                         if (!jsonObject.get("sold").isJsonNull()) {
                             productStatus = jsonObject.get("sold").getAsString();
                         }
+                        if (jsonObject.get("sold_to").isJsonNull()) {
+                            winner = jsonObject.get("sold_to").getAsString();
+                        }
                         delivery_time = jsonObject.get("delivery_time").getAsString();
                         for (int i = 1; i < 9; i++) {
                             String photoCounter = ("photo") + i;
@@ -284,7 +290,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     /**
      * Custom class that extends RecyclerView adapter
      */
-     class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView>
+    class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView>
             implements Button.OnClickListener {
         private BidView bidView;
         private ArrayList<Integer> items;
@@ -337,7 +343,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             holder.setIsRecyclable(false);
             bidView.invisibleBidPrimaryKey.setText(String.valueOf(items.get(position)));
             if (!bidPriceHashMap.get(items.get(position)).contains(".00")) {
-                bidView.textView.setText(bidPriceHashMap.get(items.get(position))+".00");
+                bidView.textView.setText(bidPriceHashMap.get(items.get(position)) + ".00");
             } else {
                 bidView.textView.setText(bidPriceHashMap.get(items.get(position)));
             }
@@ -471,6 +477,11 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         final View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
         TextView sellerName = (TextView) promptView.findViewById(R.id.seller_user_name);
         TextView textView = (TextView) promptView.findViewById(R.id.write_review);
+        if (winner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
+        if (!Helpers.getBooleanValueForReview(adPrimaryKey)) {
+            textView.setVisibility(View.VISIBLE);
+        }
+        }
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -497,8 +508,6 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 intent.putExtra(AppGlobals.PRODUCT_OWNER, productOwner);
                 intent.putExtra(AppGlobals.PRIMARY_KEY, adPrimaryKey);
                 startActivity(intent);
-
-
             }
         });
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(SelectedAdDetail.this);
@@ -516,11 +525,25 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public void reviewDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
         final View promptView = layoutInflater.inflate(R.layout.review_dialog_layout, null);
-        RatingBar reviewRatingBar = (RatingBar) findViewById(R.id.review_bar);
-        EditText reviewEditText = (EditText) findViewById(R.id.review_edittext);
+        final RatingBar reviewRatingBar = (RatingBar) promptView.findViewById(R.id.review_bar);
+        final EditText reviewEditText = (EditText) promptView.findViewById(R.id.review_edittext);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(SelectedAdDetail.this);
         alertDialog.setView(promptView);
-        alertDialog.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (reviewEditText.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "please write a review", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (!reviewEditText.getText().toString().trim().isEmpty()) {
+                    String[] reviewData = {String.valueOf(reviewRatingBar.getRating()), reviewEditText.getText().toString()};
+                    new SendReviewTask().execute(reviewData);
+                }
+                dialog.dismiss();
+            }
+        });
+        alertDialog.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -544,7 +567,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 String url = AppGlobals.DELETE_UPDATE_BID_URL +
                         Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME) + "/ads/"
-                        +adPrimaryKey + "/bids/" + myBidPrimaryKey;
+                        + adPrimaryKey + "/bids/" + myBidPrimaryKey;
                 System.out.println(url);
                 try {
                     responseCode = Helpers.simpleDeleteRequest(url);
@@ -587,7 +610,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
                 String url = AppGlobals.DELETE_UPDATE_BID_URL +
                         Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME) + "/ads/"
-                        +adPrimaryKey + "/bids/" + myBidPrimaryKey;
+                        + adPrimaryKey + "/bids/" + myBidPrimaryKey;
                 try {
                     updatedAmount = params[0];
                     responseCode = Helpers.simplePutRequest(url, "bid", params[0]);
@@ -656,12 +679,57 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 new GetSellerRating().execute(next);
             } else {
                 int value = 0;
-                for (int id: reviewIdList) {
-                    int currentStarValue =  starsSet.get(id);
+                for (int id : reviewIdList) {
+                    int currentStarValue = starsSet.get(id);
                     value = value + currentStarValue;
                 }
                 ratingValue = value;
                 System.out.println(ratingValue);
+            }
+        }
+    }
+
+    private String getJsonObjectString(String starsValue, String message) {
+        return String.format("{\"stars\": \"%s\" , \"review\": \"%s\"}",
+                starsValue, message);
+    }
+
+    class SendReviewTask extends AsyncTask<String, String, Integer> {
+
+        @Override
+        protected Integer doInBackground(String... params) {
+            if (Helpers.isNetworkAvailable() && Helpers.isInternetWorking()) {
+                String link = AppGlobals.REVIEW_URL + productOwner + File.separator +
+                        "reviews" + File.separator;
+                try {
+                    URL url;
+                    url = new URL(link);
+                    HttpURLConnection connection;
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setRequestMethod("POST");
+                    String authString = Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)
+                            + ":" + Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
+                    String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
+                    connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
+                    String jsonFormattedData = getJsonObjectString(params[0], params[1]);
+                    Helpers.sendRequestData(connection, jsonFormattedData);
+                    return connection.getResponseCode();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return AppGlobals.NO_INTERNET;
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            System.out.println(integer);
+            if (integer == HttpURLConnection.HTTP_CREATED) {
+                Helpers.saveBooleanForReview(adPrimaryKey, true);
+                Toast.makeText(getApplicationContext(), "You have given your review",
+                        Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -50,7 +50,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     private CustomAdapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private String category;
-    private String nextUrl;
+    private String nextUrl = "";
     private static HashMap<Integer, String> descriptionHashMap;
     private static ArrayList<Integer> idsArray;
     private static HashMap<Integer, String> priceHashMap;

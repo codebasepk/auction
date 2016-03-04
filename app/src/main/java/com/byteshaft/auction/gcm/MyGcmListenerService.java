@@ -44,18 +44,19 @@ public class MyGcmListenerService extends GcmListenerService {
                 }
                 break;
             case "half_time_no_bid":
-                if (data.getString("ad_owner").equals(Helpers
-                        .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
                     sendNotification("Ad is posted 12h ago , you might be interested in this one", "No Bid",
                             SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
-                }
                 break;
             case "sold_to_highest_bidder":
-                if (data.getString("ad_owner").equals(Helpers
-                        .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
-                    sendNotification("You bid on a product, its sold to highest bidder", "Product sold",
-                            SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
+                String message;
+                if (data.getString("sold_to").equals(Helpers.getStringDataFromSharedPreference(
+                        AppGlobals.KEY_USERNAME))) {
+                    message = "You are the winning bidder";
+                } else {
+                    message = "Product, its sold to highest bidder";
                 }
+                    sendNotification(message, "Product sold",
+                            SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
                 break;
             case "ad_expired":
                     sendNotification("An ad is expired", "Ad Expired",
