@@ -74,7 +74,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public static int myBidPrimaryKey = 0;
     public boolean mCanUpdate = false;
     private MenuItem item;
-    public String productOwner;
+    public String productOwner = "";
     private TextView deliveryTimeTextView;
     private String delivery_time;
     private String productStatus = "";
@@ -84,6 +84,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     private HashMap<Integer, Integer> starsSet;
     private android.support.v7.widget.AppCompatRatingBar ratingBar;
     public String winner = "";
+    public ArrayList<Double> bidsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +104,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         bidPriceHashMap = new HashMap<>();
         reviewIdList = new ArrayList<>();
         starsSet = new HashMap<>();
+        bidsList = new ArrayList<>();
         placeBidButton = (Button) findViewById(R.id.place_bid);
         placeBidEditText = (EditText) findViewById(R.id.bid_editText);
         placeBidEditText.setHint(R.string.place_bid);
@@ -168,9 +170,20 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 System.out.println(onlyAmount);
                 int productPrice = Integer.valueOf(onlyAmount);
                 int biddingAmount = Integer.valueOf(placeBidEditText.getText().toString());
-                if (biddingAmount < productPrice) {
-                    Helpers.alertDialog(SelectedAdDetail.this, "", "price is lower than product amount");
+                if (biddingAmount <= productPrice) {
+                    Helpers.alertDialog(SelectedAdDetail.this, "", "price must be higher " +
+                            "than product price");
                     return;
+                }
+
+                for (Double bids : bidsList) {
+                    System.out.println(bids.intValue());
+                    System.out.println(biddingAmount);
+                    if (biddingAmount <= bids.intValue()) {
+                        Toast.makeText(SelectedAdDetail.this, "Bidding amount must be higher " +
+                                "than other bids", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                 }
 
                 if (!placeBidEditText.getText().toString().trim().isEmpty() &&
@@ -283,6 +296,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             }
             if (!productStatus.equals("true")) {
                 new GetBidsTask().execute();
+            } else if (productStatus.equals("")){
+                linearLayout.setVisibility(View.GONE);
             }
         }
     }
@@ -413,7 +428,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 mRecyclerView.removeAllViews();
                 new GetBidsTask().execute();
             } else if (s == HttpURLConnection.HTTP_CONFLICT) {
-                Helpers.alertDialog(SelectedAdDetail.this, "Conflict", "your bid is already placed!");
+                Helpers.alertDialog(SelectedAdDetail.this, "Conflict", "please place your bid again");
             } else {
                 Helpers.alertDialog(SelectedAdDetail.this, "Error", "There was an unexpected error");
             }
@@ -455,6 +470,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                                         object.get("bidder_name").getAsString());
                                 bidPriceHashMap.put(object.get("id").getAsInt(),
                                         object.get("bid").getAsString());
+                                bidsList.add(object.get("bid").getAsDouble());
                             }
                         }
                     }

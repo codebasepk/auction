@@ -25,13 +25,13 @@
                 <item
                     android:id="@+id/my_ads_detail"
                     android:icon="@drawable/my_ad_details"
-                    android:title="My ads Detail">
+                    android:title="My ads">
 
                 </item>
                 <item
                     android:id="@+id/user_bids_detail"
                     android:icon="@drawable/my_bids"
-                    android:title="My Bids Detail">
+                    android:title="My Bids">
 
                 </item>
                 <item
