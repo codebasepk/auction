@@ -262,7 +262,9 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
             holder.setIsRecyclable(false);
             viewHolder.idTextView.setText(String.valueOf(items.get(position)));
-            viewHolder.titleTextView.setText(titleHashMap.get(items.get(position)).toUpperCase());
+            String titleLowerCase = titleHashMap.get(items.get(position));
+            String firstUpper = titleLowerCase.substring(0, 1).toUpperCase() + titleLowerCase.substring(1);
+            viewHolder.titleTextView.setText(firstUpper);
             viewHolder.description.setText(descriptionHashMap.get(items.get(position)));
             viewHolder.price.setText(priceHashMap.get(items.get(position)) + " " +
                     currencyHashMap.get(items.get(position)));
