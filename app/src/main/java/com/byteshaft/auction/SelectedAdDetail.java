@@ -74,7 +74,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public static int myBidPrimaryKey = 0;
     public boolean mCanUpdate = false;
     private MenuItem item;
-    public String productOwner;
+    public String productOwner = "";
     private TextView deliveryTimeTextView;
     private String delivery_time;
     private String productStatus = "";
@@ -168,8 +168,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 System.out.println(onlyAmount);
                 int productPrice = Integer.valueOf(onlyAmount);
                 int biddingAmount = Integer.valueOf(placeBidEditText.getText().toString());
-                if (biddingAmount < productPrice) {
-                    Helpers.alertDialog(SelectedAdDetail.this, "", "price is lower than product amount");
+                if (biddingAmount <= productPrice) {
+                    Helpers.alertDialog(SelectedAdDetail.this, "", "price must be higher than product price");
                     return;
                 }
 
