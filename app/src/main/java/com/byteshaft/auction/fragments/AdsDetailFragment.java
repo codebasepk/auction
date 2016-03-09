@@ -37,6 +37,10 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Class for user specific ads.
+ */
+
 public class AdsDetailFragment extends Fragment {
 
     private View mBaseView;
@@ -79,6 +83,9 @@ public class AdsDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
+    /**
+     * custom adapter to show single ad (user specific)
+     */
     static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             implements RecyclerView.OnItemTouchListener {
 
@@ -131,6 +138,9 @@ public class AdsDetailFragment extends Fragment {
 
         }
 
+        /*
+        interface to listen click on item
+         */
         public interface OnItemClickListener {
             void onItem(Integer item);
 
@@ -199,6 +209,9 @@ public class AdsDetailFragment extends Fragment {
         }
     }
 
+    /*
+    class to instantiate elements in view
+     */
     public static class CustomView extends RecyclerView.ViewHolder {
         public TextView idTextView;
         public TextView priceTextView;
@@ -219,7 +232,7 @@ public class AdsDetailFragment extends Fragment {
     }
 
     /**
-     * task to get per user ads.
+     * Task to get user based ads.
      */
     class GetAllAdsDetailTask extends AsyncTask<String, String, ArrayList<Integer>> {
 
@@ -341,6 +354,9 @@ public class AdsDetailFragment extends Fragment {
         customAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Task to delete a ad
+     */
     class DeleteAdTask extends AsyncTask<String, String, Integer> {
 
         private int position = 987456123;

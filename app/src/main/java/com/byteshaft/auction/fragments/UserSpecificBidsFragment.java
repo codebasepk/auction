@@ -31,6 +31,10 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Class to show user , which ads posted his bid.
+ */
+
 public class UserSpecificBidsFragment extends Fragment {
 
     private View mBaseView;
@@ -71,6 +75,9 @@ public class UserSpecificBidsFragment extends Fragment {
         return mBaseView;
     }
 
+    /*
+    Custom adapter to show single ad
+     */
     static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private ArrayList<Integer> items;
@@ -134,6 +141,9 @@ public class UserSpecificBidsFragment extends Fragment {
         }
     }
 
+    /**
+     * class to instantiate all view elements
+     */
     public static class CustomView extends RecyclerView.ViewHolder {
         public TextView idTextView;
         public TextView priceTextView;
@@ -155,6 +165,9 @@ public class UserSpecificBidsFragment extends Fragment {
         }
     }
 
+    /**
+     * Task to get ads on which user posted his bids.
+     */
     static class GetUserSpecificBids extends AsyncTask<String, String, ArrayList<Integer>> {
 
         private Activity mActivity;
@@ -195,8 +208,6 @@ public class UserSpecificBidsFragment extends Fragment {
                                     object.get("description").getAsString());
                             priceHashMap.put(object.get("id").getAsInt(),
                                     object.get("price").getAsString());
-//                            bidPriceHashMap.put(object.get("id").getAsInt(),
-//                            object.get("bidsPrice").getAsString());
                             imagesUrlHashMap.put(object.get("id").getAsInt(),
                                     object.get("photo1").getAsString());
                             if (!object.get("currency").isJsonNull()) {

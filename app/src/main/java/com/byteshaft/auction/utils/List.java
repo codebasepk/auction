@@ -6,6 +6,10 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AbsListView;
 
+/**
+ * class for creating custom interface that allows you to detect up and down scrolling
+ */
+
 public class List extends android.widget.ListView {
 
     private OnScrollListener onScrollListener;
@@ -87,6 +91,10 @@ public class List extends android.widget.ListView {
     public void setOnDetectScrollListener(OnDetectScrollListener onDetectScrollListener) {
         this.onDetectScrollListener = onDetectScrollListener;
     }
+
+    /**
+     * interface with methods, called when user scroll up or down
+     */
 
     public interface OnDetectScrollListener {
 

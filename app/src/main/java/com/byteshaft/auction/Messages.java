@@ -30,7 +30,9 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Random;
 
-
+/**
+ * class fetches messages for seller and displays who send messages to seller.
+ */
 public class Messages extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private ListView mListView;

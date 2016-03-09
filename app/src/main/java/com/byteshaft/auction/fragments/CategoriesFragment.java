@@ -44,6 +44,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * class to show all category and you check you favourite ones and these categories will appear
+ * in buyer
+ */
+
 public class CategoriesFragment extends Fragment {
 
     private static CategoriesAdapter sAdapter;
@@ -191,6 +196,9 @@ public class CategoriesFragment extends Fragment {
         }
     }
 
+    /*
+    Task to get all present categories on server
+     */
     public static class GetCategoriesTask extends AsyncTask<String, String, ArrayList<String>> {
 
         private Activity mActivity;
@@ -275,6 +283,9 @@ public class CategoriesFragment extends Fragment {
         }
     }
 
+    /*
+    Task to get images for each categories
+     */
     public static class GetImagesTask extends AsyncTask<String, String, String> {
 
         private boolean imagesSaved = false;

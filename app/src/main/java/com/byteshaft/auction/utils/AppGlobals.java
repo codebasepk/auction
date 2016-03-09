@@ -14,6 +14,7 @@ import java.io.FileOutputStream;
 
 public class AppGlobals extends Application{
 
+    // static context used outside activities / fragments
     private static Context sContext;
     public static final String user_login_key = "user_login";
     public static final String lastFragment = "last_fragment";
@@ -23,7 +24,6 @@ public class AppGlobals extends Application{
     public static final String KEY_SELECTED_CATEGORY_BOOLEAN_STATUS = "selected_category_boolean_status";
     public static final String KEY_CATEGORY_BOOLEAN_STATUS = "category_boolean_status";
     public static final String SELECTED_CATEGORIES = "selected_categories";
-    public static final String KEY_CATEGORIES_AVAILABLE = "categories_availeble";
 
     public static final String detail = "detail";
     public static final String KEY_USERNAME = "username";
@@ -33,12 +33,12 @@ public class AppGlobals extends Application{
     public static final String KEY_PHONE_NUMBER = "phone_number";
     public static final String KEY_ADDRESS = "address";
     public static final String KEY_CITY = "city";
-    public static boolean loginSuccessFull = false;
     public static String KEY_PROFILE_PIC = "profile_pic";
     public static String PROFILE_PIC_STATUS = "profile_pic_status";
     public static int responseCode;
     public static int userExistResponse;
-    public static int NO_INTERNET = 2112;
+    // there is no response for no internet actually. so creating my own to identify.
+    public static int NO_INTERNET = 4040;
     public static final String BASE_URL = "http://46.101.75.194:8000";
     public static final String LOGIN_URL = String.format("%s/api/users/", BASE_URL);
     public static final String USER_EXIST_URL = String.format("%s/api/users/", BASE_URL);

@@ -393,6 +393,9 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
         inflater.inflate(R.menu.edit_user_profile, menu);
     }
 
+    /**
+     * Task to update user details
+     */
     class UpdateUserDetailsTask extends AsyncTask<String, String, String[]> {
         private boolean noInternet = false;
 
