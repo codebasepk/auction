@@ -8,6 +8,10 @@ import android.view.View;
 
 import com.byteshaft.auction.R;
 
+/**
+ * class for styling recyclerView with divider.
+ */
+
 public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     private Drawable mDivider;
 

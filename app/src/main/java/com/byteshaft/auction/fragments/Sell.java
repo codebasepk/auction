@@ -51,7 +51,9 @@ import nl.changer.polypicker.Config;
 import nl.changer.polypicker.ImagePickerActivity;
 import nl.changer.polypicker.utils.ImageInternalFetcher;
 
-
+/**
+ * seller part where user can add title, description, images etc for ad and post the ad.
+ */
 public class Sell extends Fragment implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
 
     private EditText itemTitle;
@@ -233,6 +235,9 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
 
     }
 
+    /*
+    method to show captured images by camera or selected from gellery
+     */
     private void showMedia() {
         // Remove all views before
         // adding the new ones.
@@ -285,6 +290,9 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         }
     }
 
+    /*
+    Method that opens activity that allow user to capture and select images
+     */
     private void getNImages() {
         Log.i("Auction", "Get Images Method called");
         Intent intent = new Intent(getActivity(), ImagePickerActivity.class);
@@ -405,6 +413,9 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         }
     }
 
+    /**
+     * Task to get single add details using for update when user comes from adsDetailsFragment
+     */
     class GetItemDetailsTask extends AsyncTask<String, String, ArrayList<Bitmap>> {
 
         @Override
@@ -453,7 +464,6 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                     e.printStackTrace();
                 }
             }
-//
             return null;
         }
 
@@ -480,6 +490,9 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         }
     }
 
+    /**
+     * Task to send data to update an AD.
+     */
     class UpdateAdTask extends AsyncTask<String, String, Integer> {
 
         @Override

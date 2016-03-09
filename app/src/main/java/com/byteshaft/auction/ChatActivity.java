@@ -44,6 +44,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+/**
+ * chat activity where user can chat and send and receiver message.
+ */
 
 public class ChatActivity extends Activity implements View.OnClickListener {
 
@@ -70,9 +73,6 @@ public class ChatActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_activity);
-//        toolbar = (Toolbar) findViewById(R.id.tool);
-//        setActionBar(toolbar);
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.PRIMARY_KEY, 0);
         productOwner = getIntent().getStringExtra(AppGlobals.PRODUCT_OWNER);
         messageReceiver = getIntent().getStringExtra(AppGlobals.MESSAGE_RECEIVER);
@@ -117,7 +117,6 @@ public class ChatActivity extends Activity implements View.OnClickListener {
         });
     }
 
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -140,7 +139,7 @@ public class ChatActivity extends Activity implements View.OnClickListener {
         return false;
     }
 
-    // custom raw chat interface
+    // custom raw chat view
     private class ChatArrayAdapter extends ArrayAdapter {
 
         private ArrayList<Integer> idsList;
@@ -241,6 +240,9 @@ public class ChatActivity extends Activity implements View.OnClickListener {
         public CircularImageView myMessage;
     }
 
+    /**
+     * Task to fetch user specific messages
+     */
     class FetchMessages extends AsyncTask<String, String, ArrayList<Integer>> {
 
         private boolean noInternet = false;
@@ -305,9 +307,7 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                         }
 
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
+                } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
             } else {
@@ -343,6 +343,9 @@ public class ChatActivity extends Activity implements View.OnClickListener {
         }
     }
 
+    /**
+     * Task to send message
+     */
     class SendMessageTask extends AsyncTask<String, String, String[]> {
 
         @Override

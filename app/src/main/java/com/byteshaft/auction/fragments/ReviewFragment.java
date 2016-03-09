@@ -26,6 +26,9 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Fragemtn where user can see his reviews.
+ */
 public class ReviewFragment extends Fragment{
 
     private View mBaseView;

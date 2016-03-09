@@ -200,6 +200,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    /**
+     * Task to get single ad details like, title, description, images etc
+     */
     class GetItemDetailsTask extends AsyncTask<String, String, ArrayList<Bitmap>> {
 
         @Override
@@ -340,6 +343,11 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
 
         }
 
+        /**
+         * Custom bids adapter to display bids on ad.
+         * @param data
+         * @param activity
+         */
         public BidsAdapter(ArrayList<Integer> data, Activity activity) {
             super();
             this.items = data;
@@ -396,6 +404,10 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         }
     }
 
+
+    /**
+     * Task to place a bid on ad
+     */
     class PlaceBidTask extends AsyncTask<String, String, Integer> {
 
         @Override
@@ -435,6 +447,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    /**
+     * Task to get ad specific bids
+     */
     class GetBidsTask extends AsyncTask<String, String, ArrayList<Integer>> {
 
         @Override
@@ -488,6 +503,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    /*
+    dialog to show info about ad.
+     */
     public void userInfoDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
         final View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
@@ -538,6 +556,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         alertDialog.show();
     }
 
+    /*
+    dialog to get review and sent to seller.
+     */
     public void reviewDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
         final View promptView = layoutInflater.inflate(R.layout.review_dialog_layout, null);
@@ -569,6 +590,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         alertDialog.show();
     }
 
+    /**
+     * Task to delete a bid
+     */
     class DeleteBidTask extends AsyncTask<String, String, Integer> {
 
         @Override
@@ -611,6 +635,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    /**
+     * Task to update a bid.
+     */
     class UpdateBidTask extends AsyncTask<String, String, Integer> {
         private String updatedAmount;
 
@@ -705,11 +732,20 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    /**
+     * Method returns json formatted data to send to server
+     * @param starsValue
+     * @param message
+     * @return
+     */
     private String getJsonObjectString(String starsValue, String message) {
         return String.format("{\"stars\": \"%s\" , \"review\": \"%s\"}",
                 starsValue, message);
     }
 
+    /*
+    Task to send review to seller.
+     */
     class SendReviewTask extends AsyncTask<String, String, Integer> {
 
         @Override

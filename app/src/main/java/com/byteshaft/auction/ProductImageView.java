@@ -12,6 +12,9 @@ import com.squareup.picasso.Picasso;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 
+/**
+ * Class to show single image
+ */
 public class ProductImageView extends AppCompatActivity {
 
 
