@@ -25,7 +25,7 @@
                 <item
                     android:id="@+id/my_ads_detail"
                     android:icon="@drawable/my_ad_details"
-                    android:title="My ads">
+                    android:title="My products">
 
                 </item>
                 <item

@@ -297,7 +297,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             }
             if (!productStatus.equals("true")) {
                 new GetBidsTask().execute();
-            } else if (productStatus.equals("")) {
+            }
+            if (productStatus.equals("true") || !winner.trim().isEmpty()) {
                 linearLayout.setVisibility(View.GONE);
             }
         }
