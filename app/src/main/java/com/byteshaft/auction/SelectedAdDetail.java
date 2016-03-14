@@ -49,10 +49,9 @@ import java.util.HashMap;
  */
 public class SelectedAdDetail extends AppCompatActivity implements View.OnClickListener {
 
-    private ArrayList<Bitmap> bitmapArrayList;
     private RecyclerView mRecyclerView;
     private ArrayList<Integer> arrayList;
-    private int adPrimaryKey;
+    public static int adPrimaryKey;
     public int id;
     public String description;
     public String price;
@@ -78,7 +77,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     private TextView deliveryTimeTextView;
     private String delivery_time;
     private String productStatus = "";
-    private LinearLayout linearLayout;
+    public static LinearLayout linearLayout;
     private int ratingValue = 0;
     private ArrayList<Integer> reviewIdList;
     private HashMap<Integer, Integer> starsSet;
@@ -117,7 +116,6 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
-        bitmapArrayList = new ArrayList<>();
         arrayList = new ArrayList<>();
         new GetItemDetailsTask().execute();
     }
@@ -299,7 +297,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             }
             if (!productStatus.equals("true")) {
                 new GetBidsTask().execute();
-            } else if (productStatus.equals("")){
+            } else if (productStatus.equals("")) {
                 linearLayout.setVisibility(View.GONE);
             }
         }

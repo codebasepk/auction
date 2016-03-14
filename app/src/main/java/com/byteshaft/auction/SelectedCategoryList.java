@@ -47,10 +47,6 @@ import java.util.HashMap;
 public class SelectedCategoryList extends AppCompatActivity implements View.OnClickListener, SearchView.OnQueryTextListener {
 
     public static RecyclerView sRecyclerView;
-    private CustomAdapter mAdapter;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private String category;
-    private String nextUrl = "";
     private static HashMap<Integer, String> descriptionHashMap;
     private static ArrayList<Integer> idsArray;
     private static HashMap<Integer, String> priceHashMap;
@@ -58,6 +54,10 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     private static HashMap<Integer, String> currencyHashMap;
     private static HashMap<Integer, String> titleHashMap;
     private static CustomView viewHolder;
+    private CustomAdapter mAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private String category;
+    private String nextUrl = "";
     private ProgressDialog mProgressDialog;
     private boolean refresh = false;
     private int countValue;
@@ -67,6 +67,16 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     private String categorySpecificUrl;
     private boolean searchProcess;
     private RelativeLayout notFoundLayout;
+
+    // Method to initialize the array each time for new ads if available
+    public static void initializeArrayAndHashMap() {
+        idsArray = new ArrayList<>();
+        descriptionHashMap = new HashMap<>();
+        priceHashMap = new HashMap<>();
+        imagesUrlHashMap = new HashMap<>();
+        currencyHashMap = new HashMap<>();
+        titleHashMap = new HashMap<>();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +104,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                initializeArrayAndHashMap();
+//                initializeArrayAndHashMap();
                 refresh = true;
                 new GetSpecificDataTask().execute(categorySpecificUrl);
             }
@@ -119,21 +129,17 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
     }
 
     public void onScrolledUp() {
-        System.out.println("onScrolledUp");
         showMoreLinearLayout.setVisibility(View.GONE);
     }
 
     public void onScrolledDown() {
-        System.out.println("onScrolledDown");
     }
 
     public void onScrolledToTop() {
-        System.out.println("onScrolledToTop");
         showMoreLinearLayout.setVisibility(View.GONE);
     }
 
     public void onScrolledToBottom() {
-        System.out.println("onScrolledToBottom");
         if (countValue > idsArray.size()) {
             showMoreLinearLayout.setVisibility(View.VISIBLE);
         }
@@ -153,8 +159,8 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                String url = AppGlobals.SEARCH_URL+category.toLowerCase()+
-                        "&title="+query.replaceAll(" ", "%20");
+                String url = AppGlobals.SEARCH_URL + category.toLowerCase() +
+                        "&title=" + query.replaceAll(" ", "%20");
                 searchProcess = true;
                 initializeArrayAndHashMap();
                 new GetSpecificDataTask().execute(url);
@@ -177,16 +183,6 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                 return true;
         }
         return false;
-    }
-
-    // Method to initialize the array each time for new ads if available
-    public static void initializeArrayAndHashMap() {
-        idsArray = new ArrayList<>();
-        descriptionHashMap = new HashMap<>();
-        priceHashMap = new HashMap<>();
-        imagesUrlHashMap = new HashMap<>();
-        currencyHashMap = new HashMap<>();
-        titleHashMap = new HashMap<>();
     }
 
     @Override
@@ -224,7 +220,7 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         return false;
     }
 
-// custom Member class to represent the categories selected by user and its images
+    // custom Member class to represent the categories selected by user and its images
     static class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
             RecyclerView.OnItemTouchListener {
 
@@ -436,8 +432,8 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
         @Override
         protected void onPostExecute(ArrayList<Integer> idsList) {
             super.onPostExecute(idsList);
-            refresh = false;
-                mShowMoreProgress.setVisibility(View.INVISIBLE);
+            System.out.println("FINISHED");
+            mShowMoreProgress.setVisibility(View.INVISIBLE);
             if (mProgressDialog != null) {
                 mProgressDialog.dismiss();
             }
@@ -445,24 +441,29 @@ public class SelectedCategoryList extends AppCompatActivity implements View.OnCl
                 Helpers.alertDialog(SelectedCategoryList.this, "No internet", "Internet not available");
                 return;
             }
-            System.out.println("countvalue:" +countValue);
             showMoreLinearLayout.setVisibility(View.VISIBLE);
             if (searchProcess) {
                 mAdapter = null;
             }
-            mAdapter = new CustomAdapter(idsList, SelectedCategoryList.this);
-            sRecyclerView.setAdapter(mAdapter);
-            mSwipeRefreshLayout.setRefreshing(false);
-            sRecyclerView.addOnItemTouchListener(new CustomAdapter(idsList, getApplicationContext(),
-                    new CustomAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItem(Integer item, TextView textView) {
-                            Intent intent = new Intent(getApplicationContext(), SelectedAdDetail.class);
-                            intent.putExtra(AppGlobals.detail, item);
-                            intent.putExtra(AppGlobals.SINGLE_PRODUCT_NAME, textView.getText());
-                            startActivity(intent);
-                        }
-                    }));
+            if (refresh && mAdapter != null) {
+                refresh = false;
+                mAdapter.notifyDataSetChanged();
+                mSwipeRefreshLayout.setRefreshing(false);
+            } else {
+                mAdapter = new CustomAdapter(idsList, SelectedCategoryList.this);
+                sRecyclerView.setAdapter(mAdapter);
+                mSwipeRefreshLayout.setRefreshing(false);
+                sRecyclerView.addOnItemTouchListener(new CustomAdapter(idsList, getApplicationContext(),
+                        new CustomAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItem(Integer item, TextView textView) {
+                                Intent intent = new Intent(getApplicationContext(), SelectedAdDetail.class);
+                                intent.putExtra(AppGlobals.detail, item);
+                                intent.putExtra(AppGlobals.SINGLE_PRODUCT_NAME, textView.getText());
+                                startActivity(intent);
+                            }
+                        }));
+            }
             if (nextUrl.trim().isEmpty()) {
                 showMoreLinearLayout.setVisibility(View.GONE);
             }

@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 
 public class AppGlobals extends Application{
 
@@ -82,6 +83,7 @@ public class AppGlobals extends Application{
     public static final String PRODUCT_OWNER = "product_owner";
     public static final String MESSAGE_RECEIVER = "message_sender";
     public static final String REVIEW_URL = String.format("%s/api/users/", BASE_URL);
+    private static ArrayList<Integer> soldAds;
 
     @Override
     public void onCreate() {
@@ -89,6 +91,7 @@ public class AppGlobals extends Application{
         sContext = getApplicationContext();
         root = Environment.getExternalStorageDirectory().toString()
                 +"/Android/data/" + getPackageName();
+        soldAds = new ArrayList<>();
     }
 
     public static void setPostBidResponse(int value) {
@@ -97,13 +100,6 @@ public class AppGlobals extends Application{
 
     public static int getPostBidResponse() {
         return postBidResponse;
-    }
-
-    public static Activity getCurrentActivity(){
-        return sCurrentActivity;
-    }
-    public static void setCurrentActivity(Activity activity){
-        sCurrentActivity = activity;
     }
 
     public static void setLoginResponseMessage(String responseMessage) {

@@ -1,7 +1,6 @@
 package com.byteshaft.auction.gcm;
 
 
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -49,6 +48,7 @@ public class MyGcmListenerService extends GcmListenerService {
                             SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
                 break;
             case "sold_to_highest_bidder":
+                System.out.println(data);
                 String message;
                 Class activity;
                 if (data.getString("sold_to").equals(Helpers.getStringDataFromSharedPreference(

@@ -380,9 +380,9 @@ public class CategoriesFragment extends Fragment {
                     String authString = params[0] + ":" + params[1];
                     String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
                     connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
-                    Set<String> categories = Helpers.getCategories();
+//                    Set<String> categories = Helpers.getCategories();
                     StringBuilder stringBuilder = new StringBuilder();
-                    for (String item : categories) {
+                    for (String item : selectedCategories) {
                         stringBuilder.append(item);
                         stringBuilder.append(",");
                     }
