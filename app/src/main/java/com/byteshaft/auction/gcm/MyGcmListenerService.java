@@ -64,6 +64,7 @@ public class MyGcmListenerService extends GcmListenerService {
                             activity, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
                 if ((Integer) data.get("ad_id") == SelectedAdDetail.adPrimaryKey) {
                     SelectedAdDetail.linearLayout.setVisibility(View.GONE);
+                    SelectedAdDetail.soldItem.setVisible(true);
                 }
                 break;
             case "ad_expired":
