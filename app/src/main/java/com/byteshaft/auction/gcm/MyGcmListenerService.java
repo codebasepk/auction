@@ -49,7 +49,6 @@ public class MyGcmListenerService extends GcmListenerService {
                             SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
                 break;
             case "sold_to_highest_bidder":
-
                 String message;
                 Class activity;
                 if (data.getString("sold_to").equals(Helpers.getStringDataFromSharedPreference(
@@ -57,14 +56,22 @@ public class MyGcmListenerService extends GcmListenerService {
                     message = "You are the winning bidder";
                     activity = SelectedAdDetail.class;
                 } else {
-                    message = "Product, its sold to highest bidder";
+                    message = "Product, is sold to highest bidder";
                     activity = MainActivity.class;
                 }
                     sendNotification(message, "Product sold",
                             activity, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
-                if ((Integer) data.get("ad_id") == SelectedAdDetail.adPrimaryKey) {
-                    SelectedAdDetail.linearLayout.setVisibility(View.GONE);
-                    SelectedAdDetail.soldItem.setVisible(true);
+                String id = data.get("ad_id").toString();
+                if (Integer.valueOf(id)  == SelectedAdDetail.adPrimaryKey) {
+                    if (SelectedAdDetail.getInstance() != null) {
+                        SelectedAdDetail.getInstance().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                SelectedAdDetail.linearLayout.setVisibility(View.GONE);
+                                SelectedAdDetail.soldItem.setVisible(true);
+                            }
+                        });
+                    }
                 }
                 break;
             case "ad_expired":

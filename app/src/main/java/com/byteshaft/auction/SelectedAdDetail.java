@@ -3,6 +3,7 @@ package com.byteshaft.auction;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -85,11 +87,18 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     private android.support.v7.widget.AppCompatRatingBar ratingBar;
     public String winner = "";
     public ArrayList<Double> bidsList;
+    public static SelectedAdDetail instance;
+
+    public static SelectedAdDetail getInstance() {
+        return instance;
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_detials);
+        instance = this;
         productImageView = new ProductImageView();
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.detail, 0);
         String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
@@ -189,16 +198,23 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
 
                 if (!placeBidEditText.getText().toString().trim().isEmpty() &&
                         TextUtils.isDigitsOnly(placeBidEditText.getText().toString()) && !mCanUpdate) {
+                   setHideSoftKeyboard(placeBidEditText);
                     String bid = placeBidEditText.getText().toString();
                     new PlaceBidTask().execute(bid);
                 }
                 if (!placeBidEditText.getText().toString().trim().isEmpty() &&
                         TextUtils.isDigitsOnly(placeBidEditText.getText().toString()) && mCanUpdate) {
                     String bid = placeBidEditText.getText().toString();
+                    setHideSoftKeyboard(placeBidEditText);
                     new UpdateBidTask().execute(bid);
                 }
                 break;
         }
+    }
+
+    private void setHideSoftKeyboard(EditText editText){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
     }
 
     /**
@@ -298,9 +314,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 item.setVisible(true);
                 linearLayout.setVisibility(View.GONE);
             }
-            if (!productStatus.equals("true")) {
-                new GetBidsTask().execute();
-            }
+            new GetBidsTask().execute();
             if (productStatus.equals("true") || !winner.trim().isEmpty()) {
                 linearLayout.setVisibility(View.GONE);
                 soldItem.setVisible(true);
