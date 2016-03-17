@@ -189,11 +189,11 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                 RelativeLayout.LayoutParams layoutParams = new
                         RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                         RelativeLayout.LayoutParams.WRAP_CONTENT);
-                layoutParams.setMargins(150,0,0,0);
+//                layoutParams.setMargins(150,0,0,0);
                 holder.messageBody.setText(null);
                 holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
-                holder.layout.setGravity(Gravity.RIGHT);
-                holder.layout.setGravity(Gravity.END);
+//                holder.layout.setGravity(Gravity.RIGHT);
+//                holder.layout.setGravity(Gravity.END);
                 holder.messageBody.setBackgroundResource(R.drawable.bubble_b);
                 holder.myMessage.setVisibility(View.INVISIBLE);
                 holder.imageView.setVisibility(View.VISIBLE);
@@ -204,17 +204,17 @@ public class ChatActivity extends Activity implements View.OnClickListener {
 
                 holder.imageView.setImageBitmap(letterTile);
                 holder.messageBody.setText(sMessages.get(idsList.get(position)));
-                holder.messageBody.setLayoutParams(layoutParams);
+//                holder.messageBody.setLayoutParams(layoutParams);
 
             } else {
                 holder.messageBody.setText(null);
                 RelativeLayout.LayoutParams layoutParams = new
                         RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                         RelativeLayout.LayoutParams.WRAP_CONTENT);
-                layoutParams.setMargins(430, 5, 0, 0);
+//                layoutParams.setMargins(430, 5, 0, 0);
                 holder.invisibleTextView.setText(String.valueOf(idsList.get(position)));
-                holder.layout.setGravity(Gravity.LEFT);
-                holder.layout.setGravity(Gravity.START);
+//                holder.layout.setGravity(Gravity.LEFT);
+//                holder.layout.setGravity(Gravity.START);
                 holder.messageBody.setBackgroundResource(R.drawable.bubble_a);
                 holder.imageView.setVisibility(View.INVISIBLE);
                 holder.myMessage.setVisibility(View.VISIBLE);
@@ -224,7 +224,7 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                         "#f58559", 100, 100);
                 holder.myMessage.setImageBitmap(letterTile);
                 holder.messageBody.setText(sMessages.get(idsList.get(position)));
-                holder.messageBody.setLayoutParams(layoutParams);
+//                holder.messageBody.setLayoutParams(layoutParams);
 
             }
             return convertView;
@@ -416,6 +416,9 @@ public class ChatActivity extends Activity implements View.OnClickListener {
                     mBubbleList.setAdapter(adapter);
                     editTextMessage.setText("");
                 }
+            } else {
+                Helpers.alertDialog(ChatActivity.this, "Internet problem", "there was an internet" +
+                        " problem please try again");
             }
         }
     }

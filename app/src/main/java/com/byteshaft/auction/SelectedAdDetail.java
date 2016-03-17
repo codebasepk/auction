@@ -528,6 +528,9 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         final View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
         TextView sellerName = (TextView) promptView.findViewById(R.id.seller_user_name);
         TextView textView = (TextView) promptView.findViewById(R.id.write_review);
+        System.out.println(winner);
+        System.out.println(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME));
+        System.out.println("winner" +winner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)));
         if (winner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
         if (!Helpers.getBooleanValueForReview(adPrimaryKey)) {
             textView.setVisibility(View.VISIBLE);
