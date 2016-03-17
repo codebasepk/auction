@@ -284,7 +284,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             new GetSellerRating().execute(link);
             descriptionTextView.setText("Description: \n \n" + description);
             adPrice.setText(price + currency);
-            deliveryTimeTextView.setText(delivery_time + "H");
+            deliveryTimeTextView.setText(delivery_time + "Days");
             LinearLayout layout = (LinearLayout) findViewById(R.id.linear);
             setTitle(title);
             int value = 0;
