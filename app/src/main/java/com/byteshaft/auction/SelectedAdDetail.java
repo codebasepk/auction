@@ -198,7 +198,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
 
                 if (!placeBidEditText.getText().toString().trim().isEmpty() &&
                         TextUtils.isDigitsOnly(placeBidEditText.getText().toString()) && !mCanUpdate) {
-                   setHideSoftKeyboard(placeBidEditText);
+                    setHideSoftKeyboard(placeBidEditText);
                     String bid = placeBidEditText.getText().toString();
                     new PlaceBidTask().execute(bid);
                 }
@@ -212,7 +212,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    private void setHideSoftKeyboard(EditText editText){
+    private void setHideSoftKeyboard(EditText editText) {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
     }
@@ -255,7 +255,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                         if (!jsonObject.get("sold").isJsonNull()) {
                             productStatus = jsonObject.get("sold").getAsString();
                         }
-                        if (jsonObject.get("sold_to").isJsonNull()) {
+                        if (!jsonObject.get("sold_to").isJsonNull()) {
                             winner = jsonObject.get("sold_to").getAsString();
                         }
                         delivery_time = jsonObject.get("delivery_time").getAsString();
@@ -362,6 +362,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
 
         /**
          * Custom bids adapter to display bids on ad.
+         *
          * @param data
          * @param activity
          */
@@ -530,11 +531,12 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         TextView textView = (TextView) promptView.findViewById(R.id.write_review);
         System.out.println(winner);
         System.out.println(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME));
-        System.out.println("winner" +winner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)));
-        if (winner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
-        if (!Helpers.getBooleanValueForReview(adPrimaryKey)) {
+        System.out.println((winner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))));
+        System.out.println(Helpers.getBooleanValueForReview(adPrimaryKey));
+        if (winner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)) &&
+                !Helpers.getBooleanValueForReview(adPrimaryKey)) {
             textView.setVisibility(View.VISIBLE);
-        }
+
         }
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -754,6 +756,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
 
     /**
      * Method returns json formatted data to send to server
+     *
      * @param starsValue
      * @param message
      * @return
