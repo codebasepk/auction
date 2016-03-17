@@ -1,7 +1,6 @@
 package com.byteshaft.auction.gcm;
 
 
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -10,6 +9,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.view.View;
 
 import com.byteshaft.auction.MainActivity;
 import com.byteshaft.auction.R;
@@ -56,11 +56,23 @@ public class MyGcmListenerService extends GcmListenerService {
                     message = "You are the winning bidder";
                     activity = SelectedAdDetail.class;
                 } else {
-                    message = "Product, its sold to highest bidder";
+                    message = "Product, is sold to highest bidder";
                     activity = MainActivity.class;
                 }
                     sendNotification(message, "Product sold",
                             activity, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
+                String id = data.get("ad_id").toString();
+                if (Integer.valueOf(id)  == SelectedAdDetail.adPrimaryKey) {
+                    if (SelectedAdDetail.getInstance() != null) {
+                        SelectedAdDetail.getInstance().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                SelectedAdDetail.linearLayout.setVisibility(View.GONE);
+                                SelectedAdDetail.soldItem.setVisible(true);
+                            }
+                        });
+                    }
+                }
                 break;
             case "ad_expired":
                     sendNotification("An ad is expired", "Ad Expired",

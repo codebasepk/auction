@@ -172,14 +172,14 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                     Toast.makeText(getActivity(), "All fields must be filled", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (Integer.valueOf(deliveryTimeEditText.getText().toString()) > 24) {
-                    Toast.makeText(getActivity(), "delivery time must be less than 24 hours", Toast.LENGTH_SHORT).show();
+                if (Integer.valueOf(deliveryTimeEditText.getText().toString()) > 7) {
+                    Toast.makeText(getActivity(), "delivery time must be less than a week", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (!updateProcess && !itemTitle.getText().toString().trim().isEmpty() &&
                         !itemDescription.getText().toString().trim().isEmpty() &&
                         !mItemAmount.getText().toString().isEmpty() && imagesArray.size() > 0 &&
-                        !currency.trim().isEmpty() && Integer.valueOf(deliveryTimeEditText.getText().toString()) < 24) {
+                        !currency.trim().isEmpty() && Integer.valueOf(deliveryTimeEditText.getText().toString()) <= 7) {
                     category = categorySpinner.getSelectedItem().toString();
                     String[] dataToUpload = {itemTitle.getText().toString(),
                             itemDescription.getText().toString(), mItemAmount.getText().toString(),
@@ -194,7 +194,7 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                         !itemDescription.getText().toString().trim().isEmpty() &&
                         !mItemAmount.getText().toString().isEmpty() && mMedia.size() > 0 &&
                         !currency.trim().isEmpty() &&
-                        Integer.valueOf(deliveryTimeEditText.getText().toString()) < 24) {
+                        Integer.valueOf(deliveryTimeEditText.getText().toString()) <= 7) {
                     String[] dataToUpdate = {itemTitle.getText().toString(),
                             itemDescription.getText().toString(), mItemAmount.getText().toString(),
                             currency, category, deliveryTimeEditText.getText().toString()};

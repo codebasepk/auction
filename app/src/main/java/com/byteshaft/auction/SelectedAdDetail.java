@@ -3,6 +3,7 @@ package com.byteshaft.auction;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -49,10 +51,9 @@ import java.util.HashMap;
  */
 public class SelectedAdDetail extends AppCompatActivity implements View.OnClickListener {
 
-    private ArrayList<Bitmap> bitmapArrayList;
     private RecyclerView mRecyclerView;
     private ArrayList<Integer> arrayList;
-    private int adPrimaryKey;
+    public static int adPrimaryKey;
     public int id;
     public String description;
     public String price;
@@ -74,22 +75,30 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public static int myBidPrimaryKey = 0;
     public boolean mCanUpdate = false;
     private MenuItem item;
+    public static MenuItem soldItem;
     public String productOwner = "";
     private TextView deliveryTimeTextView;
     private String delivery_time;
     private String productStatus = "";
-    private LinearLayout linearLayout;
+    public static LinearLayout linearLayout;
     private int ratingValue = 0;
     private ArrayList<Integer> reviewIdList;
     private HashMap<Integer, Integer> starsSet;
     private android.support.v7.widget.AppCompatRatingBar ratingBar;
     public String winner = "";
     public ArrayList<Double> bidsList;
+    public static SelectedAdDetail instance;
+
+    public static SelectedAdDetail getInstance() {
+        return instance;
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_detials);
+        instance = this;
         productImageView = new ProductImageView();
         adPrimaryKey = getIntent().getIntExtra(AppGlobals.detail, 0);
         String productName = getIntent().getStringExtra(AppGlobals.SINGLE_PRODUCT_NAME);
@@ -117,7 +126,6 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
-        bitmapArrayList = new ArrayList<>();
         arrayList = new ArrayList<>();
         new GetItemDetailsTask().execute();
     }
@@ -154,6 +162,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         menuInflater.inflate(R.menu.chat_for_user, menu);
         item = menu.findItem(R.id.chat_button);
         item.setVisible(false);
+        soldItem = menu.findItem(R.id.sold);
+        soldItem.setVisible(false);
         return true;
     }
 
@@ -188,16 +198,23 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
 
                 if (!placeBidEditText.getText().toString().trim().isEmpty() &&
                         TextUtils.isDigitsOnly(placeBidEditText.getText().toString()) && !mCanUpdate) {
+                    setHideSoftKeyboard(placeBidEditText);
                     String bid = placeBidEditText.getText().toString();
                     new PlaceBidTask().execute(bid);
                 }
                 if (!placeBidEditText.getText().toString().trim().isEmpty() &&
                         TextUtils.isDigitsOnly(placeBidEditText.getText().toString()) && mCanUpdate) {
                     String bid = placeBidEditText.getText().toString();
+                    setHideSoftKeyboard(placeBidEditText);
                     new UpdateBidTask().execute(bid);
                 }
                 break;
         }
+    }
+
+    private void setHideSoftKeyboard(EditText editText) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
     }
 
     /**
@@ -238,7 +255,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                         if (!jsonObject.get("sold").isJsonNull()) {
                             productStatus = jsonObject.get("sold").getAsString();
                         }
-                        if (jsonObject.get("sold_to").isJsonNull()) {
+                        if (!jsonObject.get("sold_to").isJsonNull()) {
                             winner = jsonObject.get("sold_to").getAsString();
                         }
                         delivery_time = jsonObject.get("delivery_time").getAsString();
@@ -267,7 +284,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             new GetSellerRating().execute(link);
             descriptionTextView.setText("Description: \n \n" + description);
             adPrice.setText(price + currency);
-            deliveryTimeTextView.setText(delivery_time + "H");
+            deliveryTimeTextView.setText(delivery_time + "Days");
             LinearLayout layout = (LinearLayout) findViewById(R.id.linear);
             setTitle(title);
             int value = 0;
@@ -297,10 +314,10 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                 item.setVisible(true);
                 linearLayout.setVisibility(View.GONE);
             }
-            if (!productStatus.equals("true")) {
-                new GetBidsTask().execute();
-            } else if (productStatus.equals("")){
+            new GetBidsTask().execute();
+            if (productStatus.equals("true") || !winner.trim().isEmpty()) {
                 linearLayout.setVisibility(View.GONE);
+                soldItem.setVisible(true);
             }
         }
     }
@@ -345,6 +362,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
 
         /**
          * Custom bids adapter to display bids on ad.
+         *
          * @param data
          * @param activity
          */
@@ -511,10 +529,14 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         final View promptView = layoutInflater.inflate(R.layout.user_info_rating_bar, null);
         TextView sellerName = (TextView) promptView.findViewById(R.id.seller_user_name);
         TextView textView = (TextView) promptView.findViewById(R.id.write_review);
-        if (winner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
-        if (!Helpers.getBooleanValueForReview(adPrimaryKey)) {
+        System.out.println(winner);
+        System.out.println(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME));
+        System.out.println((winner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))));
+        System.out.println(Helpers.getBooleanValueForReview(adPrimaryKey));
+        if (winner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME)) &&
+                !Helpers.getBooleanValueForReview(adPrimaryKey)) {
             textView.setVisibility(View.VISIBLE);
-        }
+
         }
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -734,6 +756,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
 
     /**
      * Method returns json formatted data to send to server
+     *
      * @param starsValue
      * @param message
      * @return

@@ -64,7 +64,7 @@
                     android:id="@+id/deliverTime"
                     android:layout_width="130dp"
                     android:layout_height="50dp"
-                    android:hint="Delivery time in hours"
+                    android:hint="Delivery Days "
                     android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
 
