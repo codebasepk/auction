@@ -306,13 +306,13 @@ public class AdsDetailFragment extends Fragment {
                     getContext(), new CustomAdapter.OnItemClickListener() {
                 @Override
                 public void onItem(Integer item) {
-                    Sell sell = new Sell();
-                    FragmentTransaction tx = getFragmentManager().beginTransaction();
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("update", item);
-                    sell.setArguments(bundle);
-                    tx.replace(R.id.container, sell);
-                    tx.commit();
+//                    Sell sell = new Sell();
+//                    FragmentTransaction tx = getFragmentManager().beginTransaction();
+//                    Bundle bundle = new Bundle();
+//                    bundle.putInt("update", item);
+//                    sell.setArguments(bundle);
+//                    tx.replace(R.id.container, sell);
+//                    tx.commit();
                 }
 
                 @Override

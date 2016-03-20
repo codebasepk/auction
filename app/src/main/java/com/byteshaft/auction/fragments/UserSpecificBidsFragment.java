@@ -71,7 +71,7 @@ public class UserSpecificBidsFragment extends Fragment {
         mRecyclerView.canScrollVertically(LinearLayoutManager.VERTICAL);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
-        new GetUserSpecificBids(getActivity()).execute();
+        new BidBasedAdsTask(getActivity()).execute();
         return mBaseView;
     }
 
@@ -168,12 +168,22 @@ public class UserSpecificBidsFragment extends Fragment {
     /**
      * Task to get ads on which user posted his bids.
      */
-    static class GetUserSpecificBids extends AsyncTask<String, String, ArrayList<Integer>> {
+    static class BidBasedAdsTask extends AsyncTask<String, String, ArrayList<Integer>> {
 
         private Activity mActivity;
 
-        public GetUserSpecificBids(Activity activity) {
+        public BidBasedAdsTask(Activity activity) {
             this.mActivity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = new ProgressDialog(mActivity);
+            mProgressDialog.setMessage("fetching your ads...");
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
         }
 
         @Override
@@ -227,7 +237,8 @@ public class UserSpecificBidsFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<Integer> s) {
             super.onPostExecute(s);
-            customAdapter = new CustomAdapter(idsArray, mActivity);
+            mProgressDialog.dismiss();
+            customAdapter = new CustomAdapter(s, mActivity);
             mRecyclerView.setAdapter(customAdapter);
         }
     }
