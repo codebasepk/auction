@@ -54,7 +54,7 @@ import nl.changer.polypicker.utils.ImageInternalFetcher;
 /**
  * seller part where user can add title, description, images etc for ad and post the ad.
  */
-public class Sell extends Fragment implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
+public class Sell extends Fragment implements View.OnClickListener {
 
     private EditText itemTitle;
     private EditText itemDescription;
@@ -62,10 +62,9 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
     private Button submitButton;
     private ImageButton addImageButton;
     private Spinner categorySpinner;
-    private RadioGroup currencyGroup;
     private ArrayList<Uri> imagesArray;
     private View mBaseView;
-    private String currency = "";
+    private String currency = "SAR";
     private String category = "";
     // static categories will be removed when api is connected
     private ArrayList<String> list;
@@ -115,13 +114,10 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         mItemAmount = (EditText) mBaseView.findViewById(R.id.item_price);
         submitButton = (Button) mBaseView.findViewById(R.id.btn_submit);
         addImageButton = (ImageButton) mBaseView.findViewById(R.id.btn_add_image);
-        currencyGroup = (RadioGroup) mBaseView.findViewById(R.id.currency_group);
         deliveryTimeEditText = (EditText) mBaseView.findViewById(R.id.deliverTime);
         submitButton.setOnClickListener(this);
         addImageButton.setOnClickListener(this);
         categorySpinner = (Spinner) mBaseView.findViewById(R.id.spinner);
-        currencyGroup.setOnCheckedChangeListener(this);
-        currency = getSelectedCurrency(currencyGroup.getCheckedRadioButtonId());
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_dropdown_item, list);
         categorySpinner.setAdapter(adapter);
@@ -139,15 +135,6 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
         categorySpinner.setSelection(0, true);
         category = (String) categorySpinner.getSelectedItem();
         return mBaseView;
-    }
-
-    // get the relevant currency method takes radioButtonId as parameter
-    private String getSelectedCurrency(int buttonId) {
-        if (buttonId == R.id.radio_dollar) {
-            return "USD";
-        } else {
-            return "SAR";
-        }
     }
 
     @Override
@@ -304,11 +291,6 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
                 .build();
         ImagePickerActivity.setConfig(config);
         startActivityForResult(intent, INTENT_REQUEST_GET_N_IMAGES);
-    }
-
-    @Override
-    public void onCheckedChanged(RadioGroup group, int checkedId) {
-        currency = getSelectedCurrency(checkedId);
     }
 
     @Override
@@ -475,11 +457,6 @@ public class Sell extends Fragment implements View.OnClickListener, RadioGroup.O
             itemDescription.setText(description);
             mItemAmount.setText(price);
             deliveryTimeEditText.setText(delivery_time);
-            if (currency.equals("SAR")) {
-                currencyGroup.check(R.id.radio_riyal);
-            } else if (currency.equals("USD")) {
-                currencyGroup.check(R.id.radio_dollar);
-            }
             getActivity().setTitle("Update");
             categorySpinner.setSelection(list.indexOf(category));
             submitButton.setText("update");
