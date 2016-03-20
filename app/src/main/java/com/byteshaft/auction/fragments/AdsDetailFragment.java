@@ -242,7 +242,7 @@ public class AdsDetailFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             mProgressDialog = new ProgressDialog(getActivity());
-            mProgressDialog.setMessage("fetching your ads...");
+            mProgressDialog.setMessage("loading...");
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.setCancelable(false);
             mProgressDialog.show();

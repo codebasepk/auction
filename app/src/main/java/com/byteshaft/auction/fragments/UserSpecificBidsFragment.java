@@ -171,6 +171,7 @@ public class UserSpecificBidsFragment extends Fragment {
     static class BidBasedAdsTask extends AsyncTask<String, String, ArrayList<Integer>> {
 
         private Activity mActivity;
+        private boolean noInternet = false;
 
         public BidBasedAdsTask(Activity activity) {
             this.mActivity = activity;
@@ -226,9 +227,9 @@ public class UserSpecificBidsFragment extends Fragment {
                             }
                         }
                     }
-
-
                 }
+            } else {
+                noInternet = true;
             }
 
             return idsArray;
@@ -238,8 +239,13 @@ public class UserSpecificBidsFragment extends Fragment {
         protected void onPostExecute(ArrayList<Integer> s) {
             super.onPostExecute(s);
             mProgressDialog.dismiss();
-            customAdapter = new CustomAdapter(s, mActivity);
-            mRecyclerView.setAdapter(customAdapter);
+            if (!noInternet) {
+                customAdapter = new CustomAdapter(s, mActivity);
+                mRecyclerView.setAdapter(customAdapter);
+            } else if (noInternet) {
+                Helpers.alertDialog(mActivity, "Internet problem",
+                        "There was an internet problem please try again");
+            }
         }
     }
 }

@@ -177,16 +177,16 @@ public class Sell extends Fragment implements View.OnClickListener {
                     Toast.makeText(AppGlobals.getContext(), "please select at least one image", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (updateProcess && !itemTitle.getText().toString().trim().isEmpty() &&
-                        !itemDescription.getText().toString().trim().isEmpty() &&
-                        !mItemAmount.getText().toString().isEmpty() && mMedia.size() > 0 &&
-                        !currency.trim().isEmpty() &&
-                        Integer.valueOf(deliveryTimeEditText.getText().toString()) <= 7) {
-                    String[] dataToUpdate = {itemTitle.getText().toString(),
-                            itemDescription.getText().toString(), mItemAmount.getText().toString(),
-                            currency, category, deliveryTimeEditText.getText().toString()};
-                    new UpdateAdTask().execute(dataToUpdate);
-                }
+//                if (updateProcess && !itemTitle.getText().toString().trim().isEmpty() &&
+//                        !itemDescription.getText().toString().trim().isEmpty() &&
+//                        !mItemAmount.getText().toString().isEmpty() && mMedia.size() > 0 &&
+//                        !currency.trim().isEmpty() &&
+//                        Integer.valueOf(deliveryTimeEditText.getText().toString()) <= 7) {
+//                    String[] dataToUpdate = {itemTitle.getText().toString(),
+//                            itemDescription.getText().toString(), mItemAmount.getText().toString(),
+//                            currency, category, deliveryTimeEditText.getText().toString()};
+//                    new UpdateAdTask().execute(dataToUpdate);
+//                }
                 break;
             case R.id.btn_add_image:
                 // here we check for camera permission
