@@ -68,30 +68,6 @@
                     android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
 
-            <RadioGroup
-                android:id="@+id/currency_group"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/description"
-                android:layout_toEndOf="@+id/amount_layout"
-                android:layout_toRightOf="@+id/amount_layout"
-                android:paddingLeft="30dp">
-
-                <RadioButton
-                    android:id="@+id/radio_dollar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="US Dollar" />
-
-                <RadioButton
-                    android:id="@+id/radio_riyal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Saudi Riyal" />
-
-            </RadioGroup>
-
             <Spinner
                 android:id="@+id/spinner"
                 style="@android:style/Widget.Holo.Light.Spinner"
