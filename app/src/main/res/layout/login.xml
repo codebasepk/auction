@@ -63,17 +63,5 @@
             android:text="Register"
             android:background="@color/bluish"
             android:id="@+id/register_button" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:textSize="10sp"
-            android:text="forgot password"
-            android:textColor="@color/forget_password_background"
-            android:layout_margin="10dp"
-            android:id="@+id/forget_password"
-            android:layout_gravity="right" />
-
     </LinearLayout>
 </ScrollView>

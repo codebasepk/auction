@@ -2,7 +2,6 @@ package com.byteshaft.auction.register_login;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -10,14 +9,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.byteshaft.auction.MainActivity;
@@ -46,7 +42,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText mEditTextPassword;
     private Button mLoginButton;
     public static ProgressDialog sProgressDialog;
-    private TextView forgetPassword;
     private String profilePicUrl = "";
     private static LoginActivity sInstance;
     String[] loginData;
@@ -67,8 +62,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mEditTextUserName = (EditText) findViewById(R.id.username_login);
         mEditTextPassword = (EditText) findViewById(R.id.password_login);
         mLoginButton = (Button) findViewById(R.id.btn_login);
-        forgetPassword = (TextView) findViewById(R.id.forget_password);
-        forgetPassword.setOnClickListener(this);
         mLoginButton.setOnClickListener(this);
         mRegisterButton.setOnClickListener(this);
     }
@@ -116,9 +109,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }
                 }
                 break;
-            case R.id.forget_password:
-                showCustomDialog();
-                break;
         }
     }
 
@@ -144,38 +134,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
         }
-
     }
-
-    // password recovery dialog
-    private void showCustomDialog() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Password Recovery");
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(20, 5, 30, 0);
-        EditText textBox = new EditText(LoginActivity.this);
-        textBox.setHint("Enter Your Email");
-        layout.addView(textBox, params);
-        alert.setView(layout);
-        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // do nothing
-                dialog.dismiss();
-            }
-        });
-
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // do nothing
-                dialog.dismiss();
-            }
-        });
-        alert.show();
-    }
-
 
     @Override
     public void onBackPressed() {
