@@ -87,6 +87,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                if (mEditTextUserName.getText().toString().contains("")) {
+                    Toast.makeText(getApplicationContext(), "Username must not contains any spaces",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (!Helpers.containsDigit(mEditTextPassword.getText().toString())) {
                     Toast.makeText(getApplicationContext(), "password must contain 0-9", Toast.LENGTH_SHORT).show();
                     return;
