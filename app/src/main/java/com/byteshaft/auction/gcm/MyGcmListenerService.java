@@ -40,12 +40,12 @@ public class MyGcmListenerService extends GcmListenerService {
             case "new_ad_posted":
                 if (!data.getString("ad_owner").equals(Helpers
                         .getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
-                    sendNotification("A new ad is posted in your subscribed category", "New Ad Posted !!",
+                    sendNotification("A new product is posted in your subscribed category", "New product Posted !!",
                             SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
                 }
                 break;
             case "half_time_no_bid":
-                    sendNotification("Ad is posted 12h ago , you might be interested in this one", "No Bid",
+                    sendNotification("product is posted 12h ago , you might be interested in this one", "No Bid",
                             SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
                 break;
             case "sold_to_highest_bidder":
@@ -75,7 +75,7 @@ public class MyGcmListenerService extends GcmListenerService {
                 }
                 break;
             case "ad_expired":
-                    sendNotification("An ad is expired", "Ad Expired",
+                    sendNotification("An product is expired", "product Expired",
                             MainActivity.class, "", 0);
                 break;
         }
