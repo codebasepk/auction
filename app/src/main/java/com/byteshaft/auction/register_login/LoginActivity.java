@@ -88,8 +88,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     return;
                 }
 
-                if (mEditTextUserName.getText().toString().contains("")) {
-                    Toast.makeText(getApplicationContext(), "Username must not contains any spaces",
+                if (mEditTextUserName.getText().toString().contains(" ")) {
+                    Toast.makeText(getApplicationContext(), "Username should not contains any spaces",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -232,7 +232,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else if (arrayList.get(0).equals(HttpURLConnection.HTTP_FORBIDDEN)) {
                 sProgressDialog.dismiss();
                 Helpers.alertDialog(LoginActivity.this, "Login Error",
-                        AppGlobals.getLoginResponseMessage());
+                        "Authentication error");
             } else if (arrayList.get(0).equals(AppGlobals.NO_INTERNET)) {
                 sProgressDialog.dismiss();
                 Helpers.alertDialog(LoginActivity.this, "No Internet", "Internet Not Available");

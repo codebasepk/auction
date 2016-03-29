@@ -225,9 +225,12 @@ public class Helpers {
         } else {
             InputStream is = connection.getErrorStream();
             parsedString = convertInputStreamToString(is);
-            JsonParser jsonParser = new JsonParser();
-            JsonObject jsonObject = jsonParser.parse(parsedString).getAsJsonObject();
-            AppGlobals.setLoginResponseMessage(jsonObject.get("detail").getAsString());
+            System.out.println(parsedString);
+            if (!parsedString.contains("Forbidden")) {
+                JsonParser jsonParser = new JsonParser();
+                JsonObject jsonObject = jsonParser.parse(parsedString).getAsJsonObject();
+                AppGlobals.setLoginResponseMessage(jsonObject.get("detail").getAsString());
+            }
             return new String[]{String.valueOf(connection.getResponseCode()), parsedString};
         }
 
