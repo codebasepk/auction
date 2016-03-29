@@ -330,6 +330,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.BidView> {
         private BidView bidView;
         private ArrayList<Integer> items;
+        private Activity mActivity;
 
         /**
          * Custom bids adapter to display bids on ad.
@@ -340,6 +341,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         public BidsAdapter(ArrayList<Integer> data, Activity activity) {
             super();
             this.items = data;
+            this.mActivity = activity;
         }
 
         @Override
@@ -551,20 +553,13 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
         LayoutInflater layoutInflater = LayoutInflater.from(SelectedAdDetail.this);
         final View promptView = layoutInflater.inflate(R.layout.review_dialog_layout, null);
         final RatingBar reviewRatingBar = (RatingBar) promptView.findViewById(R.id.review_bar);
-        final EditText reviewEditText = (EditText) promptView.findViewById(R.id.review_edittext);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(SelectedAdDetail.this);
         alertDialog.setView(promptView);
         alertDialog.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (reviewEditText.getText().toString().trim().isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "please write a review", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (!reviewEditText.getText().toString().trim().isEmpty()) {
-                    String[] reviewData = {String.valueOf(reviewRatingBar.getRating()), reviewEditText.getText().toString()};
+                    String[] reviewData = {String.valueOf(reviewRatingBar.getRating()), ""};
                     new SendReviewTask().execute(reviewData);
-                }
                 dialog.dismiss();
             }
         });
