@@ -24,7 +24,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -149,10 +148,6 @@ public class Sell extends Fragment implements View.OnClickListener {
                     Toast.makeText(AppGlobals.getContext(), "please select currency", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (imagesArray.size() < 1 && !updateProcess) {
-                    Toast.makeText(AppGlobals.getContext(), "please select at least one image", Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 if (itemTitle.getText().toString().trim().isEmpty() ||
                         itemDescription.getText().toString().trim().isEmpty() ||
                         mItemAmount.getText().toString().trim().isEmpty()) {
@@ -161,6 +156,10 @@ public class Sell extends Fragment implements View.OnClickListener {
                 }
                 if (Integer.valueOf(deliveryTimeEditText.getText().toString()) > 7) {
                     Toast.makeText(getActivity(), "delivery time must be less than a week", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (imagesArray.size() < 1 && !updateProcess) {
+                    Toast.makeText(AppGlobals.getContext(), "please select at least one image", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (!updateProcess && !itemTitle.getText().toString().trim().isEmpty() &&

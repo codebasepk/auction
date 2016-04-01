@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.byteshaft.auction.fragments.AdsDetailFragment;
 import com.byteshaft.auction.fragments.Buy;
 import com.byteshaft.auction.fragments.CategoriesFragment;
+import com.byteshaft.auction.fragments.Faq;
 import com.byteshaft.auction.fragments.ReviewFragment;
 import com.byteshaft.auction.fragments.Sell;
 import com.byteshaft.auction.fragments.UserSettingFragment;
@@ -228,12 +229,15 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_user:
                 fragmentClass = UserSettingFragment.class;
                 break;
+            case R.id.my_reviews:
+                fragmentClass = ReviewFragment.class;
+                break;
+            case R.id.nav_faq:
+                fragmentClass = Faq.class;
+                break;
             case R.id.logout:
                 Helpers.removeUserData();
                 logout = true;
-                break;
-            case R.id.my_reviews:
-                fragmentClass = ReviewFragment.class;
                 break;
             default:
                 fragmentClass = Buy.class;
