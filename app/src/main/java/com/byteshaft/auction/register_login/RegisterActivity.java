@@ -184,7 +184,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                 if (mPasswordEditText.getText().toString().length() < 6 &&
                         mConfPasswordEditText.getText().toString().length() < 6) {
-                    Toast.makeText(getApplicationContext(), "password must contain 6 character", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "password must contain at least 6 characters", Toast.LENGTH_SHORT).show();
                     return;
                 }
 

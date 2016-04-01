@@ -181,7 +181,7 @@ public class UserSpecificBidsFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             mProgressDialog = new ProgressDialog(mActivity);
-            mProgressDialog.setMessage("fetching your ads...");
+            mProgressDialog.setMessage("fetching your bids...");
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.setCancelable(false);
             mProgressDialog.show();
