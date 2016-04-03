@@ -104,8 +104,8 @@ public class UserSpecificBidsFragment extends Fragment {
             customView.descriptionTextView.setText(descriptionHashMap.get(items.get(position)));
             customView.priceTextView.setText(priceHashMap.get(items.get(position)) + " " +
                     currencyHashMap.get(items.get(position)));
-            customView.userBidsPrice.setText(bidPriceHashMap.get(items.get(position)) + " " +
-                    currencyHashMap.get(items.get(position)));
+//            customView.userBidsPrice.setText(bidPriceHashMap.get(items.get(position)) + " " +
+//                    currencyHashMap.get(items.get(position)));
             Picasso.with(mActivity)
                     .load(imagesUrlHashMap.get(items.get(position)))
                     .resize(200, 200)

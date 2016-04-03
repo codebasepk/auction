@@ -425,7 +425,7 @@ public class CategoriesFragment extends Fragment {
                 Helpers.saveBooleanToSharedPreference(AppGlobals.KEY_SELECTED_CATEGORY_BOOLEAN_STATUS, true);
                 Log.i("OnPostExecute", String.valueOf(selectedCategories));
                 Helpers.saveCategories(selectedCategories);
-                Toast.makeText(getActivity(), "success", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "updated", Toast.LENGTH_SHORT).show();
                 FragmentTransaction tx = getFragmentManager().beginTransaction();
                 tx.replace(R.id.container, new Buy());
                 tx.commit();
