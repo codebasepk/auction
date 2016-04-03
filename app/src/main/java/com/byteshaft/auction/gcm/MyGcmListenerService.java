@@ -75,7 +75,8 @@ public class MyGcmListenerService extends GcmListenerService {
                 }
                 break;
             case "ad_expired":
-                    sendNotification("An product is expired", "product Expired",
+                    sendNotification("A product is expired", "Ad Expired",
+
                             MainActivity.class, "", 0);
                 break;
         }

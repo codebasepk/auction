@@ -2,13 +2,16 @@ package com.byteshaft.auction.register_login;
 
 
 import android.app.ProgressDialog;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.byteshaft.auction.R;
@@ -28,7 +32,9 @@ import com.byteshaft.auction.utils.Helpers;
 
 import org.json.JSONException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -45,7 +51,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private EditText mConfPasswordEditText;
     private Button mRegisterButton;
     private boolean mPasswordMatched = false;
-//    private ImageButton dpButton;
+    private ImageButton dpButton;
     private String[] registrationData;
     private EditText mPhoneNumber;
     private EditText mAddress;
@@ -78,6 +84,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         mAddress = (EditText) findViewById(R.id.user_address);
         mCity = (EditText) findViewById(R.id.user_city);
         mRegisterButton = (Button) findViewById(R.id.btn_send);
+        dpButton = (ImageButton) findViewById(R.id.button_dp);
+        dpButton.setOnClickListener(this);
         mRegisterButton.setOnClickListener(this);
         mConfPasswordEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -176,7 +184,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                 if (mPasswordEditText.getText().toString().length() < 6 &&
                         mConfPasswordEditText.getText().toString().length() < 6) {
-                    Toast.makeText(getApplicationContext(), "password must contain 6 character", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "password must contain at least 6 characters", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -189,9 +197,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     new RegistrationTask().execute(data);
                 }
                 break;
-//            case R.id.button_dp:
-//                selectImage();
-//                break;
+            case R.id.button_dp:
+                selectImage();
+                break;
         }
 
     }
@@ -238,50 +246,51 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 } else if (items[item].equals("Cancel")) {
                     dialog.dismiss();
                 } else if (items[item].equals("Remove photo")) {
-//                    dpButton.setImageDrawable(null);
+                    dpButton.setImageDrawable(null);
                 }
+
             }
         });
         builder.show();
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (resultCode == RESULT_OK) {
-//            if (requestCode == REQUEST_CAMERA) {
-//                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-//                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-//                thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-//                destination = new File(Environment.getExternalStorageDirectory(),
-//                        System.currentTimeMillis() + ".jpg");
-//                imageUrl = destination.getAbsolutePath();
-//                FileOutputStream fo;
-//                try {
-//                    destination.createNewFile();
-//                    fo = new FileOutputStream(destination);
-//                    fo.write(bytes.toByteArray());
-//                    fo.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                profilePic = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
-//                dpButton.setImageBitmap(thumbnail);
-//            } else if (requestCode == SELECT_FILE) {
-//                selectedImageUri = data.getData();
-//                String[] projection = {MediaStore.MediaColumns.DATA};
-//                CursorLoader cursorLoader = new CursorLoader(this, selectedImageUri, projection, null, null,
-//                        null);
-//                Cursor cursor = cursorLoader.loadInBackground();
-//                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-//                cursor.moveToFirst();
-//                String selectedImagePath = cursor.getString(column_index);
-//                profilePic = Helpers.getBitMapOfProfilePic(selectedImagePath);
-//                dpButton.setImageBitmap(profilePic);
-//                imageUrl = String.valueOf(selectedImagePath);
-//            }
-//        }
-//    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_CAMERA) {
+                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+                destination = new File(Environment.getExternalStorageDirectory(),
+                        System.currentTimeMillis() + ".jpg");
+                imageUrl = destination.getAbsolutePath();
+                FileOutputStream fo;
+                try {
+                    destination.createNewFile();
+                    fo = new FileOutputStream(destination);
+                    fo.write(bytes.toByteArray());
+                    fo.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                profilePic = Helpers.getBitMapOfProfilePic(destination.getAbsolutePath());
+                dpButton.setImageBitmap(thumbnail);
+            } else if (requestCode == SELECT_FILE) {
+                selectedImageUri = data.getData();
+                String[] projection = {MediaStore.MediaColumns.DATA};
+                CursorLoader cursorLoader = new CursorLoader(this, selectedImageUri, projection, null, null,
+                        null);
+                Cursor cursor = cursorLoader.loadInBackground();
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                cursor.moveToFirst();
+                String selectedImagePath = cursor.getString(column_index);
+                profilePic = Helpers.getBitMapOfProfilePic(selectedImagePath);
+                dpButton.setImageBitmap(profilePic);
+                imageUrl = String.valueOf(selectedImagePath);
+            }
+        }
+    }
 
     // Member class to send registration data to server and check
     class RegistrationTask extends AsyncTask<String, String, String[]> {

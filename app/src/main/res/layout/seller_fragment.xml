@@ -50,7 +50,7 @@
                     android:id="@+id/item_price"
                     android:layout_width="150dp"
                     android:layout_height="50dp"
-                    android:hint="Amount"
+                    android:hint="Price"
                     android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
 

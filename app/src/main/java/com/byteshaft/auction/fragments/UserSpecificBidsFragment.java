@@ -104,8 +104,8 @@ public class UserSpecificBidsFragment extends Fragment {
             customView.descriptionTextView.setText(descriptionHashMap.get(items.get(position)));
             customView.priceTextView.setText(priceHashMap.get(items.get(position)) + " " +
                     currencyHashMap.get(items.get(position)));
-            customView.userBidsPrice.setText(bidPriceHashMap.get(items.get(position)) + " " +
-                    currencyHashMap.get(items.get(position)));
+//            customView.userBidsPrice.setText(bidPriceHashMap.get(items.get(position)) + " " +
+//                    currencyHashMap.get(items.get(position)));
             Picasso.with(mActivity)
                     .load(imagesUrlHashMap.get(items.get(position)))
                     .resize(200, 200)
@@ -181,7 +181,7 @@ public class UserSpecificBidsFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             mProgressDialog = new ProgressDialog(mActivity);
-            mProgressDialog.setMessage("fetching your ads...");
+            mProgressDialog.setMessage("fetching your bids...");
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.setCancelable(false);
             mProgressDialog.show();
