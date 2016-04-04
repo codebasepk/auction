@@ -324,6 +324,7 @@ public class CategoriesFragment extends Fragment {
                 }
                 if (RegisterActivity.sRegisterProgressDialog != null && AppGlobals.sRegisterProcess) {
                     RegisterActivity.sRegisterProgressDialog.dismiss();
+                    Toast.makeText(AppGlobals.getContext(), "success", Toast.LENGTH_SHORT).show();
                     RegisterActivity.getInstance().finish();
                 }
                 LoginActivity.getLoginActivityInstance().finish();

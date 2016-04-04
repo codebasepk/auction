@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.byteshaft.auction.R;
+import com.byteshaft.auction.register_login.RegisterActivity;
 import com.byteshaft.auction.utils.AppGlobals;
 import com.byteshaft.auction.utils.Helpers;
 import com.byteshaft.auction.utils.MultiPartUtility;
@@ -56,6 +58,7 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
     private EditText mAddress;
     private EditText mCity;
     private EditText mNewPassword;
+    private boolean mPasswordMatched = false;
     private Button mButtonDone;
     private boolean emailChanged = false;
     private boolean passWordChanged = false;
@@ -87,6 +90,36 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
         mButtonDone.setOnClickListener(this);
         mButtonDone.setVisibility(View.GONE);
         getValuesFromSharedPreference();
+        mNewPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                mPasswordMatched = false;
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (mUserCurrentPassword.getText().toString().equals
+                        (mNewPassword.getText().toString())) {
+                    mNewPassword.setCompoundDrawables(null, null, null, null);
+                } else {
+                    mNewPassword.setError("password does not match");
+                    mPasswordMatched = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (mUserCurrentPassword.getText().toString().equals
+                        (mNewPassword.getText().toString())) {
+                    Drawable drawable = getResources().getDrawable(R.drawable.tick);
+                    drawable.setBounds(0, 0, 20, 20);
+                    mNewPassword.setCompoundDrawables(null, null, drawable, null);
+                    mPasswordMatched = true;
+                }
+
+            }
+        });
         mUserEmail.addTextChangedListener(new TextWatcher() {
             private boolean textChanged = false;
             private String textBeforeChanged;
@@ -314,12 +347,12 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_done:
-                System.out.println(emailChanged);
-                System.out.println(passWordChanged);
-                System.out.println(cityChanged);
-                System.out.println(addressChanged);
-                System.out.println(profilePictureChanged);
-                System.out.println(phoneNumberChanged);
+                boolean validEmail = RegisterActivity.isValidEmail(mUserEmail.getText().toString());
+                if (!validEmail) {
+                    Toast.makeText(AppGlobals.getContext(), "please enter a valid email", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if (passWordChanged && !Helpers.containsDigit(mNewPassword.getText().toString())) {
                     Toast.makeText(getActivity(), "password must contain digit", Toast.LENGTH_SHORT).show();
                     return;
@@ -368,7 +401,7 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
         switch (item.getItemId()) {
             case R.id.user_profile_button:
                 mUserEmail.setEnabled(true);
-                mUserEmail.setSelection(mUserEmail.getText().length());
+                mUserEmail.setSelection(mUserCurrentPassword.getText().length());
                 mUserCurrentPassword.setEnabled(true);
                 mUserCurrentPassword.setSelection(mUserCurrentPassword.getText().length());
                 mNewPassword.setEnabled(true);
@@ -455,7 +488,7 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
                 }
             }
             if (AppGlobals.getPostResponse() == HttpURLConnection.HTTP_OK) {
-                Toast.makeText(getActivity(), "updated", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "your profile is successfully edited", Toast.LENGTH_SHORT).show();
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_EMAIL, strings[0]);
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PASSWORD, strings[1]);
                 Helpers.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER, strings[2]);

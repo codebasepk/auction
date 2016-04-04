@@ -74,7 +74,8 @@ public class Sell extends Fragment implements View.OnClickListener {
     private ViewGroup mSelectedImagesContainer;
     private HashSet<Uri> mMedia = new HashSet<>();
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_CAMERA = 0;
-    private EditText deliveryTimeEditText;
+    private Spinner deliveryTimeSpinner;
+    private String[] deliveryTimeList = {"1", "2", "3", "4", "5", "6", "7"};
     private int adPrimaryKey;
     private ArrayList<String> imagesUrls;
     private String description;
@@ -113,7 +114,10 @@ public class Sell extends Fragment implements View.OnClickListener {
         mItemAmount = (EditText) mBaseView.findViewById(R.id.item_price);
         submitButton = (Button) mBaseView.findViewById(R.id.btn_submit);
         addImageButton = (ImageButton) mBaseView.findViewById(R.id.btn_add_image);
-        deliveryTimeEditText = (EditText) mBaseView.findViewById(R.id.deliverTime);
+        deliveryTimeSpinner = (Spinner) mBaseView.findViewById(R.id.deliverTime);
+        ArrayAdapter<String> deliveryTimeAdapter = new ArrayAdapter<String>
+                (getContext(),android.R.layout.simple_spinner_dropdown_item, deliveryTimeList);
+        deliveryTimeSpinner.setAdapter(deliveryTimeAdapter);
         submitButton.setOnClickListener(this);
         addImageButton.setOnClickListener(this);
         categorySpinner = (Spinner) mBaseView.findViewById(R.id.spinner);
@@ -154,7 +158,7 @@ public class Sell extends Fragment implements View.OnClickListener {
                     Toast.makeText(getActivity(), "All fields must be filled", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (Integer.valueOf(deliveryTimeEditText.getText().toString()) > 7) {
+                if (Integer.valueOf(deliveryTimeSpinner.getSelectedItem().toString()) > 7) {
                     Toast.makeText(getActivity(), "delivery time must be less than a week", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -165,11 +169,12 @@ public class Sell extends Fragment implements View.OnClickListener {
                 if (!updateProcess && !itemTitle.getText().toString().trim().isEmpty() &&
                         !itemDescription.getText().toString().trim().isEmpty() &&
                         !mItemAmount.getText().toString().isEmpty() && imagesArray.size() > 0 &&
-                        !currency.trim().isEmpty() && Integer.valueOf(deliveryTimeEditText.getText().toString()) <= 7) {
+                        !currency.trim().isEmpty() && Integer.valueOf(deliveryTimeSpinner
+                        .getSelectedItem().toString()) <= 7) {
                     category = categorySpinner.getSelectedItem().toString();
                     String[] dataToUpload = {itemTitle.getText().toString(),
                             itemDescription.getText().toString(), mItemAmount.getText().toString(),
-                            currency, category, deliveryTimeEditText.getText().toString()};
+                            currency, category, deliveryTimeSpinner.getSelectedItem().toString()};
                     new PostDataTask().execute(dataToUpload);
                 }
                 if (updateProcess && mMedia.size() < 1) {
@@ -386,7 +391,7 @@ public class Sell extends Fragment implements View.OnClickListener {
                 itemTitle.setText("");
                 itemDescription.setText("");
                 mItemAmount.setText("");
-                deliveryTimeEditText.setText("");
+                deliveryTimeSpinner.setSelection(0);
             } else if (s.equals(AppGlobals.NO_INTERNET)) {
                 Helpers.alertDialog(getActivity(), "No Internet", "please check your internet" +
                         " and try again");
@@ -455,7 +460,7 @@ public class Sell extends Fragment implements View.OnClickListener {
             itemTitle.setText(title);
             itemDescription.setText(description);
             mItemAmount.setText(price);
-            deliveryTimeEditText.setText(delivery_time);
+            deliveryTimeSpinner.setSelection(deliveryTimeSpinner.getSelectedItemPosition());
             getActivity().setTitle("Update");
             categorySpinner.setSelection(list.indexOf(category));
             submitButton.setText("update");
@@ -558,7 +563,7 @@ public class Sell extends Fragment implements View.OnClickListener {
                 itemTitle.setText("");
                 itemDescription.setText("");
                 mItemAmount.setText("");
-                deliveryTimeEditText.setText("");
+                deliveryTimeSpinner.setSelection(deliveryTimeSpinner.getSelectedItemPosition());
             }
             File file = new File(AppGlobals.root + AppGlobals.TEMP_FOLDER);
             if (file.exists()) {

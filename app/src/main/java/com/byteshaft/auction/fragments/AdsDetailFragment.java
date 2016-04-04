@@ -321,7 +321,7 @@ public class AdsDetailFragment extends Fragment {
                     System.out.println(adPrimaryKey);
 
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-                    alertDialogBuilder.setMessage("Do you want to delete this add?");
+                    alertDialogBuilder.setMessage("Do you want to delete this product?");
                     alertDialogBuilder.setPositiveButton("Ok",
                             new DialogInterface.OnClickListener() {
 

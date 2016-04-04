@@ -45,7 +45,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="contact seller"
+        android:background="@drawable/contact_seller"
         android:id="@+id/contact_button"
         android:layout_alignTop="@+id/about_seller"
         android:layout_alignParentRight="true"
@@ -54,7 +54,7 @@
     <TextView
         android:id="@+id/write_review"
         android:visibility="invisible"
-        android:text="write review"
+        android:text="make review"
         android:paddingLeft="20dp"
         android:layout_marginTop="4dp"
         android:textColor="@color/bluish"
