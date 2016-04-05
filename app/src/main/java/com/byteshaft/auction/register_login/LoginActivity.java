@@ -94,7 +94,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     return;
                 }
                 if (!Helpers.containsDigit(mEditTextPassword.getText().toString())) {
-                    Toast.makeText(getApplicationContext(), "invalid username/password", Toast.LENGTH_SHORT).show();
+                    Helpers.alertDialog(LoginActivity.this, "Login Error",
+                            "invalid username/password");
                     return;
                 }
                 if (!mEditTextUserName.getText().toString().trim().isEmpty()

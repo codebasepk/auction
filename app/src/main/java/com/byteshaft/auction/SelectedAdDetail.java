@@ -74,7 +74,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public static int itemInArray = 0;
     public static int myBidPrimaryKey = 0;
     public boolean mCanUpdate = false;
-//    private MenuItem item;
+    private MenuItem item;
     public static MenuItem soldItem;
     public String productOwner = "";
     private TextView deliveryTimeTextView;
@@ -160,7 +160,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.chat_for_user, menu);
-        menu.getItem(2).setVisible(false);
+        item = menu.findItem(R.id.chat_button);
         soldItem = menu.findItem(R.id.sold);
         return true;
     }
@@ -309,7 +309,7 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
             }
             System.out.println(productOwner == null);
             if (productOwner.equals(Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
-//                item.setVisible(true);
+                item.setVisible(true);
                 linearLayout.setVisibility(View.GONE);
             }
             if (!productStatus.equals("true")) {

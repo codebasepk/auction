@@ -30,7 +30,6 @@ public class MyGcmListenerService extends GcmListenerService {
      *             For Set of keys use data.keySet().
      */
     // [START receive_message]
-
     @Override
     public void onMessageReceived(String from, Bundle data) {
         System.out.println(data);
@@ -45,8 +44,8 @@ public class MyGcmListenerService extends GcmListenerService {
                 }
                 break;
             case "half_time_no_bid":
-                    sendNotification("product is posted 12h ago , you might be interested in this one", "No Bid",
-                            SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
+                sendNotification("product is posted 12h ago , you might be interested in this one", "No Bid",
+                        SelectedAdDetail.class, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
                 break;
             case "sold_to_highest_bidder":
                 String message;
@@ -59,10 +58,10 @@ public class MyGcmListenerService extends GcmListenerService {
                     message = "Product, is sold to highest bidder";
                     activity = MainActivity.class;
                 }
-                    sendNotification(message, "Product sold",
-                            activity, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
+                sendNotification(message, "Product sold",
+                        activity, AppGlobals.detail, Integer.valueOf(data.getString("ad_id")));
                 String id = data.get("ad_id").toString();
-                if (Integer.valueOf(id)  == SelectedAdDetail.adPrimaryKey) {
+                if (Integer.valueOf(id) == SelectedAdDetail.adPrimaryKey) {
                     if (SelectedAdDetail.getInstance() != null) {
                         SelectedAdDetail.getInstance().runOnUiThread(new Runnable() {
                             @Override
@@ -75,9 +74,12 @@ public class MyGcmListenerService extends GcmListenerService {
                 }
                 break;
             case "ad_expired":
+                if (data.getString("ad_owner").equals
+                        (Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
                     sendNotification("A product is expired", "Ad Expired",
-
                             MainActivity.class, "", 0);
+                }
+
                 break;
         }
     }
@@ -88,7 +90,7 @@ public class MyGcmListenerService extends GcmListenerService {
      *
      * @param message GCM message received.
      */
-    private void sendNotification(String message, String title, Class  activity, String key, int value ) {
+    private void sendNotification(String message, String title, Class activity, String key, int value) {
         Intent intent = new Intent(this, activity);
         intent.putExtra(key, value);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

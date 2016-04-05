@@ -6,20 +6,20 @@
         android:title="Info"
         android:icon="@drawable/info_button"
         android:orderInCategory="100"
-        app:showAsAction="collapseActionView" />
+        app:showAsAction="always" />
 
     <item android:id="@+id/chat_button"
         android:title="Chat"
         android:visible="false"
         android:icon="@drawable/message"
         android:orderInCategory="100"
-        app:showAsAction="collapseActionView" />
+        app:showAsAction="always" />
 
 
     <item android:id="@+id/sold"
         android:title="sold"
-        android:icon="@drawable/sign"
+        android:icon="@drawable/sold"
         android:orderInCategory="100"
-        app:showAsAction="collapseActionView" />
+        app:showAsAction="always" />
 
 </menu>
