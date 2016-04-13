@@ -58,7 +58,7 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
     private EditText mAddress;
     private EditText mCity;
     private EditText mNewPassword;
-    private boolean mPasswordMatched = false;
+    private boolean mPasswordMatched = true;
     private Button mButtonDone;
     private boolean emailChanged = false;
     private boolean passWordChanged = false;
@@ -90,36 +90,50 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
         mButtonDone.setOnClickListener(this);
         mButtonDone.setVisibility(View.GONE);
         getValuesFromSharedPreference();
-        mNewPassword.addTextChangedListener(new TextWatcher() {
+        mUserCurrentPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                mPasswordMatched = false;
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (mUserCurrentPassword.getText().toString().equals
-                        (mNewPassword.getText().toString())) {
-                    mNewPassword.setCompoundDrawables(null, null, null, null);
-                } else {
-                    mNewPassword.setError("password does not match");
-                    mPasswordMatched = false;
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    if (!mUserCurrentPassword.getText().toString().equals(Helpers
+                            .getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD))) {
+                        mPasswordMatched = false;
+                        Toast.makeText(getActivity(), "Current password doesn't match", Toast.LENGTH_SHORT).show();
+                    } else {
+                        mPasswordMatched = true;
+                    }
                 }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (mUserCurrentPassword.getText().toString().equals
-                        (mNewPassword.getText().toString())) {
-                    Drawable drawable = getResources().getDrawable(R.drawable.tick);
-                    drawable.setBounds(0, 0, 20, 20);
-                    mNewPassword.setCompoundDrawables(null, null, drawable, null);
-                    mPasswordMatched = true;
-                }
-
             }
         });
+//        mNewPassword.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                mPasswordMatched = false;
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                if (mUserCurrentPassword.getText().toString().equals
+//                        (mNewPassword.getText().toString())) {
+//                    mNewPassword.setCompoundDrawables(null, null, null, null);
+//                } else {
+//                    mNewPassword.setError("password does not match");
+//                    mPasswordMatched = false;
+//                }
+//            }
+
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                if (mUserCurrentPassword.getText().toString().equals
+//                        (mNewPassword.getText().toString())) {
+//                    Drawable drawable = getResources().getDrawable(R.drawable.tick);
+//                    drawable.setBounds(0, 0, 20, 20);
+//                    mNewPassword.setCompoundDrawables(null, null, drawable, null);
+//                    mPasswordMatched = true;
+//                }
+//
+//            }
+//        });
         mUserEmail.addTextChangedListener(new TextWatcher() {
             private boolean textChanged = false;
             private String textBeforeChanged;
@@ -350,6 +364,11 @@ public class UserSettingFragment extends Fragment implements View.OnClickListene
                 boolean validEmail = RegisterActivity.isValidEmail(mUserEmail.getText().toString());
                 if (!validEmail) {
                     Toast.makeText(AppGlobals.getContext(), "please enter a valid email", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!mPasswordMatched) {
+                    Toast.makeText(getActivity(), "current password doesn't match", Toast.LENGTH_SHORT).show();
                     return;
                 }
 

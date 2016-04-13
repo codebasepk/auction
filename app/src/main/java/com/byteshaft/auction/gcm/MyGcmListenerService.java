@@ -55,7 +55,7 @@ public class MyGcmListenerService extends GcmListenerService {
                     message = "You are the winning bidder";
                     activity = SelectedAdDetail.class;
                 } else {
-                    message = "Product, is sold to highest bidder";
+                    message = "Product is sold to highest bidder";
                     activity = MainActivity.class;
                 }
                 sendNotification(message, "Product sold",
@@ -76,7 +76,7 @@ public class MyGcmListenerService extends GcmListenerService {
             case "ad_expired":
                 if (data.getString("ad_owner").equals
                         (Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_USERNAME))) {
-                    sendNotification("A product is expired", "Ad Expired",
+                    sendNotification("A product is expired", "Product Expired",
                             MainActivity.class, "", 0);
                 }
 

@@ -671,12 +671,12 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
      * Method returns json formatted data to send to server
      *
      * @param starsValue
-     * @param message
+//     * @param message
      * @return
      */
-    private String getJsonObjectString(String starsValue, String message) {
-        return String.format("{\"stars\": \"%s\" , \"review\": \"%s\"}",
-                starsValue, message);
+    private String getJsonObjectString(String starsValue) {
+        return String.format("{\"stars\": \"%s\"}",
+                starsValue);
     }
 
     /*
@@ -700,7 +700,8 @@ public class SelectedAdDetail extends AppCompatActivity implements View.OnClickL
                             + ":" + Helpers.getStringDataFromSharedPreference(AppGlobals.KEY_PASSWORD);
                     String authStringEncoded = Base64.encodeToString(authString.getBytes(), Base64.DEFAULT);
                     connection.setRequestProperty("Authorization", "Basic " + authStringEncoded);
-                    String jsonFormattedData = getJsonObjectString(params[0], params[1]);
+                    String jsonFormattedData = getJsonObjectString(params[0]);
+                    System.out.println(jsonFormattedData);
                     Helpers.sendRequestData(connection, jsonFormattedData);
                     return connection.getResponseCode();
                 } catch (IOException e) {

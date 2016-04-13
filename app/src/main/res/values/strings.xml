@@ -16,4 +16,15 @@
         running the sample again.</string>
     <string name="place_bid">Place Bid</string>
     <string name="update_bid">Update Bid</string>
+    <string name="user_name">User name <font color="#FF0000">*</font></string>
+    <string name="email_address">Email address<font color="#FF0000">*</font></string>
+    <string name="password">Password<font color="#FF0000">*</font></string>
+    <string name="password_confirm">Confirm Password<font color="#FF0000">*</font></string>
+    <string name="phone_number">Phone Number<font color="#FF0000">*</font></string>
+    <string name="address">Address<font color="#FF0000">*</font></string>
+    <string name="city">City<font color="#FF0000">*</font></string>
+    <string name="description">Description<font color="#FF0000">*</font></string>
+    <string name="price">Price<font color="#FF0000">*</font></string>
+    <string name="delivery_days">Delivery Days*<font color="#FF0000">*</font></string>
+    <string name="title">Title<font color="#FF0000">*</font></string>
 </resources>

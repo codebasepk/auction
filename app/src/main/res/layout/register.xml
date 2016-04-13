@@ -31,8 +31,7 @@
                 android:id="@+id/user_name_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="user name*"
-                android:textColorHint="@color/gray"
+                android:hint="@string/user_name"
                 android:inputType="textPersonName" />
         </android.support.design.widget.TextInputLayout>
 
@@ -46,8 +45,7 @@
                 android:id="@+id/email_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email address*"
-                android:textColorHint="@color/colorDefault"
+                android:hint="@string/email_address"
                 android:inputType="textEmailAddress" />
         </android.support.design.widget.TextInputLayout>
 
@@ -61,8 +59,7 @@
                 android:id="@+id/password_login"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Password*"
-                android:textColorHint="@color/colorDefault"
+                android:hint="@string/password"
                 android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
 
@@ -76,8 +73,7 @@
                 android:id="@+id/password_cof"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Confirm Password*"
-                android:textColorHint="@color/colorDefault"
+                android:hint="@string/password_confirm"
                 android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
 
@@ -91,8 +87,7 @@
                 android:id="@+id/user_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Phone Number*"
-                android:textColorHint="@color/colorDefault"
+                android:hint="@string/phone_number"
                 android:inputType="phone" />
         </android.support.design.widget.TextInputLayout>
 
@@ -106,8 +101,7 @@
                 android:id="@+id/user_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Address*"
-                android:textColorHint="@color/colorDefault"
+                android:hint="@string/address"
                 android:inputType="text" />
         </android.support.design.widget.TextInputLayout>
 
@@ -121,8 +115,7 @@
                 android:id="@+id/user_city"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="City*"
-                android:textColorHint="@color/colorDefault"
+                android:hint="@string/city"
                 android:inputType="text" />
         </android.support.design.widget.TextInputLayout>
 
