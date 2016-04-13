@@ -18,6 +18,7 @@
 
     <item android:id="@+id/sold"
         android:title="sold"
+        android:visible="false"
         android:icon="@drawable/sold"
         android:orderInCategory="100"
         app:showAsAction="always" />

@@ -33,7 +33,7 @@
                 android:id="@+id/user_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="user name"
+                android:hint="user name*"
                 android:textColorHint="@color/gray"
                 android:inputType="textPersonName" />
         </android.support.design.widget.TextInputLayout>
@@ -48,7 +48,7 @@
                 android:id="@+id/user_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email address"
+                android:hint="Email address*"
                 android:textColorHint="@color/gray"
                 android:inputType="textEmailAddress" />
         </android.support.design.widget.TextInputLayout>
@@ -63,7 +63,7 @@
                 android:id="@+id/current_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Current Password"
+                android:hint="Current Password*"
                 android:textColorHint="@color/gray"
                 android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
@@ -78,7 +78,7 @@
                 android:id="@+id/new_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="New password"
+                android:hint="New password*"
                 android:textColorHint="@color/gray"
                 android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
@@ -93,7 +93,7 @@
                 android:id="@+id/user_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Phone Number"
+                android:hint="Phone Number*"
                 android:textColorHint="@color/gray"
                 android:inputType="phone" />
         </android.support.design.widget.TextInputLayout>
@@ -107,7 +107,7 @@
                 android:id="@+id/user_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Address"
+                android:hint="Address*"
                 android:textColorHint="@color/gray"
                 android:inputType="text" />
         </android.support.design.widget.TextInputLayout>
@@ -122,7 +122,7 @@
                 android:id="@+id/user_city"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="City"
+                android:hint="City*"
                 android:textColorHint="@color/gray"
                 android:inputType="text" />
         </android.support.design.widget.TextInputLayout>

@@ -28,7 +28,7 @@
                     android:id="@+id/item_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Title*"
+                    android:hint="@string/title"
                     android:inputType="text"/>
 
             </android.support.design.widget.TextInputLayout>
@@ -43,7 +43,7 @@
                     android:id="@+id/item_description"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:hint="Description*"
+                    android:hint="@string/description"
                     android:inputType="text" />
             </android.support.design.widget.TextInputLayout>
 
@@ -57,7 +57,7 @@
                     android:id="@+id/item_price"
                     android:layout_width="150dp"
                     android:layout_height="50dp"
-                    android:hint="Price*"
+                    android:hint="@string/price"
                     android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
 
@@ -65,7 +65,7 @@
                 android:id="@+id/deliverTime_textview"
                 android:paddingLeft="5dp"
                 android:layout_marginTop="28dp"
-                android:text="Delivery Time"
+                android:text="@string/delivery_days"
                 android:layout_below="@+id/amount_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -87,6 +87,11 @@
                 android:background="@drawable/add_image"
                 android:padding="5dp"
                 android:layout_below="@+id/deliverTime"/>
+            <TextView
+                android:layout_toLeftOf="@+id/btn_add_image"
+                android:text="select image to your product"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <HorizontalScrollView
                 android:id="@+id/hori_scroll_view"
